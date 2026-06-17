@@ -206,11 +206,14 @@ try {
                                 
                                <?php if($prod['stock'] > 0): ?>
                                     <form action="hacer-pedido.php" method="POST" class="mt-2">
-                                        <input type="hidden" name="producto_id" value="<?php echo $prod['id']; ?>">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100 py-2">
-                                            📲 Pedir por WhatsApp
-                                        </button>
-                                    </form>
+                                    <input type="hidden" name="producto_id" value="<?php echo $prod['id']; ?>">
+                                    <input type="hidden" name="tienda_id"   value="<?php echo $tienda_id; ?>">
+                                    <input type="text" name="nombre_cliente" class="form-control form-control-sm mb-2"
+                                        placeholder="Tu nombre" required>
+                                    <button type="submit" class="btn btn-primary btn-sm w-100 py-2">
+                                        📲 Pedir por WhatsApp
+                                    </button>
+                                </form>
                                 <?php else: ?>
                                     <button class="btn btn-secondary btn-sm w-100 fw-bold py-2 mt-2" disabled>❌ Agotado</button>
                                 <?php endif; ?>

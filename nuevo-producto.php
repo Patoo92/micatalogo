@@ -34,24 +34,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url_imagen_final = "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500"; // Foto por defecto por si no sube ninguna
 
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-            $nombre_archivo = $_FILES['imagen']['name'];
             $ruta_temporal = $_FILES['imagen']['tmp_name'];
-            
-            // Limpiamos el nombre del archivo para evitar problemas con espacios o caracteres raros
-            $extension = pathinfo($nombre_archivo, PATHINFO_EXTENSION);
-            $nuevo_nombre_archivo = time() . "_" . uniqid() . "." . $extension; // Ej: 171854321_666f.jpg
-            
-            $ruta_destino = "imagenes/" . $nuevo_nombre_archivo;
 
-            // Movemos el archivo desde la carpeta temporal de XAMPP a nuestra carpeta 'imagenes'
-            if (move_uploaded_file($ruta_temporal, $ruta_destino)) {
-                // Si se movió con éxito, guardamos esa ruta relativa en la variable
-                $url_imagen_final = $ruta_destino;
+            // --- VALIDACIÓN MIME REAL (no confiar en la extensión del nombre) ---
+            $TIPOS_PERMITIDOS = [
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+            ];
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime_real = $finfo->file($ruta_temporal);
+
+            if (!array_key_exists($mime_real, $TIPOS_PERMITIDOS)) {
+                $error = "Solo se permiten imágenes JPG, PNG, GIF o WEBP.";
+            } else {
+            // --- FIN VALIDACIÓN MIME ---
+
+                // Usamos la extensión del MIME real, no la del nombre original
+                $extension = $TIPOS_PERMITIDOS[$mime_real];
+                $nuevo_nombre_archivo = time() . "_" . uniqid() . "." . $extension;
+                $ruta_destino = "imagenes/" . $nuevo_nombre_archivo;
+
+                if (move_uploaded_file($ruta_temporal, $ruta_destino)) {
+                    $url_imagen_final = $ruta_destino;
+                }
             }
         }
 
-        // --- INSERTAR EN LA BASE DE DATOS ---
-        try {
+        // --- INSERTAR EN LA BASE DE DATOS (solo si no hubo error de MIME) ---
+        if (empty($error)) try {
             $sql = "INSERT INTO productos (tienda_id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, imagen_url) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);

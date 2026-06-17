@@ -12,19 +12,32 @@ $tienda_id = $_SESSION['tienda_id'];
 // 1. Recibir datos del formulario
 $instagram = $_POST['instagram'];
 $color = $_POST['color'];
-$whatsapp = $_POST['whatsapp']; // Nueva variable
+$whatsapp = $_POST['whatsapp'];
 
 // 2. Lógica para subir el Logo
 $logo_url = null;
 if (!empty($_FILES['logo']['name'])) {
+
+    // --- VALIDACIÓN MIME REAL (no confiar en la extensión del nombre) ---
+    $TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime_real = $finfo->file($_FILES['logo']['tmp_name']);
+
+    if (!in_array($mime_real, $TIPOS_PERMITIDOS)) {
+        // Rechazamos el archivo y redirigimos con error
+        header("Location: configuracion.php?error=tipo_archivo_no_permitido");
+        exit;
+    }
+    // --- FIN VALIDACIÓN MIME ---
+
     $target_dir = "uploads/";
-    // Creamos un nombre único para evitar sobrescribir logos de otras tiendas
+    // Forzamos extensión .png independientemente del nombre original
     $logo_url = $target_dir . "logo_" . $tienda_id . "_" . time() . ".png";
     move_uploaded_file($_FILES["logo"]["tmp_name"], $logo_url);
 }
 
 // 3. Actualizar la base de datos
-// Usamos COALESCE: si no se sube un nuevo logo, mantiene el que ya estaba
 $sql = "UPDATE tiendas SET 
             instagram_url = ?, 
             color_tema = ?, 

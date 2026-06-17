@@ -23,8 +23,8 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
 
         // 2. Traemos los datos del producto y la tienda para armar el mensaje de WhatsApp
         $stmtDatos = $pdo->prepare("
-            SELECT p.nombre AS producto_nombre, p.precio, t.telefono_whatsapp 
-            FROM productos p 
+            SELECT p.nombre AS producto_nombre, p.precio, t.whatsapp_number AS telefono_whatsapp
+            FROM productos p JOIN tiendas t ON p.tienda_id = t.id WHERE p.id = ?
             JOIN tiendas t ON p.tienda_id = t.id 
             WHERE p.id = ?
         ");
