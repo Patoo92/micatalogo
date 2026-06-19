@@ -2,5 +2,5 @@ RewriteEngine On
 
 # Si el usuario escribe dominio.com/nombre-tienda, el servidor lo procesa internamente como index.php?tienda=nombre-tienda
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([^/]+)$ index.php?tienda=$1 [L,QSA]

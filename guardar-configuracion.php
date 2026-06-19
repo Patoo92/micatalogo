@@ -25,24 +25,22 @@ if (!empty($_FILES['logo']['name'])) {
     $mime_real = $finfo->file($_FILES['logo']['tmp_name']);
 
     if (!in_array($mime_real, $TIPOS_PERMITIDOS)) {
-        // Rechazamos el archivo y redirigimos con error
         header("Location: configuracion.php?error=tipo_archivo_no_permitido");
         exit;
     }
     // --- FIN VALIDACIÓN MIME ---
 
     $target_dir = "uploads/";
-    // Forzamos extensión .png independientemente del nombre original
     $logo_url = $target_dir . "logo_" . $tienda_id . "_" . time() . ".png";
     move_uploaded_file($_FILES["logo"]["tmp_name"], $logo_url);
 }
 
 // 3. Actualizar la base de datos
 $sql = "UPDATE tiendas SET 
-            instagram_url = ?, 
-            color_tema = ?, 
-            whatsapp_number = ?,
-            logo_url = COALESCE(?, logo_url) 
+            instagram_url     = ?, 
+            color_tema        = ?, 
+            telefono_whatsapp = ?,
+            logo_url          = COALESCE(?, logo_url) 
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
