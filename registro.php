@@ -5,16 +5,22 @@ $error = '';
 $exito = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verificar_csrf($_POST['_csrf'] ?? '')) {
+        $error = "Solicitud inválida.";
+    } else {
     $nombre_tienda     = trim($_POST['nombre_tienda']);
     $slug              = trim($_POST['slug']);
     $usuario           = trim($_POST['usuario']);
     $password          = trim($_POST['password']);
     $password_confirm  = trim($_POST['password_confirm']);
     $telefono_whatsapp = trim($_POST['telefono_whatsapp']);
+    $email             = trim($_POST['email']);
 
-    // Validaciones básicas
     if (empty($nombre_tienda) || empty($slug) || empty($usuario) || empty($password) || empty($telefono_whatsapp)) {
         $error = "Todos los campos son obligatorios.";
+
+    } elseif (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "El email ingresado no es válido.";
 
     } elseif (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
         $error = "El slug solo puede contener letras minúsculas, números y guiones. Ej: mi-tienda";
@@ -26,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Las contraseñas no coinciden.";
 
     } else {
-        // Verificar que el slug y el usuario no estén ya en uso
         $stmtCheck = $pdo->prepare("SELECT id FROM tiendas WHERE slug = ? OR usuario = ?");
         $stmtCheck->execute([$slug, $usuario]);
 
@@ -36,13 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hash = password_hash($password, PASSWORD_BCRYPT);
 
             $stmt = $pdo->prepare("
-                INSERT INTO tiendas (nombre_tienda, slug, usuario, password, telefono_whatsapp, activo)
-                VALUES (?, ?, ?, ?, ?, 1)
+                INSERT INTO tiendas (nombre_tienda, slug, usuario, password, telefono_whatsapp, email, activo)
+                VALUES (?, ?, ?, ?, ?, ?, 1)
             ");
-            $stmt->execute([$nombre_tienda, $slug, $usuario, $hash, $telefono_whatsapp]);
+            $stmt->execute([$nombre_tienda, $slug, $usuario, $hash, $telefono_whatsapp, $email ?: null]);
 
-            $exito = "¡Tienda creada correctamente! Ya puedes <a href='login.php' class='alert-link'>iniciar sesión</a>.";
+            $_SESSION['flash_message'] = '¡Tienda creada correctamente! Ya puedes iniciar sesión.';
+            $_SESSION['flash_type'] = 'success';
+            header("Location: login.php");
+            exit;
         }
+    }
     }
 }
 ?>
@@ -123,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php else: ?>
 
         <form method="POST" action="registro.php">
+            <?php echo csrf_field(); ?>
 
             <div class="mb-3">
                 <label>Nombre de tu tienda *</label>
@@ -151,6 +161,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label>Repetir contraseña *</label>
                 <input type="password" name="password_confirm" class="form-control mt-1" placeholder="Repite la contraseña" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Email <span class="text-muted">(opcional)</span></label>
+                <input type="email" name="email" class="form-control mt-1"
+                       placeholder="Ej: sofia@ejemplo.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
             </div>
 
             <div class="mb-4">

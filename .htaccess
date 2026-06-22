@@ -1,6 +1,30 @@
 RewriteEngine On
 
-# Si el usuario escribe dominio.com/nombre-tienda, el servidor lo procesa internamente como index.php?tienda=nombre-tienda
+# Excepciones: redirigir nombres especiales sin .php
+RewriteRule ^registro$ registro.php [L,QSA]
+RewriteRule ^recuperar-admin$ recuperar-admin.php [L,QSA]
+
+# Catálogo de tienda
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^/]+)$ index.php?tienda=$1 [L,QSA]
+RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?tienda=$1 [L,QSA]
+
+# Denegar acceso a archivos sensibles
+<FilesMatch "\.(sql|md|log)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^(conexion|helpers)\.php$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteRule ^templates/ - [F,L]
+    RewriteRule ^logs/ - [F,L]
+</IfModule>
+
+# Desactivar listado de directorios
+Options -Indexes
+
+# Ocultar versión del servidor
+ServerSignature Off

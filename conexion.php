@@ -1,15 +1,19 @@
 <?php
-// Configuración de las credenciales de tu servidor local
-$host = 'localhost';
-$db   = 'catalogo_whatsapp';
-$user = 'root'; // Por defecto en XAMPP el usuario es root
-$pass = '';     // Por defecto en XAMPP la contraseña está vacía
-$charset = 'utf8mb4';
+$logDir = __DIR__ . '/logs';
+if (!is_dir($logDir)) mkdir($logDir, 0755, true);
+ini_set('log_errors', 1);
+ini_set('error_log', $logDir . '/error.log');
 
-// El "DSR" es la cadena de conexión que le dice a PHP dónde está la base de datos
+$config = require 'C:\xampp\micatalogo-config\db.php';
+
+$host    = $config['host'];
+$db      = $config['db'];
+$user    = $config['user'];
+$pass    = $config['pass'];
+$charset = $config['charset'];
+
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
-// Opciones de seguridad para que si hay un error en SQL, PHP nos avise claramente
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -17,11 +21,46 @@ $options = [
 ];
 
 try {
-    // Intentamos conectar
     $pdo = new PDO($dsn, $user, $pass, $options);
-
 } catch (\PDOException $e) {
-    // Si algo sale mal (ej: pusiste mal la contraseña), el sistema se detiene y te dice por qué
     die("Error crítico de conexión: " . $e->getMessage());
 }
-?>
+
+require_once __DIR__ . '/helpers.php';
+
+function registrar_actividad($pdo, $tienda_id, $usuario_nombre, $usuario_tipo, $accion, $detalle = null) {
+    try {
+        $stmt = $pdo->prepare("INSERT INTO actividad (tienda_id, usuario_nombre, usuario_tipo, accion, detalle) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$tienda_id, $usuario_nombre, $usuario_tipo, $accion, $detalle]);
+    } catch (PDOException $e) {}
+}
+
+function obtener_usuario_actual() {
+    if (isset($_SESSION['admin_id'])) {
+        return [
+            'nombre' => $_SESSION['admin_usuario'],
+            'tipo'   => 'superadmin',
+            'tienda_id' => null,
+        ];
+    } elseif (isset($_SESSION['staff_id'])) {
+        return [
+            'nombre' => $_SESSION['staff_usuario'],
+            'tipo'   => 'staff',
+            'tienda_id' => $_SESSION['tienda_id'],
+        ];
+    } elseif (isset($_SESSION['tienda_id'])) {
+        return [
+            'nombre' => $_SESSION['tienda_nombre'],
+            'tipo'   => 'owner',
+            'tienda_id' => $_SESSION['tienda_id'],
+        ];
+    }
+    return null;
+}
+
+function verificar_permiso($permiso) {
+    if (!isset($_SESSION['tienda_id'])) return false;
+    if (!isset($_SESSION['staff_id'])) return true;
+    $permisos = $_SESSION['staff_permisos'] ?? [];
+    return !empty($permisos[$permiso]);
+}

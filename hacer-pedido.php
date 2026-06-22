@@ -12,7 +12,6 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
     }
 
     try {
-        // 1. Insertamos el pre-pedido con estado 'Pendiente'
         $sql  = "INSERT INTO pedidos (tienda_id, producto_id, nombre_cliente, estado) VALUES (?, ?, ?, 'Pendiente')";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$tienda_id, $producto_id, $nombre_cliente]);
@@ -29,16 +28,14 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
         $stmtDatos->execute([$producto_id]);
         $datos = $stmtDatos->fetch();
 
-        // 3. Construimos el mensaje de WhatsApp
         $textoMensaje = "¡Hola! Soy " . $nombre_cliente . ". Me interesa el producto: " . $datos['producto_nombre'] . " (Precio: " . $datos['precio'] . "€). Mi código de pedido es el #" . $id_pedido;
         $urlWhatsapp  = "https://wa.me/" . preg_replace('/[^0-9]/', '', $datos['telefono_whatsapp']) . "?text=" . urlencode($textoMensaje);
 
-        // 4. Redirigimos al cliente a WhatsApp
         header("Location: " . $urlWhatsapp);
         exit;
 
     } catch (\PDOException $e) {
-        die("Error al procesar el pedido: " . $e->getMessage());
+        mostrar_error("Error al procesar", "No se pudo realizar el pedido. Intenta de nuevo.");
     }
 
 } else {

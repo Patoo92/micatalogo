@@ -6,19 +6,28 @@ if (!isset($_SESSION['tienda_id'])) {
     header("Location: login.php");
     exit;
 }
+if (!verificar_permiso('configuracion_editar')) {
+    header("Location: configuracion.php?error=permiso");
+    exit;
+}
 
 $tienda_id = $_SESSION['tienda_id'];
 
-// 1. Recibir datos del formulario
+if (!verificar_csrf($_POST['_csrf'] ?? '')) {
+    header("Location: configuracion.php?error=csrf");
+    exit;
+}
+
 $instagram = $_POST['instagram'];
 $color = $_POST['color'];
 $whatsapp = $_POST['whatsapp'];
 
-// 2. Lógica para subir el Logo
 $logo_url = null;
 if (!empty($_FILES['logo']['name'])) {
-
-    // --- VALIDACIÓN MIME REAL (no confiar en la extensión del nombre) ---
+    if ($_FILES['logo']['size'] > 2 * 1024 * 1024) {
+        header("Location: configuracion.php?error=logo_grande");
+        exit;
+    }
     $TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
     $finfo = new finfo(FILEINFO_MIME_TYPE);
@@ -28,14 +37,11 @@ if (!empty($_FILES['logo']['name'])) {
         header("Location: configuracion.php?error=tipo_archivo_no_permitido");
         exit;
     }
-    // --- FIN VALIDACIÓN MIME ---
-
     $target_dir = "uploads/";
     $logo_url = $target_dir . "logo_" . $tienda_id . "_" . time() . ".png";
     move_uploaded_file($_FILES["logo"]["tmp_name"], $logo_url);
 }
 
-// 3. Actualizar la base de datos
 $sql = "UPDATE tiendas SET 
             instagram_url     = ?, 
             color_tema        = ?, 
@@ -45,6 +51,9 @@ $sql = "UPDATE tiendas SET
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$instagram, $color, $whatsapp, $logo_url, $tienda_id]);
+
+$u = obtener_usuario_actual();
+registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la configuración de la tienda');
 
 header("Location: configuracion.php?success=1");
 exit;

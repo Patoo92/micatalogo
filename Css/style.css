@@ -8,11 +8,7 @@ html {
     border-radius: 1rem !important;
 }
 
-/* Mejora botones */
-.btn-success {
-    background-color: var(--color-principal) !important;
-    border-color: var(--color-principal) !important;
-}
+/* Mejora botones - color heredado de Bootstrap por defecto */
 
 /* Tipografía más limpia */
 body {

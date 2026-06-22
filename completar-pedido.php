@@ -6,12 +6,14 @@ if (!isset($_SESSION['tienda_id']) || !isset($_GET['id'])) {
     header("Location: login.php");
     exit;
 }
+if (!verificar_permiso('pedidos_gestionar')) {
+    mostrar_error("Acceso denegado", "No tienes permiso para gestionar pedidos.", "pedidos.php", "Volver");
+}
 
 $pedido_id = (int)$_GET['id'];
 $tienda_id = $_SESSION['tienda_id'];
 
 try {
-    // 1. Buscamos el pedido para verificar tienda y saber qué producto es
     $stmt = $pdo->prepare("SELECT producto_id, estado FROM pedidos WHERE id = ? AND tienda_id = ?");
     $stmt->execute([$pedido_id, $tienda_id]);
     $pedido = $stmt->fetch();
@@ -21,11 +23,9 @@ try {
 
         $pdo->beginTransaction();
 
-        // Acción A: Cambiar el estado del pedido a Vendido
         $stmtUpdatePedido = $pdo->prepare("UPDATE pedidos SET estado = 'Vendido' WHERE id = ?");
         $stmtUpdatePedido->execute([$pedido_id]);
 
-        // Acción B: Restar 1 unidad al stock
         $stmtUpdateStock = $pdo->prepare("UPDATE productos SET stock = stock - 1 WHERE id = ?");
         $stmtUpdateStock->execute([$producto_id]);
 
@@ -62,6 +62,10 @@ try {
         // --- FIN ALERTA ---
     }
 
+    $u = obtener_usuario_actual();
+    $nombre_producto = $producto['nombre'] ?? "ID: $producto_id";
+    registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Marcó pedido como vendido', "Pedido #$pedido_id - $nombre_producto");
+
     header("Location: pedidos.php");
     exit;
 
@@ -69,5 +73,5 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    die("Error crítico al procesar la venta: " . $e->getMessage());
+    mostrar_error("Error al procesar", "No se pudo completar la venta. Intenta de nuevo.", "pedidos.php", "Volver a pedidos");
 }

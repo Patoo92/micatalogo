@@ -2,16 +2,14 @@
 session_start();
 require_once 'conexion.php';
 
-// Solo admins autenticados
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login-admin.php");
     exit;
 }
 
-// Acción de bloquear / desbloquear
 if (isset($_GET['toggle']) && isset($_GET['id'])) {
     $tienda_id  = (int)$_GET['id'];
-    $nuevo_estado = (int)$_GET['toggle']; // 0 = bloquear, 1 = desbloquear
+    $nuevo_estado = (int)$_GET['toggle'];
 
     if ($nuevo_estado === 0 || $nuevo_estado === 1) {
         $stmt = $pdo->prepare("UPDATE tiendas SET activo = ? WHERE id = ?");
@@ -21,7 +19,24 @@ if (isset($_GET['toggle']) && isset($_GET['id'])) {
     exit;
 }
 
-// Obtener todas las tiendas con conteo de productos y pedidos
+if (isset($_GET['delete']) && isset($_GET['confirm'])) {
+    $tienda_id = (int)$_GET['delete'];
+    try {
+        $pdo->beginTransaction();
+        $pdo->exec("DELETE FROM actividad WHERE tienda_id = $tienda_id");
+        $pdo->exec("DELETE FROM store_staff WHERE tienda_id = $tienda_id");
+        $pdo->exec("DELETE FROM pedidos WHERE tienda_id = $tienda_id");
+        $pdo->exec("DELETE FROM productos WHERE tienda_id = $tienda_id");
+        $pdo->exec("DELETE FROM categorias WHERE tienda_id = $tienda_id");
+        $pdo->exec("DELETE FROM tiendas WHERE id = $tienda_id");
+        $pdo->commit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
+    }
+    header("Location: super-admin.php");
+    exit;
+}
+
 $stmt = $pdo->query("
     SELECT 
         t.id,
@@ -42,6 +57,17 @@ $tiendas = $stmt->fetchAll();
 
 $total_tiendas  = count($tiendas);
 $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
+
+$tab = $_GET['tab'] ?? 'tiendas';
+
+$stmtAct = $pdo->query("
+    SELECT a.*, t.nombre_tienda
+    FROM actividad a
+    LEFT JOIN tiendas t ON a.tienda_id = t.id
+    ORDER BY a.created_at DESC
+    LIMIT 100
+");
+$actividades = $stmtAct->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -50,6 +76,7 @@ $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin — Panel de Control</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
         body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: #e2e8f0; }
 
@@ -119,18 +146,24 @@ $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
         <div class="brand">⚙️ Super<span>Admin</span></div>
         <div class="d-flex align-items-center gap-3">
             <span style="color: #64748b; font-size: 0.85rem;">Sesión: <strong style="color:#94a3b8;"><?php echo htmlspecialchars($_SESSION['admin_usuario']); ?></strong></span>
+            <a href="backup.php" class="logout-btn" style="display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo BD</a>
             <a href="logout-admin.php" class="logout-btn">Cerrar sesión →</a>
         </div>
     </div>
 
     <div class="container-fluid py-4 px-4" style="max-width: 1100px;">
 
-        <div class="mb-4">
-            <h4 class="fw-bold" style="color: #f1f5f9;">Panel de Tiendas</h4>
-            <p style="color: #64748b; font-size: 0.9rem;">Gestiona todas las tiendas registradas en la plataforma.</p>
-        </div>
+        <ul class="nav nav-tabs border-0 mb-4" style="border-bottom: 1px solid #334155 !important;">
+            <li class="nav-item">
+                <a class="nav-link fw-semibold <?php echo $tab === 'tiendas' ? 'active' : ''; ?>" <?php echo $tab === 'tiendas' ? 'style="background:#1e293b;border-color:#334155;color:#f1f5f9;"' : 'style="color:#64748b;border-color:transparent;"'; ?> href="super-admin.php?tab=tiendas"><iconify-icon icon="mdi:store" width="18"></iconify-icon> Tiendas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link fw-semibold <?php echo $tab === 'historial' ? 'active' : ''; ?>" <?php echo $tab === 'historial' ? 'style="background:#1e293b;border-color:#334155;color:#f1f5f9;"' : 'style="color:#64748b;border-color:transparent;"'; ?> href="super-admin.php?tab=historial"><iconify-icon icon="mdi:history" width="18"></iconify-icon> Historial Global</a>
+            </li>
+        </ul>
 
-        <!-- Stats -->
+        <?php if ($tab === 'tiendas'): ?>
+
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
                 <div class="stat-card">
@@ -158,7 +191,6 @@ $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
             </div>
         </div>
 
-        <!-- Tabla de tiendas -->
         <div class="table-card">
             <div class="table-responsive">
                 <table class="table mb-0">
@@ -201,18 +233,26 @@ $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end">
+                                    <div class="d-flex gap-1 justify-content-end">
                                     <?php if ($tienda['activo']): ?>
                                         <a href="super-admin.php?toggle=0&id=<?php echo $tienda['id']; ?>"
                                            class="btn-bloquear"
-                                           onclick="return confirm('¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? El dueño no podrá acceder a su panel.');">
-                                            🔒 Bloquear
+                                           onclick="return confirm('¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?');">
+                                            🔒
                                         </a>
                                     <?php else: ?>
                                         <a href="super-admin.php?toggle=1&id=<?php echo $tienda['id']; ?>"
                                            class="btn-desbloquear">
-                                            ✅ Desbloquear
+                                            ✅
                                         </a>
                                     <?php endif; ?>
+                                        <a href="super-admin.php?delete=<?php echo $tienda['id']; ?>&confirm=1"
+                                           class="btn-bloquear"
+                                           style="border-color:rgba(239,68,68,0.3);"
+                                           onclick="return confirm('¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.');">
+                                            🗑️
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -221,6 +261,53 @@ $tiendas_activas = array_filter($tiendas, fn($t) => $t['activo'] == 1);
                 </table>
             </div>
         </div>
+
+        <?php endif; ?>
+
+        <?php if ($tab === 'historial'): ?>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tienda</th>
+                            <th>Usuario</th>
+                            <th>Tipo</th>
+                            <th>Acción</th>
+                            <th>Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($actividades)): ?>
+                            <tr><td colspan="6" class="text-center py-4" style="color: #475569;">Sin actividad registrada.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($actividades as $a): ?>
+                            <tr>
+                                <td style="font-size:0.8rem; color:#64748b; white-space:nowrap;"><?php echo $a['created_at']; ?></td>
+                                <td><?php echo htmlspecialchars($a['nombre_tienda'] ?? '—'); ?></td>
+                                <td><?php echo htmlspecialchars($a['usuario_nombre']); ?></td>
+                                <td>
+                                    <?php if ($a['usuario_tipo'] === 'owner'): ?>
+                                        <span style="color:#38bdf8;">Dueño</span>
+                                    <?php elseif ($a['usuario_tipo'] === 'staff'): ?>
+                                        <span style="color:#a78bfa;">Staff</span>
+                                    <?php else: ?>
+                                        <span style="color:#34d399;">Superadmin</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($a['accion']); ?></td>
+                                <td style="font-size:0.85rem; color:#94a3b8;"><?php echo htmlspecialchars($a['detalle'] ?? ''); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <?php endif; ?>
 
     </div>
 </body>

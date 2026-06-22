@@ -1,0 +1,115 @@
+<?php
+function ruta_imagen($tienda_id) {
+    $dir = "imagenes/{$tienda_id}";
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    return $dir;
+}
+
+function imagen_defecto() {
+    return "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500";
+}
+
+function generar_thumbnail($origen, $destino, $ancho = 300, $alto = 300) {
+    if (!file_exists($origen)) return false;
+    $info = getimagesize($origen);
+    if (!$info) return false;
+
+    list($w, $h) = $info;
+    $src = match ($info[2]) {
+        IMAGETYPE_JPEG => imagecreatefromjpeg($origen),
+        IMAGETYPE_PNG  => imagecreatefrompng($origen),
+        IMAGETYPE_WEBP => imagecreatefromwebp($origen),
+        IMAGETYPE_GIF  => imagecreatefromgif($origen),
+        default        => null,
+    };
+    if (!$src) return false;
+
+    $thumb = imagecreatetruecolor($ancho, $alto);
+    imagecopyresampled($thumb, $src, 0, 0, 0, 0, $ancho, $alto, $w, $h);
+
+    $ext = strtolower(pathinfo($destino, PATHINFO_EXTENSION));
+    match ($ext) {
+        'png'  => imagepng($thumb, $destino, 8),
+        'webp' => imagewebp($thumb, $destino, 85),
+        'gif'  => imagegif($thumb, $destino),
+        default => imagejpeg($thumb, $destino, 85),
+    };
+
+    imagedestroy($src);
+    imagedestroy($thumb);
+    return true;
+}
+
+function ip_normalizada() {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    if ($ip === '::1' || $ip === '::ffff:127.0.0.1') return '127.0.0.1';
+    return $ip;
+}
+
+function verificar_rate_limit($pdo, $tipo, $max_intentos = 5, $ventana_minutos = 15) {
+    $ip = ip_normalizada();
+    $desde = date('Y-m-d H:i:s', time() - $ventana_minutos * 60);
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND tipo = ? AND created_at >= ?");
+    $stmt->execute([$ip, $tipo, $desde]);
+    return $stmt->fetchColumn() < $max_intentos;
+}
+
+function registrar_intento_login($pdo, $tipo) {
+    $ip = ip_normalizada();
+    $stmt = $pdo->prepare("INSERT INTO login_attempts (ip_address, tipo) VALUES (?, ?)");
+    $stmt->execute([$ip, $tipo]);
+}
+
+function limpiar_intentos_login($pdo, $tipo) {
+    $ip = ip_normalizada();
+    $stmt = $pdo->prepare("DELETE FROM login_attempts WHERE ip_address = ? AND tipo = ?");
+    $stmt->execute([$ip, $tipo]);
+}
+
+function csrf_token() {
+    if (empty($_SESSION['_csrf'])) {
+        $_SESSION['_csrf'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['_csrf'];
+}
+
+function csrf_field() {
+    return '<input type="hidden" name="_csrf" value="' . csrf_token() . '">';
+}
+
+function verificar_csrf($token) {
+    if (empty($_SESSION['_csrf']) || empty($token)) return false;
+    return hash_equals($_SESSION['_csrf'], $token);
+}
+
+// Página de error amigable
+function mostrar_error($titulo, $mensaje, $enlace = null, $texto_enlace = null) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><?php echo htmlspecialchars($titulo); ?></title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { background: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, sans-serif; }
+            .error-card { background: #fff; border-radius: 20px; padding: 3rem; max-width: 480px; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; animation: fadeUp 0.3s ease; }
+            @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .error-card h2 { font-weight: 700; color: #0f172a; }
+            .error-card p { color: #64748b; }
+        </style>
+    </head>
+    <body>
+        <div class="error-card">
+            <h2><?php echo htmlspecialchars($titulo); ?></h2>
+            <p class="mb-4"><?php echo htmlspecialchars($mensaje); ?></p>
+            <?php if ($enlace): ?>
+                <a href="<?php echo htmlspecialchars($enlace); ?>" class="btn btn-primary"><?php echo htmlspecialchars($texto_enlace ?? 'Volver'); ?></a>
+            <?php endif; ?>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
