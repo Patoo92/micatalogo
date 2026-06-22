@@ -1,36 +1,35 @@
 <?php
-// Inicializamos el sistema de sesiones de PHP
 session_start();
 require_once 'conexion.php';
 
 $error = '';
 
-// Si el usuario ya está logueado, lo mandamos directo al panel de control
 if (isset($_SESSION['tienda_id'])) {
     header("Location: admin.php");
     exit;
 }
 
-// Verificamos si el dueño envió el formulario de acceso
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = trim($_POST['usuario']);
+    $usuario  = trim($_POST['usuario']);
     $password = trim($_POST['password']);
 
     if (!empty($usuario) && !empty($password)) {
-        // Buscamos si existe una tienda con ese usuario
-        $stmt = $pdo->prepare("SELECT id, nombre_tienda, password FROM tiendas WHERE usuario = ?");
+        $stmt = $pdo->prepare("SELECT id, nombre_tienda, password, activo FROM tiendas WHERE usuario = ?");
         $stmt->execute([$usuario]);
         $tienda = $stmt->fetch();
 
-
         if ($tienda && password_verify($password, $tienda['password'])) {
-            // ¡Contraseña correcta! Guardamos los datos en la Sesión del servidor
-            $_SESSION['tienda_id'] = $tienda['id'];
-            $_SESSION['tienda_nombre'] = $tienda['nombre_tienda'];
 
-            // Lo redirigimos al panel de administración
-            header("Location: admin.php");
-            exit;
+            // Verificar si la tienda está bloqueada
+            if ($tienda['activo'] == 0) {
+                $error = "Tu cuenta está suspendida. Contacta con soporte para reactivarla.";
+            } else {
+                $_SESSION['tienda_id']     = $tienda['id'];
+                $_SESSION['tienda_nombre'] = $tienda['nombre_tienda'];
+                header("Location: admin.php");
+                exit;
+            }
+
         } else {
             $error = "Usuario o contraseña incorrectos.";
         }
@@ -78,6 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Ingresar al Panel →
             </button>
         </form>
+
+        <p class="text-center text-muted mt-3" style="font-size: 0.85rem;">
+            ¿No tienes tienda? <a href="registro.php" style="color: #10b981;">Crear cuenta gratis</a>
+        </p>
     </div>
 
 </body>

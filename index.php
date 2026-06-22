@@ -17,6 +17,11 @@ try {
         die("La tienda '" . htmlspecialchars($slug_tienda) . "' no existe.");
     }
 
+    if ($tienda['activo'] == 0) {
+        header("HTTP/1.0 403 Forbidden");
+        die("Esta tienda está temporalmente suspendida.");
+    }
+
     $tienda_id = $tienda['id'];
 
     $stmtCat = $pdo->prepare("SELECT * FROM categorias WHERE tienda_id = ?");
