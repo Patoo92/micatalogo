@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'conexion.php';
+require_once 'email_helper.php';
 
 $mensaje = '';
 
@@ -10,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email = trim($_POST['email']);
 
-        $stmt = $pdo->prepare("SELECT id, nombre_tienda FROM tiendas WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, nombre_tienda, usuario FROM tiendas WHERE email = ?");
         $stmt->execute([$email]);
         $tienda = $stmt->fetch();
 
@@ -19,12 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO password_resets (email, token) VALUES (?, ?)");
             $stmt->execute([$email, $token]);
 
-            $link = "reset-password.php?token=" . urlencode($token);
-            $mensaje = '<div class="alert alert-success">
-                <strong>Enlace de recuperación generado:</strong><br>
-                <a href="' . $link . '">' . $link . '</a>
-                <br><small class="text-muted">En producción este enlace se envía por email.</small>
-            </div>';
+            $link = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/micatalogo/reset-password.php?token=' . urlencode($token);
+            $cuerpo = '<h2>Recuperación de contraseña</h2>
+                <p>Hola <strong>' . htmlspecialchars($tienda['nombre_tienda']) . '</strong>,</p>
+                <p>Recibimos una solicitud para restablecer tu contraseña. Hacé clic en el botón de abajo:</p>
+                <p style="text-align:center;margin:30px 0;">
+                    <a href="' . $link . '" style="background:#10b981;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Restablecer Contraseña</a>
+                </p>
+                <p>Si no solicitaste esto, ignorá este mensaje.</p>
+                <hr><small style="color:#94a3b8;">micatalogo.app — tu tienda online</small>';
+
+            if (enviar_email($email, 'Recupera tu contraseña de ' . $tienda['nombre_tienda'], $cuerpo)) {
+                $mensaje = '<div class="alert alert-success"><strong>Correo enviado.</strong> Revisá tu bandeja de entrada (y la carpeta de spam).</div>';
+            } else {
+                $mensaje = '<div class="alert alert-warning">
+                    <strong>No se pudo enviar el email.</strong> Configurá SMTP en <code>micatalogo-config/email.php</code>.<br>
+                    Mientras tanto, usá este enlace directo:<br>
+                    <a href="' . $link . '">' . $link . '</a>
+                </div>';
+            }
         } else {
             $mensaje = '<div class="alert alert-danger">No hay ninguna cuenta registrada con ese email.</div>';
         }

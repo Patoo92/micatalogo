@@ -1,1 +1,1 @@
-{"version":2,"defects":[],"times":{"HelpersTest::testRutaImagenCreaDirectorio":0.002,"HelpersTest::testImagenDefecto":0,"HelpersTest::testVerificarRateLimitSinIntentos":0.006,"HelpersTest::testGenerarThumbnailConArchivoInexistente":0}}
+{"version":2,"defects":[],"times":{"HelpersTest::testRutaImagenCreaDirectorio":0.002,"HelpersTest::testImagenDefecto":0,"HelpersTest::testVerificarRateLimitSinIntentos":0.005,"HelpersTest::testGenerarThumbnailConArchivoInexistente":0}}

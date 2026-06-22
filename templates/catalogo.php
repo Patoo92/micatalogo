@@ -159,44 +159,53 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let carrito = JSON.parse(localStorage.getItem('carrito_' + <?php echo $tienda_id; ?>)) || [];
+let carritoData = [];
 const whatsappNum = '<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>';
 
 function guardarCarrito() {
     localStorage.setItem('carrito_' + <?php echo $tienda_id; ?>, JSON.stringify(carrito));
 }
 
-function actualizarUI() {
-    const total = carrito.reduce((s, i) => s + i.cant, 0);
+function actualizarBadge() {
+    const total = carrito.reduce((s, i) => s + i.c, 0);
     const badge = document.getElementById('cartBadgeNav');
-    if (total > 0) {
-        badge.style.display = 'inline';
-        badge.textContent = total;
-    } else {
-        badge.style.display = 'none';
-    }
+    if (total > 0) { badge.style.display = 'inline'; badge.textContent = total; }
+    else { badge.style.display = 'none'; }
+}
+
+function cargarCarrito() {
+    const ids = carrito.map(i => i.id).join(',');
+    if (!ids) { carritoData = []; renderCarrito(); return; }
+    fetch('api-productos.php?ids=' + ids)
+        .then(r => r.json())
+        .then(data => { carritoData = data; renderCarrito(); });
+}
+
+function renderCarrito() {
     const container = document.getElementById('cartItems');
     const footer = document.getElementById('cartFooter');
     const empty = document.getElementById('cartEmpty');
     if (carrito.length === 0) {
-        empty.style.display = 'block';
-        footer.classList.add('d-none');
+        empty.style.display = 'block'; footer.classList.add('d-none');
         container.querySelectorAll('.cart-item').forEach(el => el.remove());
         return;
     }
-    empty.style.display = 'none';
-    footer.classList.remove('d-none');
+    empty.style.display = 'none'; footer.classList.remove('d-none');
     container.querySelectorAll('.cart-item').forEach(el => el.remove());
     let html = '';
-    carrito.forEach((item, idx) => {
+    carrito.forEach(item => {
+        const prod = carritoData.find(p => p.id === item.id);
+        if (!prod) return;
+        const subtotal = (prod.precio * item.c).toFixed(2);
         html += '<div class="cart-item">';
-        html += '<img src="' + item.img + '" alt="' + item.nombre + '">';
-        html += '<div class="flex-grow-1"><div class="fw-bold small">' + item.nombre + '</div><small class="text-success fw-bold">' + item.precio.toFixed(2) + ' €</small></div>';
+        html += '<img src="' + prod.imagen + '" alt="' + prod.nombre + '">';
+        html += '<div class="flex-grow-1"><div class="fw-bold small">' + prod.nombre + '</div><small class="text-success fw-bold">' + prod.precio.toFixed(2) + ' €</small></div>';
         html += '<div class="d-flex align-items-center gap-1">';
-        html += '<button class="qty-btn" onclick="cambiarCant(' + idx + ', -1)">−</button>';
-        html += '<span class="fw-bold mx-1" style="min-width:20px;text-align:center;">' + item.cant + '</span>';
-        html += '<button class="qty-btn" onclick="cambiarCant(' + idx + ', 1)">+</button>';
+        html += '<button class="qty-btn" onclick="cambiarCant(' + item.id + ', -1)">−</button>';
+        html += '<span class="fw-bold mx-1" style="min-width:20px;text-align:center;">' + item.c + '</span>';
+        html += '<button class="qty-btn" onclick="cambiarCant(' + item.id + ', 1)">+</button>';
         html += '</div>';
-        html += '<button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarDelCarrito(' + idx + ')"><iconify-icon icon="mdi:close" width="16"></iconify-icon></button>';
+        html += '<button class="btn btn-sm btn-outline-danger border-0" onclick="eliminarDelCarrito(' + item.id + ')"><iconify-icon icon="mdi:close" width="16"></iconify-icon></button>';
         html += '</div>';
     });
     container.insertAdjacentHTML('beforeend', html);
@@ -204,13 +213,10 @@ function actualizarUI() {
 
 function agregarAlCarrito(id, nombre, precio, img) {
     const idx = carrito.findIndex(i => i.id === id);
-    if (idx >= 0) {
-        carrito[idx].cant += 1;
-    } else {
-        carrito.push({ id, nombre, precio, img, cant: 1 });
-    }
+    if (idx >= 0) { carrito[idx].c += 1; }
+    else { carrito.push({ id, c: 1 }); }
     guardarCarrito();
-    actualizarUI();
+    actualizarBadge();
     const toastEl = document.getElementById('cartToast');
     toastEl.classList.remove('text-bg-danger');
     toastEl.classList.add('text-bg-success');
@@ -218,49 +224,47 @@ function agregarAlCarrito(id, nombre, precio, img) {
     bootstrap.Toast.getOrCreateInstance(toastEl).show();
 }
 
-function cambiarCant(idx, delta) {
-    carrito[idx].cant += delta;
-    if (carrito[idx].cant <= 0) {
-        carrito.splice(idx, 1);
-    }
-    guardarCarrito();
-    actualizarUI();
+function cambiarCant(id, delta) {
+    const item = carrito.find(i => i.id === id);
+    if (!item) return;
+    item.c += delta;
+    if (item.c <= 0) { carrito = carrito.filter(i => i.id !== id); }
+    guardarCarrito(); actualizarBadge(); cargarCarrito();
 }
 
-function eliminarDelCarrito(idx) {
-    carrito.splice(idx, 1);
-    guardarCarrito();
-    actualizarUI();
+function eliminarDelCarrito(id) {
+    carrito = carrito.filter(i => i.id !== id);
+    guardarCarrito(); actualizarBadge(); cargarCarrito();
 }
 
 function toggleCart() {
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas'));
-    if (offcanvas) offcanvas.show();
-    else new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')).show();
+    if (offcanvas) offcanvas.show(); else new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')).show();
+    cargarCarrito();
 }
 
 function enviarWhatsApp() {
     const nombre = document.getElementById('cartNombre').value.trim();
-    if (!nombre) {
-        document.getElementById('cartNombre').classList.add('is-invalid');
-        return;
-    }
+    if (!nombre) { document.getElementById('cartNombre').classList.add('is-invalid'); return; }
     document.getElementById('cartNombre').classList.remove('is-invalid');
     if (!whatsappNum) { alert('La tienda no tiene WhatsApp configurado.'); return; }
     let msg = 'Hola, soy *' + nombre + '* y quiero pedir:\n';
+    let total = 0;
     carrito.forEach(item => {
-        msg += '\n• ' + item.nombre + ' x' + item.cant + ' = ' + (item.precio * item.cant).toFixed(2) + '€';
+        const prod = carritoData.find(p => p.id === item.id);
+        if (!prod) return;
+        msg += '\n• ' + prod.nombre + ' x' + item.c + ' = ' + (prod.precio * item.c).toFixed(2) + '€';
+        total += prod.precio * item.c;
     });
-    const total = carrito.reduce((s, i) => s + i.precio * i.cant, 0);
     msg += '\n\n*Total: ' + total.toFixed(2) + '€*';
     localStorage.removeItem('carrito_' + <?php echo $tienda_id; ?>);
-    carrito = [];
-    actualizarUI();
+    carrito = []; carritoData = [];
+    actualizarBadge(); renderCarrito();
     bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide();
     window.open('https://wa.me/' + whatsappNum + '?text=' + encodeURIComponent(msg), '_blank');
 }
 
-actualizarUI();
+actualizarBadge();
 </script>
 </body>
 </html>
