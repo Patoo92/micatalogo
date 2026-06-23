@@ -25,6 +25,8 @@ try {
 
     if ($pedido && $pedido['estado'] === 'Pendiente') {
         $producto_id = $pedido['producto_id'];
+        $nombre_cliente = $pedido['nombre_cliente'];
+        $email_cliente_pedido = $pedido['email_cliente'];
 
         $stmtUpdatePedido = $pdo->prepare("UPDATE pedidos SET estado = 'Vendido' WHERE id = ?");
         $stmtUpdatePedido->execute([$pedido_id]);
@@ -64,20 +66,20 @@ try {
             }
         }
 
-        if (!empty($pedido['email_cliente']) && $producto) {
+        if (!empty($email_cliente_pedido) && $producto) {
             $stmtTiendaMail = $pdo->prepare("SELECT nombre_tienda FROM tiendas WHERE id = ?");
             $stmtTiendaMail->execute([$tienda_id]);
             $tiendaInfo = $stmtTiendaMail->fetch();
 
             if ($tiendaInfo) {
                 $asunto = "✅ Pedido Completado - " . $producto['nombre'];
-                $mensaje = "Hola " . htmlspecialchars($pedido['nombre_cliente']) . ",<br><br>";
+                $mensaje = "Hola " . htmlspecialchars($nombre_cliente) . ",<br><br>";
                 $mensaje .= "Tu pedido de <strong>" . htmlspecialchars($producto['nombre']) . "</strong> ha sido completado.<br><br>";
                 $mensaje .= "Gracias por tu compra.<br><br>";
                 $mensaje .= "Saludos,<br>" . htmlspecialchars($tiendaInfo['nombre_tienda']);
 
                 $from = !empty($_SESSION['marca_blanca']) ? $tiendaInfo['nombre_tienda'] : null;
-                enviar_email($pedido['email_cliente'], $asunto, $mensaje, $from);
+                enviar_email($email_cliente_pedido, $asunto, $mensaje, $from);
             }
         }
     }

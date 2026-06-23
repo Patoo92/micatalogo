@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Panel de Administración - <?php echo htmlspecialchars($tienda_nombre); ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .navbar-admin { background: linear-gradient(135deg, #1e293b, #0f172a) !important; }
-        .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
-        .card-admin { border: none; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); transition: box-shadow 0.2s; }
-        .card-admin:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-        .table-admin thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-        .badge-stock { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
-        .btn-action { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 0; }
-        iconify-icon { vertical-align: -2px; display: inline-flex; }
-        .toast-container-custom { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        body { font-family: 'Inter', sans-serif; }
         @media (max-width: 991.98px) {
             .navbar-collapse .d-flex { flex-direction: column; width: 100%; gap: 0.5rem !important; }
             .navbar-collapse .d-flex .btn { width: 100%; }
@@ -26,25 +19,11 @@
 </head>
 <body class="bg-light">
 
-    <div class="toast-container-custom">
-        <div id="flashToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500">
-            <div class="d-flex">
-                <div id="flashToastBody" class="toast-body d-flex align-items-center gap-2"></div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
+    <?php require __DIR__ . '/toast_partial.php'; ?>
 
-    <script nonce="<?= $csp_nonce ?>">
     <?php if ($flash_message): ?>
-    window.addEventListener('DOMContentLoaded', function() {
-        var toastEl = document.getElementById('flashToast');
-        toastEl.classList.add('text-bg-<?php echo in_array($flash_type, ['success','danger','warning','info']) ? $flash_type : 'info'; ?>');
-        document.getElementById('flashToastBody').innerHTML = '<iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'alert-circle'; ?>" width="20"></iconify-icon> <?php echo js_escape($flash_message); ?>';
-        bootstrap.Toast.getOrCreateInstance(toastEl).show();
-    });
+    <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($flash_message); ?>, '<?php echo in_array($flash_type, ['success','danger','warning','info']) ? $flash_type : 'info'; ?>'); });</script>
     <?php endif; ?>
-    </script>
 
     <?php if ($total_critico > 0): ?>
     <div class="container mt-3" style="max-width: 900px;">
@@ -58,23 +37,44 @@
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($trial_ends_at) && $trial_ends_at >= date('Y-m-d')): 
+        $dias_restantes = (strtotime($trial_ends_at) - time()) / 86400;
+        $dias_mostrar = max(0, (int)ceil($dias_restantes));
+        $trial_tipo = $dias_mostrar <= 1 ? 'danger' : ($dias_mostrar <= 2 ? 'warning' : 'info');
+    ?>
+    <div class="container mt-3" style="max-width: 900px;">
+        <div class="alert alert-<?php echo $trial_tipo; ?> d-flex align-items-center justify-content-between py-2 mb-0" style="border-radius: 12px;">
+            <div class="d-flex align-items-center gap-2">
+                <iconify-icon icon="mdi:clock-outline" width="18"></iconify-icon>
+                <strong>Período de prueba:</strong> te quedan <strong><?php echo $dias_mostrar; ?> día<?php echo $dias_mostrar !== 1 ? 's' : ''; ?></strong> de prueba.
+                <?php if ($_SESSION['plan'] !== 'starter'): ?>
+                Al finalizar pasarás al plan Starter.
+                <?php endif; ?>
+            </div>
+            <a href="configuracion.php#plan" class="btn btn-sm btn-outline-<?php echo $trial_tipo; ?> fw-bold">Ver detalles del plan</a>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
             <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
             <?php echo htmlspecialchars($tienda_nombre); ?>
+            <span class="badge bg-<?php echo $_SESSION['plan'] === 'business' ? 'warning' : ($_SESSION['plan'] === 'pro' ? 'primary' : 'secondary'); ?> text-dark fw-normal" style="font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;"><?php echo htmlspecialchars($_SESSION['plan']); ?></span>
         </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="adminNav">
             <div class="d-flex gap-2 flex-wrap justify-content-end">
-                <a href="admin.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
-                <a href="pedidos.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
-                <a href="staff.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:account-group" width="16"></iconify-icon> Staff</a>
-                <a href="historial.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:history" width="16"></iconify-icon> Historial</a>
+                <a href="index.php?tienda=<?php echo htmlspecialchars($_SESSION['tienda_slug']); ?>" target="_blank" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:eye" width="16"></iconify-icon> Ver tienda</a>
+                <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
+                <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
+                <a href="staff.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:account-group" width="16"></iconify-icon> Staff</a>
+                <a href="historial.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:history" width="16"></iconify-icon> Historial</a>
                 <a href="configuracion.php" class="btn btn-sm btn-primary btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
-                <a href="backup.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo</a>
+                <a href="backup.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo</a>
                 <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
             </div>
         </div>
@@ -88,6 +88,14 @@
             </div>
             <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
         </div>
+
+        <?php if (count($productos) === 0): ?>
+        <div class="text-center py-5 empty-state">
+            <iconify-icon icon="mdi:package-variant-closed" width="48"></iconify-icon>
+            <p>No hay productos todavía. ¡Creá el primero!</p>
+            <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon mt-2"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
+        </div>
+        <?php else: ?>
 
         <div class="d-md-none">
     <?php foreach ($productos as $prod): ?>
@@ -164,6 +172,7 @@
                 </table>
             </div>
         </div>
+        <?php endif; ?>
 
         <?php if ($total_paginas > 1): ?>
         <nav class="mt-4 d-flex justify-content-center">

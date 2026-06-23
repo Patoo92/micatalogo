@@ -37,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtDel->execute([$tienda_id]);
         $stmtDel = $pdo->prepare("DELETE FROM productos WHERE tienda_id = ?");
         $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM api_keys WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
         $stmtDel = $pdo->prepare("DELETE FROM categorias WHERE tienda_id = ?");
         $stmtDel->execute([$tienda_id]);
         $stmtDel = $pdo->prepare("DELETE FROM tiendas WHERE id = ?");
@@ -47,7 +49,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     header("Location: super-admin.php");
     exit;
-}
+    }
+
+    if (isset($_POST['cambiar_plan']) && isset($_POST['id'])) {
+        $tienda_id = (int)$_POST['id'];
+        $nuevo_plan = $_POST['nuevo_plan'] ?? 'starter';
+        $planes_validos = ['starter', 'pro', 'business', 'enterprise'];
+        if (in_array($nuevo_plan, $planes_validos)) {
+            $stmt = $pdo->prepare("UPDATE tiendas SET plan = ? WHERE id = ?");
+            $stmt->execute([$nuevo_plan, $tienda_id]);
+        }
+        header("Location: super-admin.php");
+        exit;
+    }
+
+    if (isset($_POST['extender_trial']) && isset($_POST['id'])) {
+        $tienda_id = (int)$_POST['id'];
+        $dias = max(1, min(365, (int)($_POST['dias_trial'] ?? 3)));
+        $nueva_fecha = date('Y-m-d', strtotime("+$dias days"));
+        $stmt = $pdo->prepare("UPDATE tiendas SET trial_ends_at = ? WHERE id = ?");
+        $stmt->execute([$nueva_fecha, $tienda_id]);
+        header("Location: super-admin.php");
+        exit;
+    }
 }
 
 $stmt = $pdo->query("
@@ -56,8 +80,12 @@ $stmt = $pdo->query("
         t.nombre_tienda,
         t.slug,
         t.usuario,
+        t.email,
         t.telefono_whatsapp,
         t.activo,
+        t.plan,
+        t.trial_ends_at,
+        t.marca_blanca,
         COUNT(DISTINCT p.id)  AS total_productos,
         COUNT(DISTINCT pe.id) AS total_pedidos
     FROM tiendas t
@@ -88,6 +116,7 @@ $actividades = $stmtAct->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin — Panel de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
@@ -212,9 +241,11 @@ $actividades = $stmtAct->fetchAll();
                             <th>#</th>
                             <th>Tienda</th>
                             <th>Usuario</th>
-                            <th>WhatsApp</th>
-                            <th class="text-center">Productos</th>
-                            <th class="text-center">Pedidos</th>
+                            <th>Email</th>
+                            <th>Plan</th>
+                            <th>Trial</th>
+                            <th class="text-center">Prod.</th>
+                            <th class="text-center">Ped.</th>
                             <th class="text-center">Estado</th>
                             <th class="text-end">Acción</th>
                         </tr>
@@ -222,7 +253,8 @@ $actividades = $stmtAct->fetchAll();
                     <tbody>
                         <?php if (empty($tiendas)): ?>
                             <tr>
-                                <td colspan="8" class="text-center py-4" style="color: #475569;">
+                                <td colspan="10" class="text-center py-4" style="color: #475569;">
+                                    <iconify-icon icon="mdi:store-off" width="24" style="opacity:0.5;"></iconify-icon><br>
                                     No hay tiendas registradas aún.
                                 </td>
                             </tr>
@@ -235,7 +267,20 @@ $actividades = $stmtAct->fetchAll();
                                     <a href="index.php?tienda=<?php echo $tienda['slug']; ?>" target="_blank" class="slug-link">/<?php echo $tienda['slug']; ?></a>
                                 </td>
                                 <td><?php echo htmlspecialchars($tienda['usuario']); ?></td>
-                                <td style="font-size: 0.85rem;"><?php echo htmlspecialchars($tienda['telefono_whatsapp'] ?? '—'); ?></td>
+                                <td style="font-size:0.8rem;color:#94a3b8;"><?php echo htmlspecialchars($tienda['email'] ?? '—'); ?></td>
+                                <td>
+                                    <span class="badge-custom" style="background:rgba(56,189,248,0.1);color:#38bdf8;border-color:rgba(56,189,248,0.3);text-transform:uppercase;"><?php echo htmlspecialchars($tienda['plan'] ?? 'starter'); ?></span>
+                                </td>
+                                <td style="font-size:0.8rem;color:#94a3b8;">
+                                    <?php if (!empty($tienda['trial_ends_at'])): ?>
+                                        <?php echo $tienda['trial_ends_at']; ?>
+                                        <?php if ($tienda['trial_ends_at'] < date('Y-m-d')): ?>
+                                            <span style="color:#f87171;">(vencido)</span>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        —
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-center"><?php echo $tienda['total_productos']; ?></td>
                                 <td class="text-center"><?php echo $tienda['total_pedidos']; ?></td>
                                 <td class="text-center">
@@ -245,28 +290,45 @@ $actividades = $stmtAct->fetchAll();
                                         <span class="badge-custom badge-bloqueada">● Bloqueada</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-end">
-                                    <div class="d-flex gap-1 justify-content-end">
+                                <td class="text-end" style="min-width:200px;">
+                                    <div class="d-flex gap-1 justify-content-end flex-wrap">
                                     <?php if ($tienda['activo']): ?>
                                         <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?">
                                             <input type="hidden" name="toggle" value="0">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-bloquear" style="border:none;cursor:pointer;">🔒</button>
+                                            <button type="submit" class="btn-bloquear" style="border:none;cursor:pointer;" title="Bloquear">🔒</button>
                                         </form>
                                     <?php else: ?>
                                         <form method="POST" action="super-admin.php" class="d-inline">
                                             <input type="hidden" name="toggle" value="1">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-desbloquear" style="border:none;cursor:pointer;">✅</button>
+                                            <button type="submit" class="btn-desbloquear" style="border:none;cursor:pointer;" title="Desbloquear">✅</button>
                                         </form>
                                     <?php endif; ?>
+                                        <form method="POST" action="super-admin.php" class="d-inline">
+                                            <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <select name="nuevo_plan" class="form-select d-inline" style="width:auto;font-size:0.75rem;padding:2px 6px;background:#1e293b;color:#cbd5e1;border-color:#334155;">
+                                                <option value="starter" <?php echo ($tienda['plan'] ?? '') === 'starter' ? 'selected' : ''; ?>>Starter</option>
+                                                <option value="pro" <?php echo ($tienda['plan'] ?? '') === 'pro' ? 'selected' : ''; ?>>Pro</option>
+                                                <option value="business" <?php echo ($tienda['plan'] ?? '') === 'business' ? 'selected' : ''; ?>>Business</option>
+                                                <option value="enterprise" <?php echo ($tienda['plan'] ?? '') === 'enterprise' ? 'selected' : ''; ?>>Enterprise</option>
+                                            </select>
+                                            <button type="submit" name="cambiar_plan" class="btn-desbloquear" style="border:none;cursor:pointer;font-size:0.75rem;padding:2px 8px;" title="Cambiar plan">⇄</button>
+                                        </form>
+                                        <form method="POST" action="super-admin.php" class="d-inline">
+                                            <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <input type="number" name="dias_trial" value="7" min="1" max="365" style="width:40px;font-size:0.7rem;padding:2px 4px;background:#1e293b;color:#cbd5e1;border:1px solid #334155;border-radius:4px;">
+                                            <button type="submit" name="extender_trial" class="btn-desbloquear" style="border:none;cursor:pointer;font-size:0.75rem;padding:2px 8px;" title="Extender trial">⏱️</button>
+                                        </form>
                                         <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.">
                                             <input type="hidden" name="delete" value="<?php echo $tienda['id']; ?>">
                                             <input type="hidden" name="confirm" value="1">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-bloquear" style="border-color:rgba(239,68,68,0.3);border:none;cursor:pointer;">🗑️</button>
+                                            <button type="submit" class="btn-bloquear" style="border-color:rgba(239,68,68,0.3);border:none;cursor:pointer;" title="Eliminar">🗑️</button>
                                         </form>
                                     </div>
                                 </td>
@@ -297,7 +359,7 @@ $actividades = $stmtAct->fetchAll();
                     </thead>
                     <tbody>
                         <?php if (empty($actividades)): ?>
-                            <tr><td colspan="6" class="text-center py-4" style="color: #475569;">Sin actividad registrada.</td></tr>
+                            <tr><td colspan="6" class="text-center py-4" style="color: #475569;"><iconify-icon icon="mdi:history" width="24" style="opacity:0.5;"></iconify-icon><br>Sin actividad registrada.</td></tr>
                         <?php else: ?>
                             <?php foreach ($actividades as $a): ?>
                             <tr>

@@ -56,15 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cambiar Contraseña</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        .navbar-admin { background: linear-gradient(135deg, #1e293b, #0f172a) !important; }
-        .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        iconify-icon { display: inline-flex; vertical-align: -2px; }
-        .toast-container-custom { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        body { font-family: 'Inter', sans-serif; }
         .input-wrapper { position: relative; }
         .password-toggle {
             position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -75,39 +72,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="bg-light">
 
-    <div class="toast-container-custom">
-        <div id="crudToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500">
-            <div class="d-flex">
-                <div id="toastBody" class="toast-body d-flex align-items-center gap-2"></div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
+    <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
-    <script nonce="<?= $csp_nonce ?>">
-    function mostrarToastAdmin(mensaje, tipo) {
-        var el = document.getElementById('crudToast');
-        el.className = 'toast align-items-center border-0 show text-bg-' + tipo;
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:' + (tipo === 'success' ? 'check-circle' : 'alert-circle') + '" width="20"></iconify-icon> ' + mensaje;
-        setTimeout(function() { el.classList.remove('show'); }, 3000);
-    }
     <?php if ($exito): ?>
-    window.addEventListener('DOMContentLoaded', function() { mostrarToastAdmin(<?php echo js_escape($exito); ?>, 'success'); });
+    <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($exito); ?>, 'success'); });</script>
     <?php elseif ($error): ?>
-    window.addEventListener('DOMContentLoaded', function() { mostrarToastAdmin(<?php echo js_escape($error); ?>, 'danger'); });
+    <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
-    </script>
 
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
                 <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <div class="d-flex gap-2">
-                <a href="admin.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
-                <a href="pedidos.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
-                <a href="configuracion.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
+                <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
+                <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
+                <a href="configuracion.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
                 <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
             </div>
         </div>
@@ -150,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 btn-icon py-2">
+                <button type="submit" class="btn btn-primary w-100 btn-icon py-2" data-loading="Guardando…">
                     <iconify-icon icon="mdi:content-save" width="18"></iconify-icon> Guardar Cambios
                 </button>
             </form>

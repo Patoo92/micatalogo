@@ -1,4 +1,7 @@
 <?php
+if (defined('HELPERS_LOADED')) return;
+define('HELPERS_LOADED', true);
+
 function ruta_imagen($tienda_id) {
     $dir = "imagenes/{$tienda_id}";
     if (!is_dir($dir)) mkdir($dir, 0755, true);
@@ -27,10 +30,10 @@ function generar_thumbnail($origen, $destino, $ancho = 300, $alto = 300) {
 
     list($w, $h) = $info;
     $src = match ($info[2]) {
-        IMAGETYPE_JPEG => imagecreatefromjpeg($origen),
-        IMAGETYPE_PNG  => imagecreatefrompng($origen),
-        IMAGETYPE_WEBP => imagecreatefromwebp($origen),
-        IMAGETYPE_GIF  => imagecreatefromgif($origen),
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($origen),
+        IMAGETYPE_PNG  => @imagecreatefrompng($origen),
+        IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($origen) : null,
+        IMAGETYPE_GIF  => @imagecreatefromgif($origen),
         default        => null,
     };
     if (!$src) return false;
@@ -111,6 +114,26 @@ function _getenv($key, $default = '') {
 function _env_path($key, $default = '') {
     $val = getenv($key);
     return $val !== false && $val !== '' ? rtrim($val, '\\/') . '/' : $default;
+}
+
+function plan_limite($caracteristica) {
+    $planes = [
+        'starter'   => ['staff' => 1, 'tiendas' => 1, 'api_keys' => 0,  'marca_blanca' => false],
+        'pro'       => ['staff' => 3, 'tiendas' => 1, 'api_keys' => 1,  'marca_blanca' => false],
+        'business'  => ['staff' => 10,'tiendas' => 3, 'api_keys' => 5,  'marca_blanca' => true],
+        'enterprise'=> ['staff' => 999,'tiendas' => 999,'api_keys' => 999,'marca_blanca' => true],
+    ];
+    $plan = $_SESSION['plan'] ?? 'starter';
+    return $planes[$plan][$caracteristica] ?? 0;
+}
+
+function verificar_limite_plan($caracteristica, $actual, $titulo = 'Límite del plan') {
+    $maximo = plan_limite($caracteristica);
+    if ($actual >= $maximo) {
+        $plan = ucfirst($_SESSION['plan'] ?? 'starter');
+        $mensaje = "Tu plan <strong>$plan</strong> permite hasta <strong>$maximo</strong> " . htmlspecialchars($caracteristica) . ". Actualizá tu plan para ampliarlo.";
+        mostrar_error($titulo, $mensaje, 'configuracion.php', 'Ver planes');
+    }
 }
 
 // Página de error amigable

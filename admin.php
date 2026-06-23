@@ -36,5 +36,9 @@ $productos = $stmt->fetchAll();
 
 $stock_critico = array_filter($productos, fn($p) => $p['stock'] <= $p['stock_minimo']);
 $total_critico = count($stock_critico);
+
+$stmtTrial = $pdo->prepare("SELECT trial_ends_at FROM tiendas WHERE id = ?");
+$stmtTrial->execute([$tienda_id]);
+$trial_ends_at = $stmtTrial->fetchColumn();
 ?>
 <?php require __DIR__ . '/templates/admin_body.php';

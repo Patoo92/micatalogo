@@ -27,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generar_api_key'])) {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> Solicitud inválida.</div>';
     } else {
+        $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM api_keys WHERE tienda_id = ?");
+        $stmtCount->execute([$tienda_id]);
+        verificar_limite_plan('api_keys', (int)$stmtCount->fetchColumn(), 'Límite de API Keys');
         $nueva_key = 'mca_' . bin2hex(random_bytes(32));
         $nombre_key = trim($_POST['nombre_key'] ?? 'API v1');
         $stmt = $pdo->prepare("INSERT INTO api_keys (tienda_id, api_key, nombre) VALUES (?, ?, ?)");

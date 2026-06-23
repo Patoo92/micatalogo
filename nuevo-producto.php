@@ -92,43 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Añadir Nuevo Producto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .toast-container-custom { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        body { font-family: 'Inter', sans-serif; }
         iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
 <body class="bg-light">
 
-    <div class="toast-container-custom">
-        <div id="crudToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500">
-            <div class="d-flex">
-                <div id="toastBody" class="toast-body d-flex align-items-center gap-2"></div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
+    <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
-    <script nonce="<?= $csp_nonce ?>">
     <?php if (!empty($exito)): ?>
-    window.addEventListener('DOMContentLoaded', function() {
-        var toastEl = document.getElementById('crudToast');
-        toastEl.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
-        bootstrap.Toast.getOrCreateInstance(toastEl).show();
-    });
+    <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($exito); ?>, 'success'); });</script>
     <?php elseif (!empty($error)): ?>
-    window.addEventListener('DOMContentLoaded', function() {
-        var toastEl = document.getElementById('crudToast');
-        toastEl.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
-        bootstrap.Toast.getOrCreateInstance(toastEl).show();
-    });
+    <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
-    </script>
 
     <div class="container my-5" style="max-width: 600px;">
         
@@ -184,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="d-flex gap-2">
                     <a href="admin.php" class="btn btn-outline-secondary w-50 fw-bold">← Volver al Panel</a>
-                    <button type="submit" class="btn btn-success w-50 fw-bold">Guardar Producto</button>
+                    <button type="submit" class="btn btn-success w-50 fw-bold" data-loading="Guardando…">Guardar Producto</button>
                 </div>
 
             </form>

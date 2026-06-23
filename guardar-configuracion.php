@@ -21,6 +21,7 @@ if (!verificar_csrf($_POST['_csrf'] ?? '')) {
 $instagram = trim($_POST['instagram'] ?? '');
 $color = trim($_POST['color'] ?? '');
 $whatsapp = trim($_POST['whatsapp'] ?? '');
+$marca_blanca = !empty($_POST['marca_blanca']) ? 1 : 0;
 
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
     $color = '#0d6efd';
@@ -31,6 +32,10 @@ if (!preg_match('/^\+?[0-9]{7,15}$/', $whatsapp)) {
 }
 if (!empty($instagram) && !preg_match('/^[a-zA-Z0-9_.]+$/', $instagram)) {
     header("Location: configuracion.php?error=instagram_invalido");
+    exit;
+}
+if ($marca_blanca && !plan_limite('marca_blanca')) {
+    header("Location: configuracion.php?error=permiso");
     exit;
 }
 
@@ -65,11 +70,14 @@ $sql = "UPDATE tiendas SET
             instagram_url     = ?, 
             color_tema        = ?, 
             telefono_whatsapp = ?,
-            logo_url          = COALESCE(?, logo_url) 
+            logo_url          = COALESCE(?, logo_url),
+            marca_blanca      = CASE WHEN ? IS NOT NULL THEN ? ELSE marca_blanca END
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$instagram, $color, $whatsapp, $logo_url, $tienda_id]);
+$stmt->execute([$instagram, $color, $whatsapp, $logo_url, $marca_blanca, $marca_blanca, $tienda_id]);
+
+$_SESSION['marca_blanca'] = $marca_blanca;
 
 $u = obtener_usuario_actual();
 registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la configuración de la tienda');

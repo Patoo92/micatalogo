@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = trim($_POST['password']);
 
         if (!empty($usuario) && !empty($password)) {
-            $stmt = $pdo->prepare("SELECT id, nombre_tienda, password, activo, marca_blanca FROM tiendas WHERE usuario = ?");
+            $stmt = $pdo->prepare("SELECT id, nombre_tienda, slug, password, activo, marca_blanca, plan, trial_ends_at FROM tiendas WHERE usuario = ?");
             $stmt->execute([$usuario]);
             $tienda = $stmt->fetch();
 
@@ -30,22 +30,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($tienda['activo'] == 0) {
                     $error = "Tu cuenta está suspendida. Contacta con soporte para reactivarla.";
                 } else {
+                    $plan_actual = $tienda['plan'] ?? 'starter';
+                    if ($plan_actual !== 'starter' && !empty($tienda['trial_ends_at']) && $tienda['trial_ends_at'] < date('Y-m-d')) {
+                        $pdo->prepare("UPDATE tiendas SET plan = 'starter', marca_blanca = 0 WHERE id = ?")->execute([$tienda['id']]);
+                        $plan_actual = 'starter';
+                        $_SESSION['flash_message'] = 'Tu período de prueba ha finalizado. Has sido cambiado al plan Starter.';
+                        $_SESSION['flash_type'] = 'warning';
+                    }
                     limpiar_intentos_login($pdo, 'login');
                     session_regenerate_id(true);
                     $_SESSION['tienda_id']     = $tienda['id'];
                     $_SESSION['tienda_nombre'] = $tienda['nombre_tienda'];
+                    $_SESSION['tienda_slug']   = $tienda['slug'];
+                    $_SESSION['plan']          = $plan_actual;
                     $_SESSION['marca_blanca']  = (int)($tienda['marca_blanca'] ?? 0);
                     registrar_actividad($pdo, $tienda['id'], $tienda['nombre_tienda'], 'owner', 'Inició sesión');
                     header("Location: admin.php");
                     exit;
                 }
             } else {
-                $stmt = $pdo->prepare("
-                    SELECT s.*, t.nombre_tienda, t.activo, t.marca_blanca 
-                    FROM store_staff s 
-                    JOIN tiendas t ON s.tienda_id = t.id 
-                    WHERE s.usuario = ?
-                ");
+                    $stmt = $pdo->prepare("
+                        SELECT s.*, t.nombre_tienda, t.slug, t.activo, t.marca_blanca, t.plan, t.trial_ends_at
+                        FROM store_staff s 
+                        JOIN tiendas t ON s.tienda_id = t.id 
+                        WHERE s.usuario = ?
+                    ");
                 $stmt->execute([$usuario]);
                 $staff = $stmt->fetch();
 
@@ -59,6 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         session_regenerate_id(true);
                         $_SESSION['tienda_id']      = $staff['tienda_id'];
                         $_SESSION['tienda_nombre']  = $staff['nombre_tienda'];
+                        $_SESSION['tienda_slug']    = $staff['slug'];
+                        $_SESSION['plan']           = $staff['plan'] ?? 'starter';
                         $_SESSION['marca_blanca']   = (int)($staff['marca_blanca'] ?? 0);
                         $_SESSION['staff_id']       = $staff['id'];
                         $_SESSION['staff_usuario']  = $staff['usuario'];
