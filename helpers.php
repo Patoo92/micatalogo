@@ -9,6 +9,17 @@ function imagen_defecto() {
     return "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500";
 }
 
+function imagen_url($path) {
+    if (empty($path)) return imagen_defecto();
+    if (str_starts_with($path, 'http')) return $path;
+    $cdn = _getenv('CDN_URL');
+    if ($cdn !== '') {
+        $cdn = rtrim($cdn, '/');
+        return $cdn . '/' . ltrim($path, '/');
+    }
+    return $path;
+}
+
 function generar_thumbnail($origen, $destino, $ancho = 300, $alto = 300) {
     if (!file_exists($origen)) return false;
     $info = getimagesize($origen);
@@ -79,7 +90,27 @@ function csrf_field() {
 
 function verificar_csrf($token) {
     if (empty($_SESSION['_csrf']) || empty($token)) return false;
-    return hash_equals($_SESSION['_csrf'], $token);
+    $ok = hash_equals($_SESSION['_csrf'], $token);
+    $_SESSION['_csrf'] = bin2hex(random_bytes(32));
+    return $ok;
+}
+
+function js_escape($str) {
+    return json_encode($str ?? '', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+}
+
+function js_string($str) {
+    return str_replace(["'", "\\", "\n", "\r", "\t"], ["\\'", "\\\\", "\\n", "\\r", "\\t"], $str ?? '');
+}
+
+function _getenv($key, $default = '') {
+    $val = getenv($key);
+    return $val !== false && $val !== '' ? $val : $default;
+}
+
+function _env_path($key, $default = '') {
+    $val = getenv($key);
+    return $val !== false && $val !== '' ? rtrim($val, '\\/') . '/' : $default;
 }
 
 // Página de error amigable

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -78,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $u = obtener_usuario_actual();
             registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Creó un producto', "Nombre: $nombre");
         } catch (\PDOException $e) {
-            $error = "Error al guardar en la base de datos: " . $e->getMessage();
+            error_log("Error al crear producto: " . $e->getMessage());
+            $error = "Error al guardar el producto. Intenta de nuevo.";
         }
     }
 }
@@ -111,19 +112,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     <?php if (!empty($exito)): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('crudToast');
         toastEl.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo addslashes($exito); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     });
     <?php elseif (!empty($error)): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('crudToast');
         toastEl.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo addslashes($error); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     });
     <?php endif; ?>
@@ -158,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="categoria_id" class="form-select">
                             <option value="">Sin categoría</option>
                             <?php foreach ($categorias as $cat): ?>
-                                <option value="<?php echo $cat['id']; ?>"><?php echo $cat['nombre_categoria']; ?></option>
+                                <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['nombre_categoria']); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

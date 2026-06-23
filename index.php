@@ -1,4 +1,5 @@
 <?php
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_GET['tienda']) || empty($_GET['tienda'])) {

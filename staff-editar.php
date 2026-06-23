@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id']) || !isset($_GET['id'])) {
@@ -65,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $permisos = json_decode($staff['permisos'], true) ?? [];
         }
     } catch (PDOException $e) {
-        $error = "Error al actualizar: " . $e->getMessage();
+        error_log("Error al editar staff: " . $e->getMessage());
+        $error = "Error al actualizar. Intenta de nuevo.";
     }
 }
 }
@@ -98,19 +99,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     <?php if ($exito): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var t = document.getElementById('crudToast');
         t.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo addslashes($exito); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
         bootstrap.Toast.getOrCreateInstance(t).show();
     });
     <?php elseif ($error): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var t = document.getElementById('crudToast');
         t.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo addslashes($error); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
         bootstrap.Toast.getOrCreateInstance(t).show();
     });
     <?php endif; ?>
@@ -120,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-                <?php echo $tienda_nombre; ?>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <div class="d-flex gap-2">
                 <a href="admin.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>

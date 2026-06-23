@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {

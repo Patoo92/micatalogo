@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -38,7 +38,7 @@ $staff = $stmt->fetchAll();
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-                <?php echo $tienda_nombre; ?>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <div class="d-flex gap-2">
                 <a href="admin.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
@@ -108,7 +108,7 @@ $staff = $stmt->fetchAll();
                                     <a href="staff-editar.php?id=<?php echo $s['id']; ?>" class="btn btn-sm btn-outline-secondary btn-action-sm" title="Editar">
                                         <iconify-icon icon="mdi:pencil" width="16"></iconify-icon>
                                     </a>
-                                    <a href="staff-eliminar.php?id=<?php echo $s['id']; ?>" class="btn btn-sm btn-outline-danger btn-action-sm" title="Eliminar" onclick="return confirm('¿Eliminar este miembro del staff?');">
+                                    <a href="staff-eliminar.php?id=<?php echo $s['id']; ?>" class="btn btn-sm btn-outline-danger btn-action-sm" title="Eliminar">
                                         <iconify-icon icon="mdi:delete" width="16"></iconify-icon>
                                     </a>
                                 </td>

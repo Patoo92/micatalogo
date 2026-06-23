@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 $error = '';
@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
         $password = $_POST['password'];
         $confirm = $_POST['password_confirm'];
 
-        if (strlen($password) < 8) {
-            $error = "La contraseña debe tener al menos 8 caracteres.";
+        if (strlen($password) < 10 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
+            $error = "La contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
         } elseif ($password !== $confirm) {
             $error = "Las contraseñas no coinciden.";
         } else {
@@ -72,9 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
         </div>
 
         <?php if ($error): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
         <?php elseif ($exito): ?>
-            <div class="alert alert-success"><?php echo $exito; ?></div>
+            <div class="alert alert-success"><?php echo htmlspecialchars($exito); ?></div>
         <?php else: ?>
             <form method="POST">
                 <?php echo csrf_field(); ?>

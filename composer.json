@@ -1,0 +1,15 @@
+{
+    "name": "micatalogo/app",
+    "description": "SaaS multi-tenant para catálogos de productos con pedidos por WhatsApp",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "files": [
+            "helpers.php",
+            "email_helper.php"
+        ]
+    }
+}

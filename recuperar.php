@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 require_once 'email_helper.php';
 
@@ -20,7 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO password_resets (email, token) VALUES (?, ?)");
             $stmt->execute([$email, $token]);
 
-            $link = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/micatalogo/reset-password.php?token=' . urlencode($token);
+            $host = $_SERVER['HTTP_HOST'] ?? '';
+            if (!preg_match('/^[a-z0-9\.\-:]+$/i', $host)) { $host = 'localhost'; }
+            $link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $host . '/micatalogo/reset-password.php?token=' . urlencode($token);
             $cuerpo = '<h2>Recuperación de contraseña</h2>
                 <p>Hola <strong>' . htmlspecialchars($tienda['nombre_tienda']) . '</strong>,</p>
                 <p>Recibimos una solicitud para restablecer tu contraseña. Hacé clic en el botón de abajo:</p>
@@ -35,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $mensaje = '<div class="alert alert-warning">
                     <strong>No se pudo enviar el email.</strong> Configurá SMTP en <code>micatalogo-config/email.php</code>.<br>
-                    Mientras tanto, usá este enlace directo:<br>
-                    <a href="' . $link . '">' . $link . '</a>
+                    Pedí un nuevo enlace cuando tengas SMTP funcionando.
                 </div>';
             }
         } else {

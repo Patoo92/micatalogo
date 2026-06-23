@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 $error = '';
@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = "Tu cuenta está suspendida. Contacta con soporte para reactivarla.";
                 } else {
                     limpiar_intentos_login($pdo, 'login');
+                    session_regenerate_id(true);
                     $_SESSION['tienda_id']     = $tienda['id'];
                     $_SESSION['tienda_nombre'] = $tienda['nombre_tienda'];
                     registrar_actividad($pdo, $tienda['id'], $tienda['nombre_tienda'], 'owner', 'Inició sesión');
@@ -50,10 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($staff && password_verify($password, $staff['password'])) {
                     if ($staff['activo'] == 0) {
                         $error = "Tu cuenta de staff está desactivada.";
-                    } elseif ($tienda['activo'] == 0) {
+                    } elseif ($staff['activo'] == 0) {
                         $error = "La tienda está suspendida.";
                     } else {
                         limpiar_intentos_login($pdo, 'login');
+                        session_regenerate_id(true);
                         $_SESSION['tienda_id']      = $staff['tienda_id'];
                         $_SESSION['tienda_nombre']  = $staff['nombre_tienda'];
                         $_SESSION['staff_id']       = $staff['id'];
@@ -148,16 +150,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <?php if ($flash_message): ?>
-            <div class="alert alert-<?php echo $flash_type; ?> d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
+            <div class="alert alert-<?php echo htmlspecialchars($flash_type ?? 'info'); ?> d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
                 <iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'alert-circle'; ?>" width="18"></iconify-icon>
-                <?php echo $flash_message; ?>
+                <?php echo htmlspecialchars($flash_message); ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($error)): ?>
             <div class="alert alert-danger d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
                 <iconify-icon icon="mdi:alert-circle" width="18"></iconify-icon>
-                <?php echo $error; ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 
@@ -172,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="d-flex align-items-center gap-1"><iconify-icon icon="mdi:lock" width="16"></iconify-icon> Contraseña</label>
                 <div class="input-wrapper">
                     <input type="password" name="password" id="storePassword" class="form-control mt-1" placeholder="••••••••" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword()" title="Mostrar contraseña">
+                    <button type="button" class="password-toggle" id="btnTogglePass" title="Mostrar contraseña">
                         <iconify-icon icon="mdi:eye-outline" id="eyeIcon" width="18"></iconify-icon>
                     </button>
                 </div>
@@ -187,8 +189,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
-    <script>
-        function togglePassword() {
+    <script nonce="<?= $csp_nonce ?>">
+        document.getElementById('btnTogglePass').addEventListener('click', function() {
             const input = document.getElementById('storePassword');
             const icon = document.getElementById('eyeIcon');
             if (input.type === 'password') {
@@ -198,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 input.type = 'password';
                 icon.setAttribute('icon', 'mdi:eye-outline');
             }
-        }
+        });
     </script>
 
 </body>

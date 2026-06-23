@@ -1,1 +1,38 @@
+# Dependencias
+vendor/
+composer.lock
+composer.phar
+
+# Archivos de configuración fuera del webroot
+micatalogo-config/
+
+# Logs
+logs/
+
+# Archivos subidos por usuarios
+imagenes/
+uploads/
+
+# Backups
+backups/
+
+# Entorno
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# PHPUnit
 phpunit.phar
+.phpunit.result.cache
+
+# Git
+*.orig
+*.bak

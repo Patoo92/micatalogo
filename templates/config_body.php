@@ -24,7 +24,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-                <?php echo $tienda_nombre; ?>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#configNav">
                 <span class="navbar-toggler-icon"></span>

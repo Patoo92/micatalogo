@@ -10,17 +10,23 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([a-zA-Z0-9_-]+)$ index.php?tienda=$1 [L,QSA]
 
 # Denegar acceso a archivos sensibles
-<FilesMatch "\.(sql|md|log)$">
+<FilesMatch "\.(sql|md|log|env)$">
     Require all denied
 </FilesMatch>
 
-<FilesMatch "^(conexion|helpers)\.php$">
+<FilesMatch "^(conexion|helpers|email_helper|composer)\.(php|json)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "^(genhash)$">
     Require all denied
 </FilesMatch>
 
 <IfModule mod_rewrite.c>
     RewriteRule ^templates/ - [F,L]
     RewriteRule ^logs/ - [F,L]
+    RewriteRule ^vendor/ - [F,L]
+    RewriteRule ^tests/ - [F,L]
 </IfModule>
 
 # Desactivar listado de directorios
@@ -28,3 +34,39 @@ Options -Indexes
 
 # Ocultar versión del servidor
 ServerSignature Off
+
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
+
+# =============================================
+# NOTA PARA NGINX:
+# Este .htaccess es específico de Apache.
+# Si usas Nginx, replica estas reglas:
+#
+# location ~* \.(sql|md|log|env)$ { deny all; }
+# location ~* /(templates|logs|vendor|tests)/ { deny all; }
+# location / {
+#   try_files $uri $uri/ /index.php?tienda=$1&$args;
+# }
+# location ~ /(conexion|helpers|email_helper)\.php$ { deny all; }
+# location ~* /composer\.json$ { deny all; }
+#
+# location ~* \.(jpg|jpeg|png|gif|webp)$ {
+#   expires 1y;
+#   add_header Cache-Control "public, immutable";
+# }
+# =============================================

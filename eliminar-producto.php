@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id']) || !isset($_GET['id'])) {
@@ -24,6 +24,9 @@ if (!$producto) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirmar'] ?? '') === 'si') {
+    if (!verificar_csrf($_POST['_csrf'] ?? '')) {
+        mostrar_error("Solicitud inválida", "Token de seguridad incorrecto.", "admin.php", "Volver al panel");
+    }
     try {
         $stmt = $pdo->prepare("DELETE FROM productos WHERE id = ? AND tienda_id = ?");
         $stmt->execute([$producto_id, $tienda_id]);
@@ -65,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirmar'] ?? '') === 'si
         <p class="text-danger small mb-4">Esta acción no se puede deshacer.</p>
 
         <form method="POST">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="confirmar" value="si">
             <div class="d-flex gap-2">
                 <a href="admin.php" class="btn btn-outline-secondary w-50 fw-bold">← Cancelar</a>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -12,6 +12,8 @@ if (!verificar_permiso('pedidos_ver')) {
 
 $tienda_id = $_SESSION['tienda_id'];
 $tienda_nombre = $_SESSION['tienda_nombre'];
+
+$csrf_token = csrf_token();
 
 $stmt = $pdo->prepare("
     SELECT p.*, prod.nombre AS producto_nombre, prod.precio 

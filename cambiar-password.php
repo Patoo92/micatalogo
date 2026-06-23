@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -15,6 +15,8 @@ $exito = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         $error = "Solicitud inválida.";
+    } elseif (!verificar_rate_limit($pdo, 'cambio_password', 5)) {
+        $error = "Demasiados intentos. Espera 15 minutos.";
     } else {
     $actual = $_POST['password_actual'];
     $nueva = $_POST['password_nueva'];
@@ -22,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($actual) || empty($nueva) || empty($confirmar)) {
         $error = "Todos los campos son obligatorios.";
-    } elseif (strlen($nueva) < 8) {
-        $error = "La nueva contraseña debe tener al menos 8 caracteres.";
+    } elseif (strlen($nueva) < 10 || !preg_match('/[A-Z]/', $nueva) || !preg_match('/[0-9]/', $nueva)) {
+        $error = "La nueva contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
     } elseif ($nueva !== $confirmar) {
         $error = "Las contraseñas nuevas no coinciden.";
     } else {
@@ -33,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$tienda || !password_verify($actual, $tienda['password'])) {
             $error = "La contraseña actual no es correcta.";
+            registrar_intento_login($pdo, 'cambio_password');
         } else {
             $hash = password_hash($nueva, PASSWORD_BCRYPT);
             $stmt = $pdo->prepare("UPDATE tiendas SET password = ? WHERE id = ?");
@@ -81,19 +84,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     <?php if ($exito): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var t = document.getElementById('crudToast');
         t.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo addslashes($exito); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
         bootstrap.Toast.getOrCreateInstance(t).show();
     });
     <?php elseif ($error): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var t = document.getElementById('crudToast');
         t.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo addslashes($error); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
         bootstrap.Toast.getOrCreateInstance(t).show();
     });
     <?php endif; ?>
@@ -103,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-                <?php echo $tienda_nombre; ?>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <div class="d-flex gap-2">
                 <a href="admin.php" class="btn btn-sm btn-outline-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
@@ -158,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     function toggle(field, eyeId) {
         var input = document.querySelector('input[name="password_' + field + '"]');
         var icon = document.getElementById(eyeId);

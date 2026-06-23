@@ -1,8 +1,17 @@
 <?php
-require_once 'C:\xampp\micatalogo-config\email.php';
-require_once __DIR__ . '/vendor/phpmailer/PHPMailer.php';
-require_once __DIR__ . '/vendor/phpmailer/SMTP.php';
-require_once __DIR__ . '/vendor/phpmailer/Exception.php';
+$emailConfigPath = __DIR__ . '/../../micatalogo-config/email.php';
+if (!file_exists($emailConfigPath)) {
+    $emailConfigPath = 'C:\xampp\micatalogo-config\email.php';
+}
+require_once $emailConfigPath;
+$autoload = __DIR__ . '/vendor/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
+} else {
+    require_once __DIR__ . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+    require_once __DIR__ . '/vendor/phpmailer/phpmailer/src/SMTP.php';
+    require_once __DIR__ . '/vendor/phpmailer/phpmailer/src/Exception.php';
+}
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

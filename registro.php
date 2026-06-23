@@ -7,7 +7,10 @@ $exito = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         $error = "Solicitud inválida.";
+    } elseif (!verificar_rate_limit($pdo, 'registro', 3)) {
+        $error = "Demasiados intentos. Espera 15 minutos.";
     } else {
+    registrar_intento_login($pdo, 'registro');
     $nombre_tienda     = trim($_POST['nombre_tienda']);
     $slug              = trim($_POST['slug']);
     $usuario           = trim($_POST['usuario']);
@@ -25,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
         $error = "El slug solo puede contener letras minúsculas, números y guiones. Ej: mi-tienda";
 
-    } elseif (strlen($password) < 8) {
-        $error = "La contraseña debe tener al menos 8 caracteres.";
+    } elseif (strlen($password) < 10 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
+        $error = "La contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
 
     } elseif ($password !== $password_confirm) {
         $error = "Las contraseñas no coinciden.";
@@ -124,11 +127,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="text-muted mb-4" style="font-size: 0.95rem;">Rellena los datos y empieza a vender por WhatsApp hoy mismo.</p>
 
         <?php if ($error): ?>
-            <div class="alert alert-danger py-2"><?php echo $error; ?></div>
+            <div class="alert alert-danger py-2"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if ($exito): ?>
-            <div class="alert alert-success py-2"><?php echo $exito; ?></div>
+            <div class="alert alert-success py-2"><?php echo htmlspecialchars($exito); ?></div>
         <?php else: ?>
 
         <form method="POST" action="registro.php">
@@ -186,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
         const slugInput = document.getElementById('slug');
         const slugPreview = document.getElementById('slug-preview');
         if (slugInput) {

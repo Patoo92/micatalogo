@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (isset($_SESSION['admin_id'])) {
@@ -8,6 +8,9 @@ if (isset($_SESSION['admin_id'])) {
 }
 
 $error = '';
+$flash_message = $_SESSION['flash_message'] ?? null;
+$flash_type = $_SESSION['flash_type'] ?? null;
+unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
@@ -25,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($admin && password_verify($password, $admin['password'])) {
                 limpiar_intentos_login($pdo, 'admin');
+                session_regenerate_id(true);
                 $_SESSION['admin_id']      = $admin['id'];
                 $_SESSION['admin_usuario'] = $admin['usuario'];
                 header("Location: super-admin.php");
@@ -135,10 +139,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="d-flex align-items-center gap-2"><iconify-icon icon="mdi:security" width="24" style="color: #10b981;"></iconify-icon> Panel Master</h2>
         <p class="mb-4">Solo el administrador del SaaS puede acceder aquí.</p>
 
+        <?php if ($flash_message): ?>
+            <div class="alert alert-<?php echo htmlspecialchars($flash_type ?? 'info'); ?> d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
+                <iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'info'; ?>" width="18"></iconify-icon>
+                <?php echo $flash_message; ?>
+            </div>
+        <?php endif; ?>
+
         <?php if ($error): ?>
             <div class="alert alert-danger d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
                 <iconify-icon icon="mdi:alert-circle" width="18"></iconify-icon>
-                <?php echo $error; ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 
@@ -152,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label class="d-flex align-items-center gap-1"><iconify-icon icon="mdi:lock" width="16"></iconify-icon> Contraseña</label>
                 <div class="input-wrapper">
                     <input type="password" name="password" id="adminPassword" class="form-control mt-1" placeholder="••••••••" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword()" title="Mostrar contraseña">
+                    <button type="button" class="password-toggle" id="btnTogglePass" title="Mostrar contraseña">
                         <iconify-icon icon="mdi:eye-outline" id="eyeIcon" width="18"></iconify-icon>
                     </button>
                 </div>
@@ -166,8 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
-    <script>
-        function togglePassword() {
+    <script nonce="<?= $csp_nonce ?>">
+        document.getElementById('btnTogglePass').addEventListener('click', function() {
             const input = document.getElementById('adminPassword');
             const icon = document.getElementById('eyeIcon');
             if (input.type === 'password') {
@@ -177,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 input.type = 'password';
                 icon.setAttribute('icon', 'mdi:eye-outline');
             }
-        }
+        });
     </script>
 </body>
 </html>

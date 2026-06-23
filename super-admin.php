@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['admin_id'])) {
@@ -7,34 +7,47 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-if (isset($_GET['toggle']) && isset($_GET['id'])) {
-    $tienda_id  = (int)$_GET['id'];
-    $nuevo_estado = (int)$_GET['toggle'];
-
-    if ($nuevo_estado === 0 || $nuevo_estado === 1) {
-        $stmt = $pdo->prepare("UPDATE tiendas SET activo = ? WHERE id = ?");
-        $stmt->execute([$nuevo_estado, $tienda_id]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verificar_csrf($_POST['_csrf'] ?? '')) {
+        header("Location: super-admin.php");
+        exit;
     }
-    header("Location: super-admin.php");
-    exit;
-}
 
-if (isset($_GET['delete']) && isset($_GET['confirm'])) {
-    $tienda_id = (int)$_GET['delete'];
+    if (isset($_POST['toggle']) && isset($_POST['id'])) {
+        $tienda_id  = (int)$_POST['id'];
+        $nuevo_estado = (int)$_POST['toggle'];
+
+        if ($nuevo_estado === 0 || $nuevo_estado === 1) {
+            $stmt = $pdo->prepare("UPDATE tiendas SET activo = ? WHERE id = ?");
+            $stmt->execute([$nuevo_estado, $tienda_id]);
+        }
+        header("Location: super-admin.php");
+        exit;
+    }
+
+    if (isset($_POST['delete']) && isset($_POST['confirm'])) {
+        $tienda_id = (int)$_POST['delete'];
     try {
         $pdo->beginTransaction();
-        $pdo->exec("DELETE FROM actividad WHERE tienda_id = $tienda_id");
-        $pdo->exec("DELETE FROM store_staff WHERE tienda_id = $tienda_id");
-        $pdo->exec("DELETE FROM pedidos WHERE tienda_id = $tienda_id");
-        $pdo->exec("DELETE FROM productos WHERE tienda_id = $tienda_id");
-        $pdo->exec("DELETE FROM categorias WHERE tienda_id = $tienda_id");
-        $pdo->exec("DELETE FROM tiendas WHERE id = $tienda_id");
+        $stmtDel = $pdo->prepare("DELETE FROM actividad WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM store_staff WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM pedidos WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM productos WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM categorias WHERE tienda_id = ?");
+        $stmtDel->execute([$tienda_id]);
+        $stmtDel = $pdo->prepare("DELETE FROM tiendas WHERE id = ?");
+        $stmtDel->execute([$tienda_id]);
         $pdo->commit();
     } catch (Exception $e) {
         $pdo->rollBack();
     }
     header("Location: super-admin.php");
     exit;
+}
 }
 
 $stmt = $pdo->query("
@@ -235,23 +248,26 @@ $actividades = $stmtAct->fetchAll();
                                 <td class="text-end">
                                     <div class="d-flex gap-1 justify-content-end">
                                     <?php if ($tienda['activo']): ?>
-                                        <a href="super-admin.php?toggle=0&id=<?php echo $tienda['id']; ?>"
-                                           class="btn-bloquear"
-                                           onclick="return confirm('¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?');">
-                                            🔒
-                                        </a>
+                                        <form method="POST" action="super-admin.php" class="d-inline" onsubmit="return confirm('¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?');">
+                                            <input type="hidden" name="toggle" value="0">
+                                            <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" class="btn-bloquear" style="border:none;cursor:pointer;">🔒</button>
+                                        </form>
                                     <?php else: ?>
-                                        <a href="super-admin.php?toggle=1&id=<?php echo $tienda['id']; ?>"
-                                           class="btn-desbloquear">
-                                            ✅
-                                        </a>
+                                        <form method="POST" action="super-admin.php" class="d-inline">
+                                            <input type="hidden" name="toggle" value="1">
+                                            <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" class="btn-desbloquear" style="border:none;cursor:pointer;">✅</button>
+                                        </form>
                                     <?php endif; ?>
-                                        <a href="super-admin.php?delete=<?php echo $tienda['id']; ?>&confirm=1"
-                                           class="btn-bloquear"
-                                           style="border-color:rgba(239,68,68,0.3);"
-                                           onclick="return confirm('¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.');">
-                                            🗑️
-                                        </a>
+                                        <form method="POST" action="super-admin.php" class="d-inline" onsubmit="return confirm('¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.');">
+                                            <input type="hidden" name="delete" value="<?php echo $tienda['id']; ?>">
+                                            <input type="hidden" name="confirm" value="1">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" class="btn-bloquear" style="border-color:rgba(239,68,68,0.3);border:none;cursor:pointer;">🗑️</button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

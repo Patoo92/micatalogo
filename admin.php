@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -14,11 +14,22 @@ $flash_message = $_SESSION['flash_message'] ?? null;
 $flash_type = $_SESSION['flash_type'] ?? null;
 unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 
+$pagina = max(1, (int)($_GET['p'] ?? 1));
+$por_pagina = 20;
+$offset = ($pagina - 1) * $por_pagina;
+
+$stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
+$stmtCount->execute([$tienda_id]);
+$total_productos = (int)$stmtCount->fetchColumn();
+$total_paginas = max(1, (int)ceil($total_productos / $por_pagina));
+
 $stmt = $pdo->prepare("
     SELECT p.*, c.nombre_categoria 
     FROM productos p 
     LEFT JOIN categorias c ON p.categoria_id = c.id 
     WHERE p.tienda_id = ?
+    ORDER BY p.id DESC
+    LIMIT $por_pagina OFFSET $offset
 ");
 $stmt->execute([$tienda_id]);
 $productos = $stmt->fetchAll();

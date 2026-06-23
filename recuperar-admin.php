@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 $mensaje = '';
@@ -12,19 +12,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
 
         if ($admin) {
-            $nueva_password = bin2hex(random_bytes(6));
+            $nueva_password = bin2hex(random_bytes(12));
             $hash = password_hash($nueva_password, PASSWORD_BCRYPT);
             $upd = $pdo->prepare("UPDATE admins SET password = ? WHERE id = ?");
             $upd->execute([$hash, $admin['id']]);
 
-            $mensaje = '<div class="alert alert-success">
-                <strong>Contraseña restablecida.</strong><br>
-                Usuario: <code>' . htmlspecialchars($admin['usuario']) . '</code><br>
-                Nueva contraseña: <code>' . $nueva_password . '</code><br>
-                <span class="text-muted">Guárdala en un lugar seguro.</span>
+            $mensaje = '
+            <div class="alert alert-success">
+                <strong>Contraseña restablecida.</strong> Copiala ahora, solo se muestra una vez:
+                <div style="background:#0f172a;color:#10b981;padding:12px;border-radius:8px;text-align:center;font-size:1.2rem;font-weight:700;letter-spacing:2px;margin:12px 0;font-family:monospace;user-select:all;">' . htmlspecialchars($nueva_password) . '</div>
+                <div style="font-size:0.8rem;color:#64748b;display:flex;align-items:center;gap:6px;"><iconify-icon icon="mdi:alert" width="14"></iconify-icon> Si cerrás esta página sin copiarla, tendrás que generar otra.</div>
+            </div>
+            <div class="text-center mt-2">
+                <a href="login-admin.php" class="btn-admin" style="display:inline-flex;padding:10px 24px;width:auto;">Ir al inicio de sesión</a>
             </div>';
-            $mensaje .= '<a href="login-admin.php" class="btn btn-admin w-100" style="background:#10b981;color:#fff;font-weight:600;border-radius:10px;padding:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;">
-                <iconify-icon icon="mdi:login" width="18"></iconify-icon> Ir al login</a>';
+
         } else {
             $mensaje = '<div class="alert alert-danger">No hay ningún administrador registrado.</div>';
         }

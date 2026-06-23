@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panel de Administración - <?php echo $tienda_nombre; ?></title>
+    <title>Panel de Administración - <?php echo htmlspecialchars($tienda_nombre); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -35,12 +35,12 @@
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     <?php if ($flash_message): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('flashToast');
-        toastEl.classList.add('text-bg-<?php echo $flash_type; ?>');
-        document.getElementById('flashToastBody').innerHTML = '<iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'alert-circle'; ?>" width="20"></iconify-icon> <?php echo addslashes($flash_message); ?>';
+        toastEl.classList.add('text-bg-<?php echo in_array($flash_type, ['success','danger','warning','info']) ? $flash_type : 'info'; ?>');
+        document.getElementById('flashToastBody').innerHTML = '<iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'alert-circle'; ?>" width="20"></iconify-icon> <?php echo js_escape($flash_message); ?>';
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     });
     <?php endif; ?>
@@ -62,7 +62,7 @@
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
             <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-            <?php echo $tienda_nombre; ?>
+            <?php echo htmlspecialchars($tienda_nombre); ?>
         </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
             <span class="navbar-toggler-icon"></span>
@@ -94,10 +94,10 @@
     <div class="card mb-3 border-0 shadow-sm card-admin">
         <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
-                <img src="<?php echo $prod['imagen_thumb'] ?: $prod['imagen_url']; ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
+                <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
                 <div class="flex-grow-1">
-                    <h6 class="mb-0 fw-bold"><?php echo $prod['nombre']; ?></h6>
-                    <small class="text-muted"><?php echo $prod['precio']; ?> €</small>
+                    <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($prod['nombre']); ?></h6>
+                    <small class="text-muted"><?php echo htmlspecialchars($prod['precio']); ?> €</small>
                 </div>
                 <div class="text-end">
                     <div class="badge badge-stock <?php echo ($prod['stock'] <= $prod['stock_minimo']) ? 'bg-danger' : 'bg-success'; ?>">
@@ -136,13 +136,13 @@
                     <tbody>
                         <?php foreach ($productos as $prod): ?>
                         <tr>
-                            <td><img src="<?php echo $prod['imagen_thumb'] ?: $prod['imagen_url']; ?>" class="rounded" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                            <td><img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="rounded" style="width: 50px; height: 50px; object-fit: cover;"></td>
                             <td>
-                                <div class="fw-bold"><?php echo $prod['nombre']; ?></div>
+                                <div class="fw-bold"><?php echo htmlspecialchars($prod['nombre']); ?></div>
                                 <small class="text-muted">ID #<?php echo $prod['id']; ?></small>
                             </td>
-                            <td><span class="badge bg-secondary"><?php echo $prod['nombre_categoria'] ?? 'Sin categoría'; ?></span></td>
-                            <td class="fw-bold text-primary"><?php echo $prod['precio']; ?> €</td>
+                            <td><span class="badge bg-secondary"><?php echo htmlspecialchars($prod['nombre_categoria'] ?? 'Sin categoría'); ?></span></td>
+                            <td class="fw-bold text-primary"><?php echo htmlspecialchars($prod['precio']); ?> €</td>
                             <td class="text-center">
                                 <span class="badge badge-stock <?php echo ($prod['stock'] <= $prod['stock_minimo']) ? 'bg-danger' : 'bg-success'; ?>">
                                     <?php echo $prod['stock']; ?> uds
@@ -164,6 +164,18 @@
                 </table>
             </div>
         </div>
+
+        <?php if ($total_paginas > 1): ?>
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination pagination-sm">
+                <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                <li class="page-item <?php echo $i === $pagina ? 'active' : ''; ?>">
+                    <a class="page-link" href="?p=<?php echo $i; ?>"><?php echo $i; ?></a>
+                </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
+        <?php endif; ?>
     </div>
 </body>
 </html>

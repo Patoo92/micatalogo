@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id']) || !isset($_GET['id'])) {
@@ -30,15 +30,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $ruta_temporal = $_FILES['imagen']['tmp_name'];
-        $extension = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION) ?: 'jpg';
-        $nuevo_nombre_archivo = time() . "_" . uniqid() . "." . $extension;
-        $ruta_destino = ruta_imagen($tienda_id) . "/" . $nuevo_nombre_archivo;
 
-        if (move_uploaded_file($ruta_temporal, $ruta_destino)) {
-            $url_imagen_final = $ruta_destino;
-            $thumb_nombre = 'thumb_' . $nuevo_nombre_archivo;
-            $thumb_ruta = ruta_imagen($tienda_id) . "/" . $thumb_nombre;
-            generar_thumbnail($ruta_destino, $thumb_ruta, 300, 300);
+        $TIPOS_PERMITIDOS = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        ];
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime_real = $finfo->file($ruta_temporal);
+
+        if (!array_key_exists($mime_real, $TIPOS_PERMITIDOS)) {
+            $error = "Solo se permiten imágenes JPG, PNG, GIF o WEBP.";
+        } else {
+            $extension = $TIPOS_PERMITIDOS[$mime_real];
+            $nuevo_nombre_archivo = time() . "_" . uniqid() . "." . $extension;
+            $ruta_destino = ruta_imagen($tienda_id) . "/" . $nuevo_nombre_archivo;
+
+            if (move_uploaded_file($ruta_temporal, $ruta_destino)) {
+                $url_imagen_final = $ruta_destino;
+                $thumb_nombre = 'thumb_' . $nuevo_nombre_archivo;
+                $thumb_ruta = ruta_imagen($tienda_id) . "/" . $thumb_nombre;
+                generar_thumbnail($ruta_destino, $thumb_ruta, 300, 300);
+            }
         }
     }
 
@@ -47,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url_thumb = $thumb_ruta;
     }
 
-    try {
+    if (empty($error)) try {
         $sql = "UPDATE productos SET categoria_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, stock_minimo = ?, imagen_url = ?, imagen_thumb = ? WHERE id = ? AND tienda_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$categoria_id, $nombre, $descripcion, $precio, $stock, $stock_minimo, $url_imagen_final, $url_thumb, $producto_id, $tienda_id]);
@@ -55,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $u = obtener_usuario_actual();
         registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Editó un producto', "ID: $producto_id - $nombre");
     } catch (\PDOException $e) {
-        $error = "Error al actualizar: " . $e->getMessage();
+        $error = "Error al actualizar datos. Intenta de nuevo.";
     }
 }
 }
@@ -100,19 +115,19 @@ $categorias = $stmtCat->fetchAll();
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= $csp_nonce ?>">
     <?php if (!empty($exito)): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('crudToast');
         toastEl.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo addslashes($exito); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     });
     <?php elseif (!empty($error)): ?>
     window.addEventListener('DOMContentLoaded', function() {
         var toastEl = document.getElementById('crudToast');
         toastEl.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo addslashes($error); ?>';
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
         bootstrap.Toast.getOrCreateInstance(toastEl).show();
     });
     <?php endif; ?>
@@ -171,7 +186,7 @@ $categorias = $stmtCat->fetchAll();
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Cambiar Foto (Opcional)</label>
                     <div class="d-flex align-items-center gap-3 mb-2">
-                        <img src="<?php echo htmlspecialchars($producto['imagen_url']); ?>" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
+                        <img src="<?php echo htmlspecialchars(imagen_url($producto['imagen_url'])); ?>" style="width: 50px; height: 50px; object-fit: cover;" class="rounded border">
                         <input type="file" name="imagen" class="form-control" accept="image/*">
                     </div>
                     <div class="form-text">Si no eliges archivo, se mantendrá la foto actual.</div>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 header('Content-Type: text/plain; charset=utf-8');
@@ -13,22 +13,33 @@ if (isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$config = require 'C:\xampp\micatalogo-config\db.php';
+$configPath = __DIR__ . '/../../micatalogo-config/db.php';
+if (!file_exists($configPath)) {
+    $configPath = 'C:\xampp\micatalogo-config\db.php';
+}
+$config = require $configPath;
 
 if ($es_admin) {
     $filename = 'backup_' . $config['db'] . '_' . date('Ymd_His') . '.sql';
     header('Content-Disposition: attachment; filename="' . $filename . '"');
 
+    $mysqldump = 'mysqldump';
+    $paths = ['C:\\xampp\\mysql\\bin\\mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe', 'mysqldump'];
+    foreach ($paths as $p) {
+        if (file_exists($p) || strpos($p, '\\') === false) { $mysqldump = $p; break; }
+    }
+
+    putenv("MYSQL_PWD={$config['pass']}");
     $cmd = sprintf(
-        '"C:\\xampp\\mysql\\bin\\mysqldump" --host=%s --user=%s --password=%s %s 2>&1',
+        '"%s" --host=%s --user=%s --single-transaction --routines --triggers %s 2>&1',
+        $mysqldump,
         escapeshellarg($config['host']),
         escapeshellarg($config['user']),
-        escapeshellarg($config['pass']),
         escapeshellarg($config['db'])
     );
 
-    putenv('PATH=' . getenv('PATH') . ';C:\\xampp\\mysql\\bin');
     passthru($cmd, $exit_code);
+    putenv("MYSQL_PWD");
 
     if ($exit_code !== 0) {
         header('Content-Type: text/html; charset=utf-8');

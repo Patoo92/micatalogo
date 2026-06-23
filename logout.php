@@ -1,6 +1,5 @@
 <?php
-session_start();
-session_destroy(); // Borra los datos de la sesión del servidor
-header("Location: login.php"); // Lo manda de vuelta al inicio
+require_once 'init_session.php';
+session_destroy();
+header("Location: login.php");
 exit;
-?>

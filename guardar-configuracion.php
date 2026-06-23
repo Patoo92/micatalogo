@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once 'init_session.php';
 require_once 'conexion.php';
 
 if (!isset($_SESSION['tienda_id'])) {
@@ -18,9 +18,21 @@ if (!verificar_csrf($_POST['_csrf'] ?? '')) {
     exit;
 }
 
-$instagram = $_POST['instagram'];
-$color = $_POST['color'];
-$whatsapp = $_POST['whatsapp'];
+$instagram = trim($_POST['instagram'] ?? '');
+$color = trim($_POST['color'] ?? '');
+$whatsapp = trim($_POST['whatsapp'] ?? '');
+
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+    $color = '#0d6efd';
+}
+if (!preg_match('/^\+?[0-9]{7,15}$/', $whatsapp)) {
+    header("Location: configuracion.php?error=whatsapp_invalido");
+    exit;
+}
+if (!empty($instagram) && !preg_match('/^[a-zA-Z0-9_.]+$/', $instagram)) {
+    header("Location: configuracion.php?error=instagram_invalido");
+    exit;
+}
 
 $logo_url = null;
 if (!empty($_FILES['logo']['name'])) {
@@ -37,8 +49,15 @@ if (!empty($_FILES['logo']['name'])) {
         header("Location: configuracion.php?error=tipo_archivo_no_permitido");
         exit;
     }
+    $EXT_POR_MIME = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+    ];
+    $ext = $EXT_POR_MIME[$mime_real] ?? 'png';
     $target_dir = "uploads/";
-    $logo_url = $target_dir . "logo_" . $tienda_id . "_" . time() . ".png";
+    $logo_url = $target_dir . "logo_" . $tienda_id . "_" . time() . "." . $ext;
     move_uploaded_file($_FILES["logo"]["tmp_name"], $logo_url);
 }
 

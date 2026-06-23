@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestión de Pedidos - <?php echo $tienda_nombre; ?></title>
+    <title>Gestión de Pedidos - <?php echo htmlspecialchars($tienda_nombre); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -26,7 +26,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
-                <?php echo $tienda_nombre; ?>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#pedidosNav">
                 <span class="navbar-toggler-icon"></span>
@@ -77,8 +77,8 @@
                                         <div class="fw-bold text-dark"><?php echo htmlspecialchars($ped['nombre_cliente']); ?></div>
                                     </td>
                                     <td>
-                                        <div><?php echo $ped['producto_nombre']; ?></div>
-                                        <small class="text-success fw-bold"><?php echo $ped['precio']; ?> €</small>
+                                        <div><?php echo htmlspecialchars($ped['producto_nombre']); ?></div>
+                                        <small class="text-success fw-bold"><?php echo htmlspecialchars($ped['precio']); ?> €</small>
                                     </td>
                                     <td class="text-muted" style="font-size: 0.85rem;">
                                         <?php echo date('d/m/Y H:i', strtotime($ped['fecha_pedido'])); ?>
@@ -96,9 +96,13 @@
                                     </td>
                                     <td class="text-end">
                                         <?php if ($ped['estado'] === 'Pendiente'): ?>
-                                            <a href="completar-pedido.php?id=<?php echo $ped['id']; ?>" class="btn btn-success btn-sm fw-bold btn-icon">
-                                                <iconify-icon icon="mdi:cash" width="16"></iconify-icon> Marcar como Vendido
-                                            </a>
+                                            <form method="POST" action="completar-pedido.php" class="d-inline">
+                                                <input type="hidden" name="id" value="<?php echo $ped['id']; ?>">
+                                                <?php echo csrf_field(); ?>
+                                                <button type="submit" class="btn btn-success btn-sm fw-bold btn-icon">
+                                                    <iconify-icon icon="mdi:cash" width="16"></iconify-icon> Marcar como Vendido
+                                                </button>
+                                            </form>
                                         <?php else: ?>
                                             <span class="badge bg-secondary badge-status"><iconify-icon icon="mdi:check" width="14"></iconify-icon> Venta cerrada</span>
                                         <?php endif; ?>
