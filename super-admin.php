@@ -248,7 +248,7 @@ $actividades = $stmtAct->fetchAll();
                                 <td class="text-end">
                                     <div class="d-flex gap-1 justify-content-end">
                                     <?php if ($tienda['activo']): ?>
-                                        <form method="POST" action="super-admin.php" class="d-inline" onsubmit="return confirm('¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?');">
+                                        <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Bloquear la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»?">
                                             <input type="hidden" name="toggle" value="0">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
@@ -262,7 +262,7 @@ $actividades = $stmtAct->fetchAll();
                                             <button type="submit" class="btn-desbloquear" style="border:none;cursor:pointer;">✅</button>
                                         </form>
                                     <?php endif; ?>
-                                        <form method="POST" action="super-admin.php" class="d-inline" onsubmit="return confirm('¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.');">
+                                        <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.">
                                             <input type="hidden" name="delete" value="<?php echo $tienda['id']; ?>">
                                             <input type="hidden" name="confirm" value="1">
                                             <?php echo csrf_field(); ?>
@@ -326,5 +326,16 @@ $actividades = $stmtAct->fetchAll();
         <?php endif; ?>
 
     </div>
+    <script nonce="<?= $csp_nonce ?>">
+    document.addEventListener('submit', function(e) {
+        var form = e.target.closest('.form-confirm');
+        if (form) {
+            var msg = form.getAttribute('data-confirm');
+            if (msg && !confirm(msg)) {
+                e.preventDefault();
+            }
+        }
+    });
+    </script>
 </body>
 </html>

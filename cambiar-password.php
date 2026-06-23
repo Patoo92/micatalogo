@@ -85,20 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script nonce="<?= $csp_nonce ?>">
+    function mostrarToastAdmin(mensaje, tipo) {
+        var el = document.getElementById('crudToast');
+        el.className = 'toast align-items-center border-0 show text-bg-' + tipo;
+        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:' + (tipo === 'success' ? 'check-circle' : 'alert-circle') + '" width="20"></iconify-icon> ' + mensaje;
+        setTimeout(function() { el.classList.remove('show'); }, 3000);
+    }
     <?php if ($exito): ?>
-    window.addEventListener('DOMContentLoaded', function() {
-        var t = document.getElementById('crudToast');
-        t.classList.add('text-bg-success');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> <?php echo js_escape($exito); ?>';
-        bootstrap.Toast.getOrCreateInstance(t).show();
-    });
+    window.addEventListener('DOMContentLoaded', function() { mostrarToastAdmin(<?php echo js_escape($exito); ?>, 'success'); });
     <?php elseif ($error): ?>
-    window.addEventListener('DOMContentLoaded', function() {
-        var t = document.getElementById('crudToast');
-        t.classList.add('text-bg-danger');
-        document.getElementById('toastBody').innerHTML = '<iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> <?php echo js_escape($error); ?>';
-        bootstrap.Toast.getOrCreateInstance(t).show();
-    });
+    window.addEventListener('DOMContentLoaded', function() { mostrarToastAdmin(<?php echo js_escape($error); ?>, 'danger'); });
     <?php endif; ?>
     </script>
 
@@ -130,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label fw-semibold">Contraseña actual</label>
                     <div class="input-wrapper">
                         <input type="password" name="password_actual" class="form-control" required>
-                        <button type="button" class="password-toggle" onclick="toggle('actual', 'eyeActual')">
-                            <iconify-icon icon="mdi:eye-outline" id="eyeActual" width="18"></iconify-icon>
+                        <button type="button" class="password-toggle" data-toggle-pass="actual">
+                            <iconify-icon icon="mdi:eye-outline" width="18"></iconify-icon>
                         </button>
                     </div>
                 </div>
@@ -139,8 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label fw-semibold">Nueva contraseña</label>
                     <div class="input-wrapper">
                         <input type="password" name="password_nueva" class="form-control" minlength="8" required>
-                        <button type="button" class="password-toggle" onclick="toggle('nueva', 'eyeNueva')">
-                            <iconify-icon icon="mdi:eye-outline" id="eyeNueva" width="18"></iconify-icon>
+                        <button type="button" class="password-toggle" data-toggle-pass="nueva">
+                            <iconify-icon icon="mdi:eye-outline" width="18"></iconify-icon>
                         </button>
                     </div>
                     <div class="form-text">Mínimo 8 caracteres.</div>
@@ -149,8 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label fw-semibold">Confirmar nueva contraseña</label>
                     <div class="input-wrapper">
                         <input type="password" name="password_confirmar" class="form-control" required>
-                        <button type="button" class="password-toggle" onclick="toggle('confirmar', 'eyeConfirm')">
-                            <iconify-icon icon="mdi:eye-outline" id="eyeConfirm" width="18"></iconify-icon>
+                        <button type="button" class="password-toggle" data-toggle-pass="confirmar">
+                            <iconify-icon icon="mdi:eye-outline" width="18"></iconify-icon>
                         </button>
                     </div>
                 </div>
@@ -162,17 +158,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script nonce="<?= $csp_nonce ?>">
-    function toggle(field, eyeId) {
-        var input = document.querySelector('input[name="password_' + field + '"]');
-        var icon = document.getElementById(eyeId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.setAttribute('icon', 'mdi:eye-off-outline');
-        } else {
-            input.type = 'password';
-            icon.setAttribute('icon', 'mdi:eye-outline');
-        }
-    }
+    document.querySelectorAll('[data-toggle-pass]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var field = this.getAttribute('data-toggle-pass');
+            var input = document.querySelector('input[name="password_' + field + '"]');
+            if (!input) return;
+            var icon = this.querySelector('iconify-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('icon', 'mdi:eye-off-outline');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('icon', 'mdi:eye-outline');
+            }
+        });
+    });
     </script>
 </body>
 </html>

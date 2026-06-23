@@ -17,6 +17,10 @@ $stmt = $pdo->prepare("SELECT * FROM tiendas WHERE id = ?");
 $stmt->execute([$_SESSION['tienda_id']]);
 $tienda = $stmt->fetch();
 
+if (!$tienda) {
+    mostrar_error("Tienda no encontrada", "La tienda no existe.", "admin.php", "Volver al panel");
+}
+
 $mensaje = '';
 if (isset($_GET['success'])) {
     $mensaje = '<div class="alert alert-success d-flex align-items-center gap-2"><iconify-icon icon="mdi:check-circle" width="20"></iconify-icon> Configuración guardada correctamente.</div>';

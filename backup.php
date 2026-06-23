@@ -61,6 +61,7 @@ if ($es_admin) {
     $stmt = $pdo->prepare("SELECT * FROM tiendas WHERE id = ?");
     $stmt->execute([$tienda_id]);
     $tienda = $stmt->fetch();
+    if (!$tienda) { echo "# Tienda no encontrada\n\n"; continue; }
     echo "# Datos de tienda\n";
     echo "UPDATE tiendas SET nombre_tienda = " . $pdo->quote($tienda['nombre_tienda']) . " WHERE id = $tienda_id;\n\n";
 

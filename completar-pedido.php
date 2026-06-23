@@ -50,7 +50,7 @@ try {
             $stmtEmail->execute([$tienda_id]);
             $tienda = $stmtEmail->fetch();
 
-            if (!empty($tienda['email'])) {
+            if ($tienda && !empty($tienda['email'])) {
                 $asunto  = "⚠️ ALERTA: Stock Crítico - " . $producto['nombre'];
 
                 $mensaje  = "Hola,\n\n";
@@ -69,13 +69,15 @@ try {
             $stmtTiendaMail->execute([$tienda_id]);
             $tiendaInfo = $stmtTiendaMail->fetch();
 
-            $asunto = "✅ Pedido Completado - " . $producto['nombre'];
-            $mensaje = "Hola " . htmlspecialchars($pedido['nombre_cliente']) . ",<br><br>";
-            $mensaje .= "Tu pedido de <strong>" . htmlspecialchars($producto['nombre']) . "</strong> ha sido completado.<br><br>";
-            $mensaje .= "Gracias por tu compra.<br><br>";
-            $mensaje .= "Saludos,<br>" . htmlspecialchars($tiendaInfo['nombre_tienda']);
+            if ($tiendaInfo) {
+                $asunto = "✅ Pedido Completado - " . $producto['nombre'];
+                $mensaje = "Hola " . htmlspecialchars($pedido['nombre_cliente']) . ",<br><br>";
+                $mensaje .= "Tu pedido de <strong>" . htmlspecialchars($producto['nombre']) . "</strong> ha sido completado.<br><br>";
+                $mensaje .= "Gracias por tu compra.<br><br>";
+                $mensaje .= "Saludos,<br>" . htmlspecialchars($tiendaInfo['nombre_tienda']);
 
-            enviar_email($pedido['email_cliente'], $asunto, $mensaje);
+                enviar_email($pedido['email_cliente'], $asunto, $mensaje);
+            }
         }
     }
 
