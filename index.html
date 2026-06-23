@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS WhatsApp Commerce | Presentación</title>
+    <title>micatalogo — Catálogo + Pedidos WhatsApp</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -15,17 +15,14 @@
             color: #1a1f36;
             background-color: #f7fafc;
         }
-        
         .text-accent { color: #10b981; }
         .bg-accent { background-color: #10b981; }
         .bg-accent:hover { background-color: #059669; }
-        
         .hero-section {
             padding: 120px 0 80px;
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
         }
-        
         .hero-title {
             font-weight: 800;
             font-size: 3.5rem;
@@ -33,16 +30,13 @@
             letter-spacing: -0.03em;
             margin-bottom: 24px;
         }
-
         .browser-mockup {
             background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
             overflow: hidden;
             border: 1px solid #e2e8f0;
-            position: relative;
         }
-        
         .browser-header {
             background: #f8fafc;
             padding: 12px 16px;
@@ -50,41 +44,35 @@
             display: flex;
             gap: 6px;
         }
-        
         .browser-dot {
             width: 10px; height: 10px; border-radius: 50%;
             background-color: #cbd5e1;
         }
-
         .mobile-mockup {
             background: #ffffff;
             border-radius: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
             overflow: hidden;
             border: 8px solid #0f172a;
             max-width: 320px;
             margin: 0 auto;
         }
-
         .pricing-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
-            padding: 48px;
+            padding: 40px 32px;
             transition: all 0.2s ease;
+            position: relative;
         }
-        
         .pricing-card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
             transform: translateY(-5px);
         }
-
         .pricing-card.premium {
             border: 2px solid #10b981;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(16,185,129,0.1);
         }
-
         .premium-badge {
             position: absolute;
             top: -12px;
@@ -99,7 +87,6 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
-
         .btn-custom {
             padding: 14px 32px;
             font-weight: 600;
@@ -107,20 +94,55 @@
             text-decoration: none;
             display: inline-block;
         }
-        
         .feature-list {
             list-style: none;
             padding: 0;
         }
-        
         .feature-list li {
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #f1f5f9;
             color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        
-        .feature-list li:last-child {
-            border-bottom: none;
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li .icon { color: #10b981; font-size: 1.1rem; flex-shrink: 0; }
+        .feature-list li.disabled { color: #94a3b8; }
+        .feature-list li.disabled .icon { color: #cbd5e1; }
+        .pill {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 12px;
+        }
+        .pricing-card.premium .pill { background: #d1fae5; color: #047857; }
+        .price-addon {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .toggle-container {
+            display: inline-flex;
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 4px;
+        }
+        .toggle-container a {
+            padding: 8px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #64748b;
+            transition: all 0.15s;
+        }
+        .toggle-container a.active {
+            background: #ffffff;
+            color: #1a1f36;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -129,22 +151,24 @@
     <section class="hero-section text-center">
         <div class="container">
             <h1 class="hero-title">Ventas en WhatsApp,<br>gestionadas como software.</h1>
-            <p class="lead text-secondary mx-auto mb-5" style="max-width: 700px; font-size: 1.25rem;">
-                Elimina las conversaciones repetitivas. Un catálogo inteligente que captura el pedido, controla tu stock en tiempo real y redirige a tus clientes directamente a la compra.
+            <p class="lead text-secondary mx-auto mb-4" style="max-width: 700px; font-size: 1.25rem;">
+                Un catálogo inteligente que captura el pedido, controla tu stock en tiempo real y redirige a tus clientes directo a WhatsApp.
             </p>
-            
+            <p class="mb-5" style="font-size: 1.1rem;">
+                <iconify-icon icon="mdi:rocket-launch" width="20" style="color:#10b981;"></iconify-icon>
+                <strong>3 días gratis</strong>, sin tarjeta de crédito.
+            </p>
             <div class="mb-5">
-                <a href="registro.php" class="btn-custom bg-accent text-white me-3">Crear mi tienda gratis</a>
+                <a href="registro.php" class="btn-custom bg-accent text-white me-3">Probar gratis 3 días</a>
                 <a href="#precios" class="btn-custom bg-light text-dark border">Ver planes</a>
             </div>
-
             <div class="browser-mockup mx-auto mt-5" style="max-width: 900px;">
                 <div class="browser-header">
                     <div class="browser-dot"></div>
                     <div class="browser-dot"></div>
                     <div class="browser-dot"></div>
                 </div>
-                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); height:420px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:1rem;">
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); height:420px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">
                     <iconify-icon icon="mdi:view-dashboard-outline" width="80" style="color:#334155;"></iconify-icon>
                 </div>
             </div>
@@ -153,16 +177,16 @@
 
     <section class="container py-5 my-5">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6 pr-lg-5">
-                <h6 class="text-accent fw-bold text-uppercase tracking-wide mb-3">Front-Office Optimizado</h6>
-                <h2 class="fw-bold mb-4 display-6">Catálogo sin fricciones.</h2>
+            <div class="col-lg-6">
+                <h6 class="text-accent fw-bold text-uppercase mb-3">Catálogo</h6>
+                <h2 class="fw-bold mb-4 display-6">Sin fricciones.</h2>
                 <p class="text-secondary fs-5 mb-4">
-                    La mayoría de ventas se pierden porque el cliente tiene que preguntar si hay disponibilidad. Nuestro sistema bloquea compras sin stock y muestra tu inventario actualizado en milisegundos.
+                    La mayoría de ventas se pierden porque el cliente tiene que preguntar disponibilidad. Nuestro sistema bloquea compras sin stock y muestra tu inventario actualizado al instante.
                 </p>
                 <ul class="feature-list fs-5">
-                    <li>Sistema web ultrarrápido, sin descargas.</li>
-                    <li>Captura de intención de compra (Pre-Pedido).</li>
-                    <li>Redirección automatizada a la API de WhatsApp.</li>
+                    <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Sistema web ultrarrápido, sin descargas.</li>
+                    <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Captura de intención de compra (Pre-Pedido).</li>
+                    <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Redirección automatizada a la API de WhatsApp.</li>
                 </ul>
             </div>
             <div class="col-lg-6 text-center">
@@ -178,16 +202,16 @@
     <section class="bg-white py-5 my-5 border-top border-bottom">
         <div class="container py-5">
             <div class="row align-items-center g-5 flex-row-reverse">
-                <div class="col-lg-6 pl-lg-5">
-                    <h6 class="text-accent fw-bold text-uppercase tracking-wide mb-3">Back-Office Corporativo</h6>
-                    <h2 class="fw-bold mb-4 display-6">Control total sobre tu inventario.</h2>
+                <div class="col-lg-6">
+                    <h6 class="text-accent fw-bold text-uppercase mb-3">Back-Office</h6>
+                    <h2 class="fw-bold mb-4 display-6">Control total.</h2>
                     <p class="text-secondary fs-5 mb-4">
-                        Una interfaz de gestión limpia donde tú tienes el control. Procesa pedidos entrantes con un solo clic y deja que el sistema se encargue de la base de datos.
+                        Una interfaz limpia donde gestionas productos, procesas pedidos con un clic y controlas tu inventario en tiempo real.
                     </p>
                     <ul class="feature-list fs-5">
-                        <li>Arquitectura Multi-tienda aislada y segura.</li>
-                        <li>Protección de accesos con cifrado BCRYPT.</li>
-                        <li>Alertas automatizadas por stock crítico.</li>
+                        <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Arquitectura multi-tienda aislada y segura.</li>
+                        <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Acceso para staff (varios usuarios por tienda).</li>
+                        <li><iconify-icon icon="mdi:check-circle" class="icon" width="20"></iconify-icon> Alertas automatizadas por stock crítico.</li>
                     </ul>
                 </div>
                 <div class="col-lg-6">
@@ -210,58 +234,147 @@
     </section>
 
     <section id="precios" class="container py-5 my-5">
-        <div class="text-center mb-5 pb-3">
-            <h2 class="fw-bold display-6 mb-3">Modelos de Despliegue</h2>
-            <p class="text-secondary fs-5">Soluciones escalables para negocios de todo tamaño.</p>
+        <div class="text-center mb-4">
+            <h2 class="fw-bold display-6 mb-3">Planes simples, sin sorpresas</h2>
+            <p class="text-secondary fs-5 mb-4">Paga solo lo que necesitas. Todos los planes incluyen 3 días de prueba gratuita.</p>
+            <div class="toggle-container mb-5" id="billingToggle">
+                <a href="#" class="active" data-period="monthly">Mensual</a>
+                <a href="#" data-period="annual">Anual <span class="pill">-20%</span></a>
+            </div>
         </div>
 
         <div class="row g-4 justify-content-center">
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="pricing-card premium h-100">
-                    <div class="premium-badge">Recomendado</div>
-                    <h3 class="fw-bold mb-2">Cloud SaaS</h3>
-                    <p class="text-secondary mb-4">Todo incluido. Listo para operar.</p>
-                    <div class="mb-4">
-                        <span class="display-4 fw-bold">19€</span>
+            <div class="col-xl-3 col-lg-6">
+                <div class="pricing-card h-100 d-flex flex-column">
+                    <h3 class="fw-bold mb-1">Starter</h3>
+                    <p class="text-secondary mb-3" style="font-size:0.9rem;">Para empezar</p>
+                    <div class="mb-3">
+                        <span class="display-4 fw-bold monthly-price">7€</span>
+                        <span class="annual-price d-none"><span class="display-4 fw-bold">5,60€</span></span>
                         <span class="text-secondary">/ mes</span>
                     </div>
-                    <ul class="feature-list text-start mb-5">
-                        <li>Alojamiento en nuestros servidores</li>
-                        <li>Dominio personalizado opcional</li>
-                        <li>Mantenimiento y actualizaciones base</li>
-                        <li>Base de datos aislada (Multi-tenant)</li>
+                    <div class="annual-note d-none text-accent fw-semibold small mb-2">Facturado 67,20€/año</div>
+                    <ul class="feature-list text-start mb-4 flex-grow-1">
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 1 tienda</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 1 staff</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Productos ilimitados</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Subdominio .micatalogo.app</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Soporte por email</li>
+                        <li class="disabled"><iconify-icon icon="mdi:close" class="icon" width="18"></iconify-icon> Dominio personalizado</li>
+                        <li class="disabled"><iconify-icon icon="mdi:close" class="icon" width="18"></iconify-icon> Marca blanca</li>
                     </ul>
-                    <a href="registro.php" class="btn-custom bg-accent text-white w-100 text-center d-block">Iniciar Suscripción</a>
+                    <a href="registro.php" class="btn-custom bg-light text-dark border w-100 text-center d-block">Probar gratis 3 días</a>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6">
-                <div class="pricing-card h-100">
-                    <h3 class="fw-bold mb-2">On-Premise</h3>
-                    <p class="text-secondary mb-4">Licencia perpetua y código fuente.</p>
-                    <div class="mb-4">
-                        <span class="display-4 fw-bold">2.200€</span>
-                        <span class="text-secondary">pago único</span>
+            <div class="col-xl-3 col-lg-6">
+                <div class="pricing-card premium h-100 d-flex flex-column">
+                    <div class="premium-badge">Más popular</div>
+                    <h3 class="fw-bold mb-1">Pro</h3>
+                    <p class="text-secondary mb-3" style="font-size:0.9rem;">Para negocios en crecimiento</p>
+                    <div class="mb-3">
+                        <span class="display-4 fw-bold monthly-price">12€</span>
+                        <span class="annual-price d-none"><span class="display-4 fw-bold">9,60€</span></span>
+                        <span class="text-secondary">/ mes</span>
                     </div>
-                    <ul class="feature-list text-start mb-5">
-                        <li>Propiedad del 100% del código fuente</li>
-                        <li>Instalación en servidor del cliente</li>
-                        <li>Integración de marca blanca</li>
-                        <li>Sin pagos mensuales recurrentes</li>
+                    <div class="annual-note d-none text-accent fw-semibold small mb-2">Facturado 115,20€/año</div>
+                    <ul class="feature-list text-start mb-4 flex-grow-1">
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 1 tienda</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 3 staff <span class="pill">+3€/mes extra c/u</span></li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Productos ilimitados</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Dominio personalizado</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Alertas de stock × email</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Soporte prioritario</li>
+                        <li class="disabled"><iconify-icon icon="mdi:close" class="icon" width="18"></iconify-icon> Marca blanca</li>
                     </ul>
-                    <a href="#" class="btn-custom bg-light text-dark border w-100 text-center d-block">Solicitar Cotización</a>
+                    <a href="registro.php" class="btn-custom bg-accent text-white w-100 text-center d-block">Probar gratis 3 días</a>
                 </div>
             </div>
 
+            <div class="col-xl-3 col-lg-6">
+                <div class="pricing-card h-100 d-flex flex-column">
+                    <h3 class="fw-bold mb-1">Business</h3>
+                    <p class="text-secondary mb-3" style="font-size:0.9rem;">Multi-tienda y agencias</p>
+                    <div class="mb-3">
+                        <span class="display-4 fw-bold monthly-price">19€</span>
+                        <span class="annual-price d-none"><span class="display-4 fw-bold">15,20€</span></span>
+                        <span class="text-secondary">/ mes</span>
+                    </div>
+                    <div class="annual-note d-none text-accent fw-semibold small mb-2">Facturado 182,40€/año</div>
+                    <ul class="feature-list text-start mb-4 flex-grow-1">
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 3 tiendas <span class="pill">+15€/mes extra c/u</span></li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 10 staff</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Productos ilimitados</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Dominio personalizado</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Marca blanca (sin branding)</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> API</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Soporte prioritario</li>
+                    </ul>
+                    <a href="registro.php" class="btn-custom bg-light text-dark border w-100 text-center d-block">Probar gratis 3 días</a>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="pricing-card h-100 d-flex flex-column" style="border-color:#94a3b8; background:#f8fafc;">
+                    <h3 class="fw-bold mb-1">Enterprise</h3>
+                    <p class="text-secondary mb-3" style="font-size:0.9rem;">Para grandes volúmenes</p>
+                    <div class="mb-3">
+                        <span class="display-4 fw-bold">A medida</span>
+                    </div>
+                    <ul class="feature-list text-start mb-4 flex-grow-1">
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Tiendas ilimitadas</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Staff ilimitado</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Instancia dedicada</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> On-premise (sin código fuente)</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> SLA 99,9%</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Soporte 24/7</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Desarrollo a medida</li>
+                    </ul>
+                    <a href="mailto:ventas@micatalogo.app" class="btn-custom bg-dark text-white w-100 text-center d-block">Contactar</a>
+                </div>
+            </div>
         </div>
+
+        <p class="text-center text-secondary mt-4" style="font-size:0.85rem;">
+            Precios sin IVA. Todos los planes inician con 3 días de prueba gratuita, sin necesidad de tarjeta.
+        </p>
     </section>
 
     <footer class="bg-white border-top py-5 text-center text-secondary">
         <div class="container">
-            <p class="mb-0">© 2026 Plataforma de Gestión de Pedidos. Arquitectura PHP & MySQL.</p>
+            <p class="mb-1">© 2026 micatalogo.app — Catálogo + Pedidos WhatsApp SaaS</p>
+            <p class="mb-0 small">PHP &middot; MySQL &middot; Arquitectura multi-tenant</p>
         </div>
     </footer>
 
+    <script>
+    (function() {
+        var links = document.querySelectorAll('#billingToggle a');
+        var period = 'monthly';
+
+        function actualizar(p) {
+            period = p;
+            links.forEach(function(el) {
+                el.classList.toggle('active', el.dataset.period === p);
+            });
+            document.querySelectorAll('.monthly-price').forEach(function(el) {
+                el.classList.toggle('d-none', p !== 'monthly');
+            });
+            document.querySelectorAll('.annual-price').forEach(function(el) {
+                el.classList.toggle('d-none', p !== 'annual');
+            });
+            document.querySelectorAll('.annual-note').forEach(function(el) {
+                el.classList.toggle('d-none', p !== 'annual');
+            });
+        }
+
+        links.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                actualizar(this.dataset.period);
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

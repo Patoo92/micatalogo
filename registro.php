@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="register-card">
-        <div class="brand-badge">Nuevo en el plan</div>
+        <div class="brand-badge">3 días gratis</div>
         <h2 class="fw-bold mb-1" style="font-size: 1.6rem;">Crea tu tienda</h2>
         <p class="text-muted mb-4" style="font-size: 0.95rem;">Rellena los datos y empieza a vender por WhatsApp hoy mismo.</p>
 
