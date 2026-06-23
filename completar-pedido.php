@@ -76,7 +76,8 @@ try {
                 $mensaje .= "Gracias por tu compra.<br><br>";
                 $mensaje .= "Saludos,<br>" . htmlspecialchars($tiendaInfo['nombre_tienda']);
 
-                enviar_email($pedido['email_cliente'], $asunto, $mensaje);
+                $from = !empty($_SESSION['marca_blanca']) ? $tiendaInfo['nombre_tienda'] : null;
+                enviar_email($pedido['email_cliente'], $asunto, $mensaje, $from);
             }
         }
     }

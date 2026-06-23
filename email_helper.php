@@ -16,7 +16,7 @@ if (file_exists($autoload)) {
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-function enviar_email($para, $asunto, $cuerpo_html) {
+function enviar_email($para, $asunto, $cuerpo_html, $from_name = null) {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
@@ -27,7 +27,7 @@ function enviar_email($para, $asunto, $cuerpo_html) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = SMTP_PORT;
 
-        $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+        $mail->setFrom(SMTP_FROM, $from_name ?: SMTP_FROM_NAME);
         $mail->addAddress($para);
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';

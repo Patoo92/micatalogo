@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email = trim($_POST['email']);
 
-        $stmt = $pdo->prepare("SELECT id, nombre_tienda, usuario FROM tiendas WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, nombre_tienda, usuario, marca_blanca FROM tiendas WHERE email = ?");
         $stmt->execute([$email]);
         $tienda = $stmt->fetch();
 
@@ -23,16 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $host = $_SERVER['HTTP_HOST'] ?? '';
             if (!preg_match('/^[a-z0-9\.\-:]+$/i', $host)) { $host = 'localhost'; }
             $link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $host . '/micatalogo/reset-password.php?token=' . urlencode($token);
+            $footer = '';
+            if (empty($tienda['marca_blanca'])) {
+                $footer = '<hr><small style="color:#94a3b8;">micatalogo.app — tu tienda online</small>';
+            }
             $cuerpo = '<h2>Recuperación de contraseña</h2>
                 <p>Hola <strong>' . htmlspecialchars($tienda['nombre_tienda']) . '</strong>,</p>
                 <p>Recibimos una solicitud para restablecer tu contraseña. Hacé clic en el botón de abajo:</p>
                 <p style="text-align:center;margin:30px 0;">
                     <a href="' . $link . '" style="background:#10b981;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Restablecer Contraseña</a>
                 </p>
-                <p>Si no solicitaste esto, ignorá este mensaje.</p>
-                <hr><small style="color:#94a3b8;">micatalogo.app — tu tienda online</small>';
+                <p>Si no solicitaste esto, ignorá este mensaje.</p>' . $footer;
 
-            if (enviar_email($email, 'Recupera tu contraseña de ' . $tienda['nombre_tienda'], $cuerpo)) {
+            $from_name = !empty($tienda['marca_blanca']) ? $tienda['nombre_tienda'] : null;
+            if (enviar_email($email, 'Recupera tu contraseña de ' . $tienda['nombre_tienda'], $cuerpo, $from_name)) {
                 $mensaje = '<div class="alert alert-success"><strong>Correo enviado.</strong> Revisá tu bandeja de entrada (y la carpeta de spam).</div>';
             } else {
                 $mensaje = '<div class="alert alert-warning">

@@ -92,6 +92,63 @@
                 </a>
             </div>
         </div>
+
+        <div class="card card-config p-4 mt-4">
+            <h5 class="mb-3 d-flex align-items-center gap-2">
+                <iconify-icon icon="mdi:key-variant" width="24"></iconify-icon>
+                API Keys
+            </h5>
+            <p class="text-muted small mb-3">Usa estas claves para acceder a tus datos desde aplicaciones externas (productos, pedidos, categorías).</p>
+
+            <?php if (count($api_keys) > 0): ?>
+                <div class="mb-3">
+                    <?php foreach ($api_keys as $k): ?>
+                        <div class="d-flex align-items-center justify-content-between border rounded p-2 mb-2" style="background:#f8fafc;">
+                            <div>
+                                <strong><?php echo htmlspecialchars($k['nombre']); ?></strong>
+                                <code style="font-size:0.75rem;color:#64748b;display:block;"><?php echo htmlspecialchars(substr($k['api_key'], 0, 16)) . '…'; ?></code>
+                                <small class="text-muted">Creada: <?php echo htmlspecialchars($k['created_at']); ?></small>
+                            </div>
+                            <form method="POST" action="configuracion.php" class="d-inline">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="key_id" value="<?php echo $k['id']; ?>">
+                                <button type="submit" name="revocar_api_key" class="btn btn-sm btn-outline-danger btn-icon" onclick="return confirm('¿Revocar esta API Key? Las integraciones que la usen dejarán de funcionar.');">
+                                    <iconify-icon icon="mdi:delete" width="14"></iconify-icon> Revocar
+                                </button>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="text-muted small">No hay API Keys. Generá una para empezar.</p>
+            <?php endif; ?>
+
+            <form method="POST" action="configuracion.php" class="d-flex gap-2 align-items-end">
+                <?php echo csrf_field(); ?>
+                <div class="flex-grow-1">
+                    <label class="form-label-custom">Nombre para identificar esta key</label>
+                    <input type="text" name="nombre_key" class="form-control" placeholder="Ej: App mobile, integración web" value="API v1">
+                </div>
+                <button type="submit" name="generar_api_key" class="btn btn-primary btn-icon py-2" style="font-weight:600;">
+                    <iconify-icon icon="mdi:plus" width="16"></iconify-icon> Generar
+                </button>
+            </form>
+
+            <p class="small text-muted mt-3 mb-0">
+                <iconify-icon icon="mdi:information" width="14"></iconify-icon>
+                Documentación: <code>GET /api.php?action=productos&api_key=...</code>
+            </p>
+        </div>
+
+        <script nonce="<?= $csp_nonce ?>">
+        document.querySelectorAll('button[name="revocar_api_key"]').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('¿Revocar esta API Key? Las integraciones que la usen dejarán de funcionar.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        </script>
     </div>
 </body>
 </html>
