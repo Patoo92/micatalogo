@@ -35,6 +35,10 @@
     </nav>
 
     <div class="sidebar-footer">
+        <a href="#" id="darkModeToggle" class="sidebar-link">
+            <iconify-icon icon="mdi:weather-night" width="18"></iconify-icon>
+            <span>Modo oscuro</span>
+        </a>
         <a href="index.php?tienda=<?php echo htmlspecialchars($_SESSION['tienda_slug']); ?>" target="_blank" class="sidebar-link">
             <iconify-icon icon="mdi:eye" width="18"></iconify-icon>
             Ver tienda

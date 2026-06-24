@@ -85,7 +85,11 @@
             <div>
                 <h2 class="fw-bold text-dark m-0 d-flex align-items-center gap-2"><iconify-icon icon="mdi:package-variant-closed" width="28"></iconify-icon> Inventario</h2>
             </div>
-            <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
+            <div class="d-flex gap-2">
+                <a href="exportar-productos.php" class="btn btn-outline-success fw-bold btn-icon btn-sm d-none d-md-inline-flex"><iconify-icon icon="mdi:file-download" width="16"></iconify-icon> Exportar</a>
+                <a href="importar-productos.php" class="btn btn-outline-info fw-bold btn-icon btn-sm d-none d-md-inline-flex"><iconify-icon icon="mdi:file-upload" width="16"></iconify-icon> Importar</a>
+                <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
+            </div>
         </div>
 
         <?php if (count($productos) === 0): ?>
@@ -137,6 +141,8 @@
                             <th>Categoría</th>
                             <th>Precio</th>
                             <th class="text-center">Stock</th>
+                            <th class="text-center">Destacado</th>
+                            <th>Etiqueta</th>
                             <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
@@ -149,12 +155,14 @@
                                 <small class="text-muted">ID #<?php echo $prod['id']; ?></small>
                             </td>
                             <td><span class="badge bg-secondary"><?php echo htmlspecialchars($prod['nombre_categoria'] ?? 'Sin categoría'); ?></span></td>
-                            <td class="fw-bold text-primary"><?php echo htmlspecialchars($prod['precio']); ?> €</td>
+                            <td class="fw-bold text-primary"><?php echo htmlspecialchars($prod['precio']); ?> <?php echo htmlspecialchars($moneda_tienda ?? '€'); ?></td>
                             <td class="text-center">
                                 <span class="badge badge-stock <?php echo ($prod['stock'] <= $prod['stock_minimo']) ? 'bg-danger' : 'bg-success'; ?>">
                                     <?php echo $prod['stock']; ?> uds
                                 </span>
                             </td>
+                            <td class="text-center"><?php echo !empty($prod['destacado']) ? '<iconify-icon icon="mdi:star" width="18" style="color:#f59e0b;"></iconify-icon>' : ''; ?></td>
+                            <td><?php echo !empty($prod['etiqueta']) ? '<span class="badge" style="background:' . ($prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b')) . ';">' . htmlspecialchars($prod['etiqueta']) . '</span>' : ''; ?></td>
                             <td class="text-end">
                                 <div class="btn-group">
                                     <a href="editar-producto.php?id=<?php echo $prod['id']; ?>" class="btn btn-sm btn-outline-secondary btn-action" title="Editar">
@@ -185,5 +193,27 @@
         </nav>
         <?php endif; ?>
     </div>
+    <script nonce="<?= $csp_nonce ?>">
+    (function() {
+        var toggle = document.getElementById('darkModeToggle');
+        var icon = toggle && toggle.querySelector('iconify-icon');
+        var span = toggle && toggle.querySelector('span');
+        if (localStorage.getItem('dark_mode') === '1') {
+            document.body.classList.add('dark-mode');
+            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+            if (span) span.textContent = 'Modo claro';
+        }
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                var isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('dark_mode', isDark ? '1' : '0');
+                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

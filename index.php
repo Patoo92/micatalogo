@@ -30,6 +30,10 @@ try {
     $stmtCat->execute([$tienda_id]);
     $categorias = $stmtCat->fetchAll();
 
+    $stmtDest = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? AND destacado = 1 AND stock > 0");
+    $stmtDest->execute([$tienda_id]);
+    $destacados = $stmtDest->fetchAll();
+
     $categoria_filtrada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
 
     if ($categoria_filtrada) {

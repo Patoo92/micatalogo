@@ -77,6 +77,21 @@ try {
         exit;
     }
 
+    // Email de confirmación al cliente
+    if (!empty($email_cliente)) {
+        require_once 'email_helper.php';
+        $stmtTiendaInfo = $pdo->prepare("SELECT nombre_tienda, marca_blanca FROM tiendas WHERE id = ?");
+        $stmtTiendaInfo->execute([$tienda_id]);
+        $tiendaInfo = $stmtTiendaInfo->fetch();
+        $from_name = !empty($tiendaInfo['marca_blanca']) ? $tiendaInfo['nombre_tienda'] : null;
+        $asunto = 'Confirmación de pedido - ' . $tiendaInfo['nombre_tienda'];
+        $cuerpo = '<p>Hola <strong>' . htmlspecialchars($nombre_cliente) . '</strong>,</p>'
+                . '<p>Hemos recibido tu pedido en <strong>' . htmlspecialchars($tiendaInfo['nombre_tienda']) . '</strong>.</p>'
+                . '<p>Te contactaremos pronto por WhatsApp para confirmar los detalles.</p>'
+                . '<p>Gracias por tu compra.</p>';
+        enviar_email($email_cliente, $asunto, $cuerpo, $from_name);
+    }
+
     echo json_encode(['success' => true, 'message' => "Pedido guardado ($creados producto(s))."]);
 
 } catch (\PDOException $e) {

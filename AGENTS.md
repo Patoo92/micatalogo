@@ -21,21 +21,30 @@
 - Staff con permisos granulares
 - API keys + API REST (api.php, api-productos.php)
 - Marca blanca (oculta branding en emails y catálogo público)
-- Productos: CRUD, stock, stock mínimo, alerta email, thumbnails, WebP con fallback
-- Catálogo público (catalogo.php) con carrito, lightbox, compartir WhatsApp, meta tags OG/Twitter
-- Página individual de producto (producto.php)
-- Pedidos: agrupados por cliente+fecha, expandibles, completar, cancelar con restauración de stock
+- Productos: CRUD, stock, stock mínimo, alerta email, thumbnails, WebP con fallback, destacado, etiqueta (Nuevo/Oferta/Sin stock)
+- Catálogo público (catalogo.php) con carrito, lightbox, compartir WhatsApp, meta tags OG/Twitter, hero personalizable, CSS custom, tracking
+- Página individual de producto (producto.php) con meta tags, tracking, CSS custom, etiqueta badge
+- Pedidos: agrupados por cliente+fecha, expandibles, completar, cancelar con restauración de stock, email de confirmación al cliente
 - Super-admin: gestión de tiendas, actividad, cambiar plan, extender trial
 - Seguridad: CSP nonce, CSRF tokens, rate limiting login, FOR UPDATE en pedidos
 - Email: SMTP Brevo con PHPMailer, alertas stock mínimo, confirmación al cliente
+- Configuración de tienda: nombre, email, moneda, redes sociales (Facebook, TikTok, Twitter/X), descripción, dirección, horario, mensaje WhatsApp, banner, hero title/subtitle, meta tags, tracking, CSS personalizado, notificaciones
+- Footer genérico con dirección/horario, cookies consent banner, página de privacidad
+- Exportar/Importar productos CSV
 
 ### Sidebar lateral (navegación moderna)
 - Creado `templates/sidebar_partial.php`: sidebar fijo (240px) en escritorio con gradiente oscuro
 - Navbar superior visible solo en móvil (`d-lg-none`), sidebar oculto en móvil (`d-none d-lg-flex`)
-- Links: Productos, Pedidos, Staff, Historial, Configuración, Respaldo + Ver tienda, Cambiar contraseña, Salir
+- Links: Productos, Pedidos, Staff, Historial, Configuración, Respaldo + Modo oscuro, Ver tienda, Cambiar contraseña, Salir
 - Link activo resaltado con CSS dinámico `basename($_SERVER['PHP_SELF'])`
-- Aplicado en 8 templates/admin pages para consistencia visual
+- Aplicado en todos los templates admin para consistencia visual
 - Estilos en `Css/style.css` con hover/active states
+
+### Dark mode
+- Toggle en sidebar (ídem `darkModeToggle`) con persistencia en `localStorage('dark_mode')`
+- Script replicado en cada admin page (`admin_body.php`, `config_body.php`, `pedidos_body.php`, y páginas standalone)
+- CSS: overrides para glass-card, glass-table, sidebar, forms, botones, badges, paginación, inputs, tables, etc. bajo `body.dark-mode`
+- Clase `dark-mode` se aplica/remueve del `<body>`
 
 ### Landing con capturas reales
 - `index.html`: reemplazados placeholders por `imagenes/captura-admin.jpg` y `captura-movil.jpg`
@@ -61,12 +70,19 @@
 - `tiendas.plan VARCHAR(20) DEFAULT 'starter'`
 - `tiendas.trial_ends_at DATE NULL`
 - Migrations: `migrations/004_planes.sql`, `migrations/005_trial.sql`
+- Nuevas columnas en `tiendas`: nombre_tienda, email, moneda, facebook_url, tiktok_url, twitter_url, descripcion, direccion, horario, mensaje_whatsapp, banner, notif_nuevo_pedido, notif_stock_bajo, meta_descripcion, meta_palabras_clave, codigo_tracking, css_personalizado, hero_title, hero_subtitle
+- Nuevas columnas en `productos`: destacado (TINYINT(1)), etiqueta (VARCHAR(20))
 
 #### Otras correcciones
 - Botones admin navbar: cambiados de `btn-outline-light` a `btn-light` + `text-white`
 - Bootstrap JS agregado en pedidos_body.php (faltaba)
 - Enlace "Mejorar plan" ahora apunta a `index.html#planes` con nota de gestión manual
 - `mostrar_error()` no tiene CSP nonce (página standalone sin scripts)
+- Tabla de productos en admin: columnas Destacado (estrella), Etiqueta (badge color), moneda desde config
+- Exportar/Importar CSV: botones en header inventario, archivos exportar-productos.php / importar-productos.php
+- `backup.php`: fix `continue` fuera de loop cambiado a `exit`
+- `card-config`: removed `background: transparent !important`
+- Dark mode: agregado a todos los admin pages con toggle persistente
 
 ### Archivos relevantes
 - `/micatalogo/`: PHP raíz (cada archivo = una ruta)
@@ -88,3 +104,5 @@
 - `conexion.php` incluye `helpers.php` con `require_once`; `init_session.php` no incluye helpers
 - El toast usa `mostrarToast()` definido en `templates/toast_partial.php`
 - Las rutas de configuración tienen fallback a `C:\xampp\micatalogo-config\` si la ruta relativa no existe
+- El dark mode se persiste en `localStorage` con clave `dark_mode` ('1' = activo)
+- Para agregar dark mode a una página nueva: (1) sidebar ya tiene el toggle, (2) copiar el script bloque justo antes de `</body>`

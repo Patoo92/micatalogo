@@ -111,5 +111,27 @@ $actividades = $stmt->fetchAll();
             </div>
         <?php endif; ?>
     </div>
+    <script nonce="<?= $csp_nonce ?>">
+    (function() {
+        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var toggle = document.getElementById('darkModeToggle');
+        var icon = toggle && toggle.querySelector('iconify-icon');
+        var span = toggle && toggle.querySelector('span');
+        if (localStorage.getItem('dark_mode') === '1') {
+            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+            if (span) span.textContent = 'Modo claro';
+        }
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                var isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('dark_mode', isDark ? '1' : '0');
+                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

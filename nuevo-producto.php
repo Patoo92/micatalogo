@@ -69,11 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $url_thumb = $thumb_ruta;
         }
 
+        $destacado = !empty($_POST['destacado']) ? 1 : 0;
+        $etiqueta = trim($_POST['etiqueta'] ?? '');
+
         if (empty($error)) try {
-            $sql = "INSERT INTO productos (tienda_id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, imagen_url, imagen_thumb) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO productos (tienda_id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, destacado, etiqueta, imagen_url, imagen_thumb) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$tienda_id, $categoria_id, $nombre, $descripcion, $precio, $stock, $stock_minimo, $url_imagen_final, $url_thumb]);
+            $stmt->execute([$tienda_id, $categoria_id, $nombre, $descripcion, $precio, $stock, $stock_minimo, $destacado, $etiqueta, $url_imagen_final, $url_thumb]);
 
             $exito = "¡Producto guardado exitosamente en tu catálogo!";
             $u = obtener_usuario_actual();
@@ -103,8 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
-<body class="bg-admin">
+<body class="bg-admin sidebar-open">
 
+    <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
     <?php if (!empty($exito)): ?>
@@ -112,6 +116,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php elseif (!empty($error)): ?>
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
+                <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nuevoNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nuevoNav">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:arrow-left" width="16"></iconify-icon> Volver</a>
+                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <div class="container my-5" style="max-width: 600px;">
         
@@ -159,6 +181,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
+                <div class="mb-3 form-check form-switch">
+                    <input type="hidden" name="destacado" value="0">
+                    <input type="checkbox" name="destacado" id="destacado" class="form-check-input" value="1" checked>
+                    <label class="form-check-label" for="destacado"><iconify-icon icon="mdi:star" width="16"></iconify-icon> Marcar como producto destacado</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Etiqueta especial</label>
+                    <select name="etiqueta" class="form-select">
+                        <option value="">Ninguna</option>
+                        <option value="Nuevo">Nuevo</option>
+                        <option value="Oferta">Oferta</option>
+                        <option value="Sin stock">Sin stock</option>
+                    </select>
+                </div>
+
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Foto del Producto</label>
                     <input type="file" name="imagen" class="form-control" accept="image/*">
@@ -174,6 +211,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
     </div>
+
+    <script nonce="<?= $csp_nonce ?>">
+    (function() {
+        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var toggle = document.getElementById('darkModeToggle');
+        var icon = toggle && toggle.querySelector('iconify-icon');
+        var span = toggle && toggle.querySelector('span');
+        if (localStorage.getItem('dark_mode') === '1') {
+            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+            if (span) span.textContent = 'Modo claro';
+        }
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                var isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('dark_mode', isDark ? '1' : '0');
+                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+            });
+        }
+    })();
+    </script>
 
 </body>
 </html>

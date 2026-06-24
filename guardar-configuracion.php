@@ -34,6 +34,12 @@ $horario         = trim($_POST['horario'] ?? '');
 $marca_blanca    = !empty($_POST['marca_blanca']) ? 1 : 0;
 $notif_pedido    = !empty($_POST['notif_nuevo_pedido']) ? 1 : 0;
 $notif_stock     = !empty($_POST['notif_stock_bajo']) ? 1 : 0;
+$meta_desc       = trim($_POST['meta_descripcion'] ?? '');
+$meta_palabras   = trim($_POST['meta_palabras_clave'] ?? '');
+$codigo_tracking = $_POST['codigo_tracking'] ?? '';
+$css_personalizado = $_POST['css_personalizado'] ?? '';
+$hero_title      = trim($_POST['hero_title'] ?? '');
+$hero_subtitle   = trim($_POST['hero_subtitle'] ?? '');
 
 if (empty($nombre_tienda)) {
     header("Location: configuracion.php?error=nombre_vacio");
@@ -131,7 +137,13 @@ $sql = "UPDATE tiendas SET
             banner_url        = COALESCE(?, banner_url),
             marca_blanca      = ?,
             notif_nuevo_pedido = ?,
-            notif_stock_bajo  = ?
+            notif_stock_bajo  = ?,
+            meta_descripcion   = ?,
+            meta_palabras_clave = ?,
+            codigo_tracking    = ?,
+            css_personalizado  = ?,
+            hero_title         = ?,
+            hero_subtitle      = ?
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
@@ -142,6 +154,8 @@ $stmt->execute([
     $descripcion, $direccion, $horario,
     $logo_url, $banner_url,
     $marca_blanca, $notif_pedido, $notif_stock,
+    $meta_desc, $meta_palabras, $codigo_tracking, $css_personalizado,
+    $hero_title, $hero_subtitle,
     $tienda_id
 ]);
 

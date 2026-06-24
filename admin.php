@@ -10,6 +10,10 @@ if (!isset($_SESSION['tienda_id'])) {
 $tienda_id = $_SESSION['tienda_id'];
 $tienda_nombre = $_SESSION['tienda_nombre'];
 
+$stmtMoneda = $pdo->prepare("SELECT moneda FROM tiendas WHERE id = ?");
+$stmtMoneda->execute([$tienda_id]);
+$moneda_tienda = $stmtMoneda->fetchColumn() ?: '€';
+
 $flash_message = $_SESSION['flash_message'] ?? null;
 $flash_type = $_SESSION['flash_type'] ?? null;
 unset($_SESSION['flash_message'], $_SESSION['flash_type']);

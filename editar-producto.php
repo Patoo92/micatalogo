@@ -62,10 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $url_thumb = $thumb_ruta;
     }
 
+    $destacado = !empty($_POST['destacado']) ? 1 : 0;
+    $etiqueta = trim($_POST['etiqueta'] ?? '');
+
     if (empty($error)) try {
-        $sql = "UPDATE productos SET categoria_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, stock_minimo = ?, imagen_url = ?, imagen_thumb = ? WHERE id = ? AND tienda_id = ?";
+        $sql = "UPDATE productos SET categoria_id = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, stock_minimo = ?, destacado = ?, etiqueta = ?, imagen_url = ?, imagen_thumb = ? WHERE id = ? AND tienda_id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$categoria_id, $nombre, $descripcion, $precio, $stock, $stock_minimo, $url_imagen_final, $url_thumb, $producto_id, $tienda_id]);
+        $stmt->execute([$categoria_id, $nombre, $descripcion, $precio, $stock, $stock_minimo, $destacado, $etiqueta, $url_imagen_final, $url_thumb, $producto_id, $tienda_id]);
         $exito = "¡Producto actualizado correctamente!";
         $u = obtener_usuario_actual();
         registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Editó un producto', "ID: $producto_id - $nombre");
@@ -184,6 +187,21 @@ $categorias = $stmtCat->fetchAll();
                     </div>
                 </div>
 
+                <div class="mb-3 form-check form-switch">
+                    <input type="hidden" name="destacado" value="0">
+                    <input type="checkbox" name="destacado" id="destacado" class="form-check-input" value="1" <?php echo $producto['destacado'] ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="destacado"><iconify-icon icon="mdi:star" width="16"></iconify-icon> Producto destacado</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Etiqueta especial</label>
+                    <select name="etiqueta" class="form-select">
+                        <option value="">Ninguna</option>
+                        <option value="Nuevo" <?php echo ($producto['etiqueta'] ?? '') === 'Nuevo' ? 'selected' : ''; ?>>Nuevo</option>
+                        <option value="Oferta" <?php echo ($producto['etiqueta'] ?? '') === 'Oferta' ? 'selected' : ''; ?>>Oferta</option>
+                        <option value="Sin stock" <?php echo ($producto['etiqueta'] ?? '') === 'Sin stock' ? 'selected' : ''; ?>>Sin stock</option>
+                    </select>
+                </div>
+
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Cambiar Foto (Opcional)</label>
                     <div class="d-flex align-items-center gap-3 mb-2">
@@ -202,6 +220,29 @@ $categorias = $stmtCat->fetchAll();
         </div>
 
     </div>
+
+    <script nonce="<?= $csp_nonce ?>">
+    (function() {
+        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var toggle = document.getElementById('darkModeToggle');
+        var icon = toggle && toggle.querySelector('iconify-icon');
+        var span = toggle && toggle.querySelector('span');
+        if (localStorage.getItem('dark_mode') === '1') {
+            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+            if (span) span.textContent = 'Modo claro';
+        }
+        if (toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('dark-mode');
+                var isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('dark_mode', isDark ? '1' : '0');
+                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+            });
+        }
+    })();
+    </script>
 
 </body>
 </html>

@@ -80,6 +80,18 @@
         #skeletonGrid { display: none; }
         #skeletonGrid.show { display: block; }
     </style>
+<?php if (!empty($tienda['meta_descripcion'])): ?>
+    <meta name="description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
+<?php endif; ?>
+<?php if (!empty($tienda['meta_palabras_clave'])): ?>
+    <meta name="keywords" content="<?php echo htmlspecialchars($tienda['meta_palabras_clave']); ?>">
+<?php endif; ?>
+<?php if (!empty($tienda['codigo_tracking'])): ?>
+    <?php echo $tienda['codigo_tracking']; ?>
+<?php endif; ?>
+<?php if (!empty($tienda['css_personalizado'])): ?>
+<style><?php echo $tienda['css_personalizado']; ?></style>
+<?php endif; ?>
 </head>
 <body>
 
@@ -149,15 +161,41 @@
         <?php if (!empty($tienda['banner_url'])): ?>
             <h2 class="fw-bold mb-2" style="color:#fff;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></h2>
         <?php else: ?>
-            <h2 class="fw-bold mb-2">Explora nuestra colección</h2>
+            <h2 class="fw-bold mb-2"><?php echo htmlspecialchars($tienda['hero_title'] ?? 'Explora nuestra colección'); ?></h2>
         <?php endif; ?>
         <p class="<?php echo !empty($tienda['banner_url']) ? 'text-light' : 'text-muted'; ?> mb-0">
-            <?php echo htmlspecialchars($tienda['descripcion'] ?? 'Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.'); ?>
+            <?php echo htmlspecialchars($tienda['hero_subtitle'] ?? $tienda['descripcion'] ?? 'Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.'); ?>
         </p>
     </div>
 </div>
 
 <div class="container pb-5" id="productos-catalogo" style="max-width: 900px;">
+
+<?php if (!empty($destacados)): ?>
+<div class="mb-5">
+    <h5 class="fw-bold mb-3"><iconify-icon icon="mdi:star" width="20" style="color: #f59e0b;"></iconify-icon> Destacados</h5>
+    <div class="row g-3">
+        <?php foreach ($destacados as $prod): ?>
+        <div class="col-6 col-md-3 fade-in">
+            <a href="producto.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>&id=<?php echo $prod['id']; ?>" class="text-decoration-none">
+                <div class="card h-100 product-card">
+                    <div class="product-card-img position-relative">
+                        <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($prod['nombre']); ?>" loading="lazy">
+                        <?php if (!empty($prod['etiqueta'])): ?>
+                        <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold mb-1 text-dark"><?php echo htmlspecialchars($prod['nombre']); ?></h6>
+                        <p class="text-success fw-bold mb-0"><?php echo number_format($prod['precio'], 2); ?> <?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
     <div class="mb-4">
         <h5 class="fw-bold mb-3">Categorías</h5>
@@ -203,6 +241,9 @@
                     <div class="card h-100 product-card" style="animation-delay: <?php echo $i * 0.05; ?>s;">
                         <div class="position-relative product-card-img">
                             <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($prod['nombre']); ?>" loading="lazy" data-img="<?php echo htmlspecialchars(imagen_url($prod['imagen_url']), ENT_QUOTES, 'UTF-8'); ?>">
+                            <?php if (!empty($prod['etiqueta'])): ?>
+                            <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
+                            <?php endif; ?>
                             <div class="share-overlay">
                                 <button class="btn btn-share" data-url="producto.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>&id=<?php echo $prod['id']; ?>" data-nombre="<?php echo htmlspecialchars($prod['nombre'], ENT_QUOTES, 'UTF-8'); ?>" title="Compartir">
                                     <iconify-icon icon="mdi:share-variant" width="14"></iconify-icon>

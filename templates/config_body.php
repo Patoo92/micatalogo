@@ -99,6 +99,31 @@
                 </div>
 
                 <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:search-web" width="18"></iconify-icon> SEO (Meta Tags)</h6>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">Meta descripción</label>
+                    <textarea name="meta_descripcion" class="form-control" rows="2" placeholder="Breve descripción para buscadores..."><?php echo htmlspecialchars($tienda['meta_descripcion'] ?? ''); ?></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">Palabras clave (separadas por coma)</label>
+                    <input type="text" name="meta_palabras_clave" value="<?php echo htmlspecialchars($tienda['meta_palabras_clave'] ?? ''); ?>" class="form-control" placeholder="ropa, moda, tienda online, ...">
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:image-auto" width="18"></iconify-icon> Hero / Portada del catálogo</h6>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">Título del hero</label>
+                    <input type="text" name="hero_title" value="<?php echo htmlspecialchars($tienda['hero_title'] ?? ''); ?>" class="form-control" placeholder="Explora nuestra colección">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">Subtítulo del hero</label>
+                    <input type="text" name="hero_subtitle" value="<?php echo htmlspecialchars($tienda['hero_subtitle'] ?? ''); ?>" class="form-control" placeholder="Agrega productos a tu carrito y envíanos tu orden por WhatsApp">
+                </div>
+
+                <hr class="my-4">
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:link-variant" width="18"></iconify-icon> Redes Sociales</h6>
 
                 <div class="mb-3">
@@ -184,6 +209,21 @@
                     </label>
                 </div>
                 <?php endif; ?>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:code-tags" width="18"></iconify-icon> Tracking &amp; Avanzado</h6>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">Código de tracking (Google Analytics, Facebook Pixel, etc.)</label>
+                    <textarea name="codigo_tracking" class="form-control" rows="4" placeholder="&lt;script&gt;...&lt;/script&gt;"><?php echo htmlspecialchars($tienda['codigo_tracking'] ?? ''); ?></textarea>
+                    <small class="text-muted">Se inyecta en el &lt;head&gt; del catálogo público.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">CSS personalizado</label>
+                    <textarea name="css_personalizado" class="form-control" rows="4" placeholder=".clase { color: red; }"><?php echo htmlspecialchars($tienda['css_personalizado'] ?? ''); ?></textarea>
+                    <small class="text-muted">Se inyecta en el &lt;head&gt; del catálogo público. Úsalo para sobrescribir estilos.</small>
+                </div>
 
                 <button type="submit" class="btn btn-primary w-100 btn-icon py-2" style="font-weight: 600;">
                     <iconify-icon icon="mdi:content-save" width="18"></iconify-icon> Guardar Cambios
@@ -273,6 +313,28 @@
                 }
             });
         });
+        </script>
+        <script nonce="<?= $csp_nonce ?>">
+        (function() {
+            if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+            var toggle = document.getElementById('darkModeToggle');
+            var icon = toggle && toggle.querySelector('iconify-icon');
+            var span = toggle && toggle.querySelector('span');
+            if (localStorage.getItem('dark_mode') === '1') {
+                if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+                if (span) span.textContent = 'Modo claro';
+            }
+            if (toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.body.classList.toggle('dark-mode');
+                    var isDark = document.body.classList.contains('dark-mode');
+                    localStorage.setItem('dark_mode', isDark ? '1' : '0');
+                    if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                    if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                });
+            }
+        })();
         </script>
     </div>
 </body>

@@ -66,6 +66,18 @@ $prod_precio = number_format($producto['precio'], 2);
     <meta name="twitter:description" content="<?php echo $prod_descripcion ?: 'Disponible en ' . htmlspecialchars($tienda['nombre_tienda']); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($prod_imagen); ?>">
 
+    <?php if (!empty($tienda['meta_descripcion'])): ?>
+    <meta name="description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
+    <meta property="og:description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
+    <meta name="twitter:description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
+    <?php endif; ?>
+    <?php if (!empty($tienda['meta_palabras_clave'])): ?>
+    <meta name="keywords" content="<?php echo htmlspecialchars($tienda['meta_palabras_clave']); ?>">
+    <?php endif; ?>
+    <?php if (!empty($tienda['codigo_tracking'])): ?>
+    <?php echo $tienda['codigo_tracking']; ?>
+    <?php endif; ?>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
@@ -113,6 +125,9 @@ $prod_precio = number_format($producto['precio'], 2);
         .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e2e8f0; background: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; transition: all 0.15s; }
         .qty-btn:hover { background: #f1f5f9; border-color: var(--color-principal); }
     </style>
+    <?php if (!empty($tienda['css_personalizado'])): ?>
+    <style><?php echo $tienda['css_personalizado']; ?></style>
+    <?php endif; ?>
 </head>
 <body>
 
@@ -192,6 +207,9 @@ $prod_precio = number_format($producto['precio'], 2);
         <div class="col-md-6">
             <div class="position-relative">
                 <img src="<?php echo htmlspecialchars($prod_imagen); ?>" class="product-main-img" alt="<?php echo $prod_nombre; ?>" id="mainImage" loading="eager">
+                <?php if (!empty($producto['etiqueta'])): ?>
+                <span class="position-absolute top-0 start-0 badge m-3" style="background:<?php echo $producto['etiqueta'] === 'Oferta' ? '#ef4444' : ($producto['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:1rem;padding:6px 14px;border-radius:20px;"><?php echo htmlspecialchars($producto['etiqueta']); ?></span>
+                <?php endif; ?>
                 <button class="btn position-absolute" style="top:12px;right:12px;background:rgba(255,255,255,0.9);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;backdrop-filter:blur(4px);" id="btnShareProduct" title="Compartir">
                     <iconify-icon icon="mdi:share-variant" width="18" style="color:#64748b;"></iconify-icon>
                 </button>
