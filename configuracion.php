@@ -57,6 +57,12 @@ if (isset($_GET['success'])) {
     $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El logo no puede superar los 2 MB.</div>';
 } elseif (isset($_GET['error']) && $_GET['error'] === 'permiso') {
     $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:lock" width="20"></iconify-icon> No tienes permiso para editar la configuración.</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'csrf') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> Solicitud inválida. Recarga la página e inténtalo de nuevo.</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'whatsapp_invalido') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El número de WhatsApp no es válido (opcional, déjalo vacío si no lo usas).</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'instagram_invalido') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> La URL de Instagram no es válida (opcional, déjalo vacío si no lo usas).</div>';
 }
 
 $stmtKeys = $pdo->prepare("SELECT id, api_key, nombre, activo, created_at FROM api_keys WHERE tienda_id = ? ORDER BY created_at DESC");
