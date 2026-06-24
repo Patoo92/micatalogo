@@ -1,37 +1,63 @@
 /* ===== Admin body con gradiente sutil para glassmorphism ===== */
 .bg-admin {
-    background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #f8fafc 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
 
 /* ===== Glassmorphism para inventario ===== */
 .glass-card {
-    background: rgba(255,255,255,0.65) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.5) !important;
+    background: rgba(255,255,255,0.25) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.3) !important;
     border-radius: var(--border-radius-card);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 .glass-card:hover {
-    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.35) !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
 .glass-table {
-    background: rgba(255,255,255,0.6) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.5) !important;
+    background: rgba(255,255,255,0.2) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.3) !important;
     border-radius: var(--border-radius-card);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.04);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 .glass-table .table { background: transparent !important; }
-.glass-table .table thead th { background: rgba(248,250,252,0.7) !important; }
-.glass-table .table tbody tr { background: transparent !important; }
-.glass-table .table tbody tr:hover { background: rgba(255,255,255,0.5) !important; }
-.card-header.bg-white { background: rgba(255,255,255,0.5) !important; }
-.glass-card .card-header { background: rgba(255,255,255,0.4) !important; border-bottom: 1px solid rgba(255,255,255,0.3) !important; }
+.glass-table .table thead th { background: rgba(255,255,255,0.15) !important; color: #fff !important; }
+.glass-table .table tbody tr { background: transparent !important; color: #fff !important; }
+.glass-table .table tbody tr:hover { background: rgba(255,255,255,0.2) !important; }
+.card-header.bg-white { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
+.glass-card .card-header { background: rgba(255,255,255,0.15) !important; border-bottom: 1px solid rgba(255,255,255,0.2) !important; }
 .card-admin, .card-custom, .card-config, .card-orders { background: transparent !important; }
+.glass-card .fw-bold, .glass-card .text-dark { color: #fff !important; }
+.glass-card .text-muted { color: rgba(255,255,255,0.7) !important; }
+.glass-card .badge.bg-secondary { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
+.glass-card .btn-light { background: rgba(255,255,255,0.2) !important; border-color: rgba(255,255,255,0.3) !important; color: #fff !important; }
+.glass-card .btn-light:hover { background: rgba(255,255,255,0.35) !important; }
+.glass-card .btn-outline-secondary { border-color: rgba(255,255,255,0.3) !important; color: #fff !important; }
+.glass-card .btn-outline-secondary:hover { background: rgba(255,255,255,0.2) !important; }
+.glass-card .btn-outline-danger { border-color: rgba(255,255,255,0.3) !important; color: #fca5a5 !important; }
+.glass-card .btn-outline-danger:hover { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
+.glass-card .btn-danger { background: rgba(239,68,68,0.4) !important; border-color: transparent !important; }
+.glass-card .btn-success { background: rgba(16,185,129,0.4) !important; border-color: transparent !important; }
+.glass-card .btn-primary { background: rgba(59,130,246,0.4) !important; border-color: transparent !important; }
+.glass-card .form-control, .glass-card .form-select {
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    color: #fff !important;
+}
+.glass-card .form-control::placeholder { color: rgba(255,255,255,0.5) !important; }
+.glass-card .form-label { color: #fff !important; }
+.glass-card a:not(.btn) { color: #93c5fd !important; }
+.glass-card .table { color: #fff !important; }
+.alert { background: rgba(255,255,255,0.2) !important; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2) !important; color: #fff !important; }
+.alert .btn-outline-danger, .alert .btn-outline-info, .alert .btn-outline-warning { color: #fff !important; border-color: rgba(255,255,255,0.4) !important; }
+.alert .btn-outline-danger:hover, .alert .btn-outline-info:hover, .alert .btn-outline-warning:hover { background: rgba(255,255,255,0.2) !important; }
+.bg-admin .navbar-admin { background: rgba(15,23,42,0.8) !important; backdrop-filter: blur(12px); }
 
 /* ===== Sidebar Admin ===== */
 .sidebar-admin {
