@@ -29,13 +29,14 @@ function generar_thumbnail($origen, $destino, $ancho = 300, $alto = 300) {
     if (!$info) return false;
 
     list($w, $h) = $info;
-    $src = match ($info[2]) {
-        IMAGETYPE_JPEG => @imagecreatefromjpeg($origen),
-        IMAGETYPE_PNG  => @imagecreatefrompng($origen),
-        IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($origen) : null,
-        IMAGETYPE_GIF  => @imagecreatefromgif($origen),
-        default        => null,
-    };
+    $creators = [
+        IMAGETYPE_JPEG => 'imagecreatefromjpeg',
+        IMAGETYPE_PNG  => 'imagecreatefrompng',
+        IMAGETYPE_WEBP => 'imagecreatefromwebp',
+        IMAGETYPE_GIF  => 'imagecreatefromgif',
+    ];
+    $fn = $creators[$info[2]] ?? null;
+    $src = $fn && function_exists($fn) ? @$fn($origen) : null;
     if (!$src) return false;
 
     $thumb = imagecreatetruecolor($ancho, $alto);

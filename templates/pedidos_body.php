@@ -46,7 +46,7 @@
         </div>
     </nav>
 
-    <div class="container my-5" style="max-width: 800px;">
+    <div class="container glass-card my-5" style="max-width: 800px;">
 
         <div class="mb-4 d-flex align-items-center gap-2">
             <iconify-icon icon="mdi:format-list-bulleted" width="32"></iconify-icon>
@@ -69,7 +69,7 @@
                 $grupo_id = 'pedido-' . md5($grupo['fecha_agrupada']);
                 $items_count = count($grupo['items']);
             ?>
-            <div class="card card-orders mb-3">
+            <div class="card card-orders glass-card mb-3">
                 <div class="card-header bg-white d-flex align-items-center justify-content-between py-3 px-4 grupo-toggle" style="cursor:pointer;border-bottom:1px solid #e2e8f0;" data-grupo="<?php echo $grupo_id; ?>">
                     <div class="d-flex align-items-center gap-3 flex-wrap">
                         <div>

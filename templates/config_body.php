@@ -43,7 +43,7 @@
     </nav>
 
     <div class="container py-5" style="max-width: 600px;">
-        <div class="card card-config p-4">
+        <div class="card card-config glass-card p-4">
             <h4 class="mb-4 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:cog" width="28"></iconify-icon>
                 Configuración de Tienda
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <div class="card card-config p-4 mt-4" id="plan">
+        <div class="card card-config glass-card p-4 mt-4" id="plan">
             <h5 class="mb-3 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:crown" width="24"></iconify-icon>
                 Plan: <?php echo htmlspecialchars(ucfirst($_SESSION['plan'])); ?>
@@ -123,7 +123,7 @@
             <p class="text-muted small mt-2 mb-0">Los cambios de plan se gestionan manualmente. <a href="https://wa.me/34123456789" target="_blank" rel="noopener">Contactanos por WhatsApp</a> para mejorar tu plan.</p>
         </div>
 
-        <div class="card card-config p-4 mt-4">
+        <div class="card card-config glass-card p-4 mt-4">
             <h5 class="mb-3 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:key-variant" width="24"></iconify-icon>
                 API Keys

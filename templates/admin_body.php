@@ -98,7 +98,7 @@
 
         <div class="d-md-none">
     <?php foreach ($productos as $prod): ?>
-    <div class="card mb-3 border-0 shadow-sm card-admin">
+    <div class="card mb-3 border-0 glass-card">
         <div class="card-body">
             <div class="d-flex align-items-center gap-3 mb-3">
                 <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
@@ -127,7 +127,7 @@
     <?php endforeach; ?>
 </div>
 
-        <div class="card card-admin d-none d-md-block">
+        <div class="card glass-table d-none d-md-block">
             <div class="table-responsive">
                 <table class="table table-admin align-middle mb-0">
                     <thead>

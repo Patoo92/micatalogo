@@ -66,12 +66,12 @@ $actividades = $stmt->fetchAll();
         </div>
 
         <?php if (empty($actividades)): ?>
-            <div class="card card-custom p-5 text-center">
+            <div class="card card-custom glass-card p-5 text-center">
                 <iconify-icon icon="mdi:history" width="48" style="color: #94a3b8;"></iconify-icon>
                 <p class="text-muted mt-2 mb-0">Aún no hay actividad registrada.</p>
             </div>
         <?php else: ?>
-            <div class="card card-custom">
+            <div class="card card-custom glass-card">
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0">
                         <thead>

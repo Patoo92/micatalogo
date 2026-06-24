@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <div class="container py-5" style="max-width: 500px;">
-        <div class="card card-custom p-4">
+        <div class="card card-custom glass-card p-4">
             <h4 class="mb-4 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:lock-reset" width="28"></iconify-icon>
                 Cambiar Contraseña

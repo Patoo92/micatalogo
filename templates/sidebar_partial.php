@@ -39,10 +39,6 @@
             <iconify-icon icon="mdi:eye" width="18"></iconify-icon>
             Ver tienda
         </a>
-        <a href="cambiar-password.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'cambiar-password.php' ? 'active' : ''; ?>">
-            <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
-            Cambiar contraseña
-        </a>
         <a href="logout.php" class="sidebar-link text-danger">
             <iconify-icon icon="mdi:logout" width="18"></iconify-icon>
             Salir

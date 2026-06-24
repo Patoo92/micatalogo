@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoria_id = !empty($_POST['categoria_id']) ? (int)$_POST['categoria_id'] : null;
     
     $url_imagen_final = $_POST['imagen_actual'];
+    $url_thumb = $producto['imagen_thumb'] ?? '';
 
     if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $ruta_temporal = $_FILES['imagen']['tmp_name'];
@@ -57,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $url_thumb = '';
     if (isset($thumb_ruta) && file_exists($thumb_ruta)) {
         $url_thumb = $thumb_ruta;
     }
@@ -105,8 +105,9 @@ $categorias = $stmtCat->fetchAll();
         iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-light sidebar-open">
 
+    <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
     <?php if (!empty($exito)): ?>
@@ -115,9 +116,27 @@ $categorias = $stmtCat->fetchAll();
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
 
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
+                <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
+                <?php echo htmlspecialchars($tienda_nombre); ?>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#editarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="editarNav">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:arrow-left" width="16"></iconify-icon> Volver</a>
+                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <div class="container my-5" style="max-width: 600px;">
         
-        <div class="card shadow-sm p-4 bg-white border-0">
+        <div class="card shadow-sm glass-card p-4 bg-white border-0">
             <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"><iconify-icon icon="mdi:pencil" width="24"></iconify-icon> Editar Producto</h3>
             <p class="text-muted mb-4">Modifica los datos del producto seleccionado.</p>
 
