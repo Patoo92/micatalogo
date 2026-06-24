@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                     $stmt = $pdo->prepare("
-                        SELECT s.*, t.nombre_tienda, t.slug, t.activo, t.marca_blanca, t.plan, t.trial_ends_at
+                        SELECT s.*, t.nombre_tienda, t.slug, t.activo AS tienda_activo, t.marca_blanca, t.plan, t.trial_ends_at
                         FROM store_staff s 
                         JOIN tiendas t ON s.tienda_id = t.id 
                         WHERE s.usuario = ?
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($staff && password_verify($password, $staff['password'])) {
                     if ($staff['activo'] == 0) {
                         $error = "Tu cuenta de staff está desactivada.";
-                    } elseif ($staff['activo'] == 0) {
+                    } elseif ($staff['tienda_activo'] == 0) {
                         $error = "La tienda está suspendida.";
                     } else {
                         limpiar_intentos_login($pdo, 'login');

@@ -16,6 +16,14 @@ $producto_id = (int)$_GET['id'];
 $error = '';
 $exito = '';
 
+$stmtProd = $pdo->prepare("SELECT * FROM productos WHERE id = ? AND tienda_id = ?");
+$stmtProd->execute([$producto_id, $tienda_id]);
+$producto = $stmtProd->fetch();
+
+if (!$producto) {
+    mostrar_error("Producto no encontrado", "No tienes permisos para editar este producto.", "admin.php", "Volver al panel");
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         $error = "Solicitud inválida.";
@@ -73,19 +81,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $exito = "¡Producto actualizado correctamente!";
         $u = obtener_usuario_actual();
         registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Editó un producto', "ID: $producto_id - $nombre");
+        // Recargar producto para reflejar datos actualizados
+        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE id = ? AND tienda_id = ?");
+        $stmtProd->execute([$producto_id, $tienda_id]);
+        $producto = $stmtProd->fetch();
     } catch (\PDOException $e) {
         $error = "Error al actualizar datos. Intenta de nuevo.";
     }
 }
-}
-
-$stmtProd = $pdo->prepare("SELECT * FROM productos WHERE id = ? AND tienda_id = ?");
-$stmtProd->execute([$producto_id, $tienda_id]);
-$producto = $stmtProd->fetch();
-
-// Si un intruso pone un ID de un producto que no es suyo, lo bloqueamos
-if (!$producto) {
-    mostrar_error("Producto no encontrado", "No tienes permisos para editar este producto.", "admin.php", "Volver al panel");
 }
 
 $stmtCat = $pdo->prepare("SELECT * FROM categorias WHERE tienda_id = ?");
