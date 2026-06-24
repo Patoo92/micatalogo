@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="container my-5" style="max-width: 600px;">
         
-        <div class="card shadow-sm glass-card p-4 bg-white border-0">
+        <div class="card shadow-sm glass-card p-4 border-0">
             <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"><iconify-icon icon="mdi:package-variant-closed" width="24"></iconify-icon> Nuevo Producto</h3>
             <p class="text-muted mb-4">Rellena los datos para subir un artículo al catálogo público</p>
 

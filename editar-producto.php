@@ -136,7 +136,7 @@ $categorias = $stmtCat->fetchAll();
 
     <div class="container my-5" style="max-width: 600px;">
         
-        <div class="card shadow-sm glass-card p-4 bg-white border-0">
+        <div class="card shadow-sm glass-card p-4 border-0">
             <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2"><iconify-icon icon="mdi:pencil" width="24"></iconify-icon> Editar Producto</h3>
             <p class="text-muted mb-4">Modifica los datos del producto seleccionado.</p>
 

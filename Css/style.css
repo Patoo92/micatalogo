@@ -1,9 +1,9 @@
 /* ===== Glassmorphism para inventario ===== */
 .glass-card {
-    background: rgba(255,255,255,0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.65) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.5) !important;
     border-radius: var(--border-radius-card);
     box-shadow: 0 8px 32px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
 }
@@ -11,14 +11,21 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.06);
 }
 .glass-table {
-    background: rgba(255,255,255,0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.6) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.5) !important;
     border-radius: var(--border-radius-card);
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0,0,0,0.04);
 }
+.glass-table .table { background: transparent !important; }
+.glass-table .table thead th { background: rgba(248,250,252,0.7) !important; }
+.glass-table .table tbody tr { background: transparent !important; }
+.glass-table .table tbody tr:hover { background: rgba(255,255,255,0.5) !important; }
+.card-header.bg-white { background: rgba(255,255,255,0.5) !important; }
+.glass-card .card-header { background: rgba(255,255,255,0.4) !important; border-bottom: 1px solid rgba(255,255,255,0.3) !important; }
+.card-admin, .card-custom, .card-config, .card-orders { background: transparent !important; }
 
 /* ===== Sidebar Admin ===== */
 .sidebar-admin {
