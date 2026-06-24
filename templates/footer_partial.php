@@ -14,6 +14,20 @@
             <?php endif; ?>
         </div>
         <?php endif; ?>
+        <?php
+        $fp_plan = $tienda['plan'] ?? 'starter';
+        $fp_pers = in_array($fp_plan, ['pro', 'business', 'enterprise']);
+        ?>
+        <?php if ($fp_pers && (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url']))): ?>
+        <div class="row mb-3">
+            <div class="col text-center">
+                <?php if (!empty($tienda['instagram_url'])): ?><a href="<?php echo htmlspecialchars($tienda['instagram_url']); ?>" target="_blank" class="text-decoration-none mx-2" style="color:#64748b;" title="Instagram"><iconify-icon icon="mdi:instagram" width="20"></iconify-icon></a><?php endif; ?>
+                <?php if (!empty($tienda['facebook_url'])): ?><a href="<?php echo htmlspecialchars($tienda['facebook_url']); ?>" target="_blank" class="text-decoration-none mx-2" style="color:#64748b;" title="Facebook"><iconify-icon icon="mdi:facebook" width="20"></iconify-icon></a><?php endif; ?>
+                <?php if (!empty($tienda['tiktok_url'])): ?><a href="<?php echo htmlspecialchars($tienda['tiktok_url']); ?>" target="_blank" class="text-decoration-none mx-2" style="color:#64748b;" title="TikTok"><iconify-icon icon="mdi:tiktok" width="20"></iconify-icon></a><?php endif; ?>
+                <?php if (!empty($tienda['twitter_url'])): ?><a href="<?php echo htmlspecialchars($tienda['twitter_url']); ?>" target="_blank" class="text-decoration-none mx-2" style="color:#64748b;" title="X / Twitter"><iconify-icon icon="mdi:twitter" width="20"></iconify-icon></a><?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
         <div class="row g-3 align-items-center">
             <div class="col-md-6 text-center text-md-start">
                 <small class="text-muted">
