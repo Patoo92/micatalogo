@@ -54,7 +54,9 @@ if ($es_admin) {
     header('Content-Disposition: attachment; filename="' . $filename . '"');
 
     echo "-- Respaldo de tienda: $tienda_nombre (ID: $tienda_id)\n";
-    echo "-- Fecha: " . date('Y-m-d H:i:s') . "\n\n";
+    echo "-- Fecha: " . date('Y-m-d H:i:s') . "\n";
+    echo "-- ATENCIÓN: Este respaldo incluye datos de staff (usuarios, contraseñas hasheadas, permisos).\n";
+    echo "-- Comparte este archivo solo con personas de confianza.\n\n";
 
     echo "SET NAMES utf8mb4;\n\n";
 

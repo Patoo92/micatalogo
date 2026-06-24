@@ -26,7 +26,7 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
     }
 
     try {
-        $stmtTienda = $pdo->prepare("SELECT id, telefono_whatsapp FROM tiendas WHERE slug = ? AND activo = 1");
+        $stmtTienda = $pdo->prepare("SELECT id, telefono_whatsapp, moneda FROM tiendas WHERE slug = ? AND activo = 1");
         $stmtTienda->execute([$slug]);
         $tienda = $stmtTienda->fetch();
 
@@ -48,7 +48,8 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
 
         $id_pedido = $pdo->lastInsertId();
 
-        $textoMensaje = "¡Hola! Soy " . $nombre_cliente . ". Me interesa el producto: " . $producto['nombre'] . " (Precio: " . $producto['precio'] . "€). Mi código de pedido es el #" . $id_pedido;
+        $moneda = htmlspecialchars($tienda['moneda'] ?? '€');
+        $textoMensaje = "¡Hola! Soy " . $nombre_cliente . ". Me interesa el producto: " . $producto['nombre'] . " (Precio: " . $producto['precio'] . $moneda . "). Mi código de pedido es el #" . $id_pedido;
         $urlWhatsapp  = "https://wa.me/" . preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']) . "?text=" . urlencode($textoMensaje);
 
         header("Location: " . $urlWhatsapp);

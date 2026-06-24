@@ -61,9 +61,10 @@ try {
 
         if ($producto_id <= 0 || $cantidad <= 0) continue;
 
-        $stmtCheck = $pdo->prepare("SELECT id FROM productos WHERE id = ? AND tienda_id = ?");
+        $stmtCheck = $pdo->prepare("SELECT id, stock FROM productos WHERE id = ? AND tienda_id = ?");
         $stmtCheck->execute([$producto_id, $tienda_id]);
-        if (!$stmtCheck->fetch()) continue;
+        $prodData = $stmtCheck->fetch();
+        if (!$prodData || $prodData['stock'] <= 0) continue;
 
         $email_db = !empty($email_cliente) ? $email_cliente : null;
         for ($i = 0; $i < $cantidad; $i++) {

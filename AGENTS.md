@@ -49,7 +49,23 @@
 ### Landing con capturas reales
 - `index.html`: reemplazados placeholders por `imagenes/captura-admin.jpg` y `captura-movil.jpg`
 
-### Bugs críticos corregidos (24 junio 2026)
+### Bugs corregidos (24 junio 2026)
+
+**Críticos:**
+- **Css/ → css/**: carpeta renombrada a minúscula para compatibilidad Linux
+- **editar-producto.php**: SELECT del producto movido antes del bloque POST; ya no se pierde thumbnail
+- **login.php**: alias `t.activo AS tienda_activo`; staff de tienda suspendida ya no puede entrar
+
+**Medios:**
+- **staff-nuevo.php**: validación de contraseña homogeneizada (solo min 10 chars, sin mayúscula/número)
+- **helpers.php**: `verificar_limite_plan()` ya no pasa HTML con `<strong>` a `mostrar_error()` (evita doble escape)
+- **guardar-pedido.php**: validación `stock > 0` antes de insertar pedido desde el carrito
+- **hacer-pedido.php**: usa `$tienda['moneda']` en vez de `€` hardcodeado
+
+**Menores:**
+- **api.php**: `Access-Control-Allow-Origin` ahora refleja el origin específico en vez de `*`
+- **backup.php**: warning en SQL output sobre datos de staff incluidos
+- **cancelar-pedido.php**: no ejecuta UPDATE stock si `producto_id` es NULL; log refleja el caso real
 - **Css/ → css/**: carpeta renombrada a minúscula para compatibilidad Linux (case-sensitive). Todos los PHP referenciaban `css/style.css` pero la carpeta era `Css/`.
 - **editar-producto.php**: movida la consulta `SELECT` del producto antes del bloque `POST`. Ya no se usa `$producto` antes de ser definida; al editar sin cambiar imagen ya no se pierde el thumbnail.
 - **login.php**: añadido alias `t.activo AS tienda_activo` al SELECT de staff. El segundo `elseif` ahora compara `$staff['tienda_activo']` en vez de duplicar la condición de `activo`. Staff de tienda suspendida ya no puede iniciar sesión.
@@ -110,14 +126,10 @@
 - `C:\xampp\micatalogo-config\email.php`: config SMTP Brevo
 
 ### Próximos pasos
-1. Homogeneizar política de contraseñas (staff-nuevo.php)
-2. Fix mostrar_error() HTML escapado doble
-3. Validar stock en guardar-pedido.php
-4. Moneda dinámica en hacer-pedido.php
-5. Integrar Stripe/Mercado Pago como pasarela de pago
-6. Encontrar/subir capturas de pantalla para la landing
-7. Desplegar en hosting real (PHP 8.2+, MySQL, Apache)
-8. Configurar dominio + DNS + HTTPS + SMTP (Brevo) + Cloudflare CDN
+1. Integrar Stripe/Mercado Pago como pasarela de pago
+2. Encontrar/subir capturas de pantalla para la landing
+3. Desplegar en hosting real (PHP 8.2+, MySQL, Apache)
+4. Configurar dominio + DNS + HTTPS + SMTP (Brevo) + Cloudflare CDN
 
 ### Notas técnicas
 - El CSP nonce se genera en `init_session.php` y se pasa como `$csp_nonce` a los templates

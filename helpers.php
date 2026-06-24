@@ -132,7 +132,7 @@ function verificar_limite_plan($caracteristica, $actual, $titulo = 'Límite del 
     $maximo = plan_limite($caracteristica);
     if ($actual >= $maximo) {
         $plan = ucfirst($_SESSION['plan'] ?? 'starter');
-        $mensaje = "Tu plan <strong>$plan</strong> permite hasta <strong>$maximo</strong> " . htmlspecialchars($caracteristica) . ". Actualizá tu plan para ampliarlo.";
+        $mensaje = "Tu plan $plan permite hasta $maximo " . htmlspecialchars($caracteristica) . ". Actualizá tu plan para ampliarlo.";
         mostrar_error($titulo, $mensaje, 'configuracion.php', 'Ver planes');
     }
 }

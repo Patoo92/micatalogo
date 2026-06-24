@@ -36,13 +36,16 @@ try {
     $stmtUpd = $pdo->prepare("UPDATE pedidos SET estado = 'Cancelado' WHERE id = ?");
     $stmtUpd->execute([$pedido_id]);
 
-    $stmtStock = $pdo->prepare("UPDATE productos SET stock = stock + 1 WHERE id = ?");
-    $stmtStock->execute([$pedido['producto_id']]);
+    if ($pedido['producto_id'] !== null) {
+        $stmtStock = $pdo->prepare("UPDATE productos SET stock = stock + 1 WHERE id = ?");
+        $stmtStock->execute([$pedido['producto_id']]);
+    }
 
     $pdo->commit();
 
     $u = obtener_usuario_actual();
-    registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Canceló pedido', "Pedido #$pedido_id - stock restituido");
+    $detalle = $pedido['producto_id'] !== null ? "Pedido #$pedido_id - stock restituido" : "Pedido #$pedido_id - producto eliminado, stock no restituido";
+    registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Canceló pedido', $detalle);
 
     $_SESSION['flash_message'] = 'Pedido cancelado y stock restituido.';
     $_SESSION['flash_type'] = 'warning';

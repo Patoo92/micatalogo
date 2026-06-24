@@ -35,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($usuario) || empty($password)) {
         $error = "Usuario y contraseña son obligatorios.";
-    } elseif (strlen($password) < 10 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
-        $error = "La contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
+    } elseif (strlen($password) < 10) {
+        $error = "La contraseña debe tener al menos 10 caracteres.";
     } else {
         $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM store_staff WHERE tienda_id = ?");
         $stmtCount->execute([$tienda_id]);
@@ -121,8 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Contraseña *</label>
-                    <input type="password" name="password" class="form-control" minlength="8" required>
-                    <div class="form-text">Mínimo 8 caracteres.</div>
+                    <input type="password" name="password" class="form-control" minlength="10" required>
+                    <div class="form-text">Mínimo 10 caracteres.</div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Email</label>
