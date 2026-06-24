@@ -105,7 +105,7 @@ $categorias = $stmtCat->fetchAll();
         iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
-<body class="bg-light sidebar-open">
+<body class="bg-admin sidebar-open">
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>

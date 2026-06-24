@@ -32,7 +32,7 @@ $actividades = $stmt->fetchAll();
         .timeline-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
     </style>
 </head>
-<body class="bg-light sidebar-open">
+<body class="bg-admin sidebar-open">
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
 

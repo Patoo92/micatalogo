@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .password-toggle:hover { color: #64748b; }
     </style>
 </head>
-<body class="bg-light sidebar-open">
+<body class="bg-admin sidebar-open">
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>

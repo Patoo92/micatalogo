@@ -18,7 +18,7 @@
         }
     </style>
 </head>
-<body class="bg-light sidebar-open">
+<body class="bg-admin sidebar-open">
 
     <?php require __DIR__ . '/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/toast_partial.php'; ?>
