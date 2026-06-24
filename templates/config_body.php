@@ -6,6 +6,8 @@
     <title>Configuración de Tienda</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -16,9 +18,11 @@
         }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-light sidebar-open">
 
-            <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
+    <?php require __DIR__ . '/sidebar_partial.php'; ?>
+
+            <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>

@@ -29,6 +29,17 @@
 - Seguridad: CSP nonce, CSRF tokens, rate limiting login, FOR UPDATE en pedidos
 - Email: SMTP Brevo con PHPMailer, alertas stock mínimo, confirmación al cliente
 
+### Sidebar lateral (navegación moderna)
+- Creado `templates/sidebar_partial.php`: sidebar fijo (240px) en escritorio con gradiente oscuro
+- Navbar superior visible solo en móvil (`d-lg-none`), sidebar oculto en móvil (`d-none d-lg-flex`)
+- Links: Productos, Pedidos, Staff, Historial, Configuración, Respaldo + Ver tienda, Cambiar contraseña, Salir
+- Link activo resaltado con CSS dinámico `basename($_SERVER['PHP_SELF'])`
+- Aplicado en 8 templates/admin pages para consistencia visual
+- Estilos en `Css/style.css` con hover/active states
+
+### Landing con capturas reales
+- `index.html`: reemplazados placeholders por `imagenes/captura-admin.jpg` y `captura-movil.jpg`
+
 ### Cambios recientes (junio 2026)
 
 #### helpers.php

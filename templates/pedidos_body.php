@@ -18,15 +18,16 @@
         }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-light sidebar-open">
 
+    <?php require __DIR__ . '/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/toast_partial.php'; ?>
 
     <?php if ($flash_message): ?>
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($flash_message); ?>, '<?php echo in_array($flash_type, ['success','danger','warning','info']) ? $flash_type : 'info'; ?>'); });</script>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>

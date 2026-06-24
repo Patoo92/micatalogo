@@ -17,8 +17,9 @@
         }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-light sidebar-open">
 
+    <?php require __DIR__ . '/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/toast_partial.php'; ?>
 
     <?php if ($flash_message): ?>
@@ -56,19 +57,17 @@
     </div>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
             <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
             <?php echo htmlspecialchars($tienda_nombre); ?>
-            <span class="badge bg-<?php echo $_SESSION['plan'] === 'business' ? 'warning' : ($_SESSION['plan'] === 'pro' ? 'primary' : 'secondary'); ?> text-dark fw-normal" style="font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;"><?php echo htmlspecialchars($_SESSION['plan']); ?></span>
         </a>
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="adminNav">
             <div class="d-flex gap-2 flex-wrap justify-content-end">
-                <a href="index.php?tienda=<?php echo htmlspecialchars($_SESSION['tienda_slug']); ?>" target="_blank" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:eye" width="16"></iconify-icon> Ver tienda</a>
                 <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
                 <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
                 <a href="staff.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:account-group" width="16"></iconify-icon> Staff</a>

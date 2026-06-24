@@ -75,8 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-light sidebar-open">
 
+    <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
     <?php if ($exito): ?>
@@ -85,17 +86,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
                 <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
-            <div class="d-flex gap-2">
-                <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
-                <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
-                <a href="configuracion.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
-                <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#staffNuevoNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="staffNuevoNav">
+                <div class="d-flex gap-2 flex-wrap justify-content-end">
+                    <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
+                    <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
+                    <a href="configuracion.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
+                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                </div>
             </div>
         </div>
     </nav>
