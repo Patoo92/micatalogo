@@ -119,10 +119,10 @@ function _env_path($key, $default = '') {
 
 function plan_limite($caracteristica) {
     $planes = [
-        'starter'   => ['staff' => 1, 'tiendas' => 1, 'api_keys' => 0,  'marca_blanca' => false],
-        'pro'       => ['staff' => 3, 'tiendas' => 1, 'api_keys' => 1,  'marca_blanca' => false],
-        'business'  => ['staff' => 10,'tiendas' => 3, 'api_keys' => 5,  'marca_blanca' => true],
-        'enterprise'=> ['staff' => 999,'tiendas' => 999,'api_keys' => 999,'marca_blanca' => true],
+        'starter'   => ['staff' => 1, 'tiendas' => 1, 'api_keys' => 0,  'marca_blanca' => false, 'personalizacion' => false],
+        'pro'       => ['staff' => 3, 'tiendas' => 1, 'api_keys' => 1,  'marca_blanca' => false, 'personalizacion' => true],
+        'business'  => ['staff' => 10,'tiendas' => 3, 'api_keys' => 5,  'marca_blanca' => true,  'personalizacion' => true],
+        'enterprise'=> ['staff' => 999,'tiendas' => 999,'api_keys' => 999,'marca_blanca' => true,  'personalizacion' => true],
     ];
     $plan = $_SESSION['plan'] ?? 'starter';
     return $planes[$plan][$caracteristica] ?? 0;

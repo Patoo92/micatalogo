@@ -80,16 +80,17 @@
         #skeletonGrid { display: none; }
         #skeletonGrid.show { display: block; }
     </style>
-<?php if (!empty($tienda['meta_descripcion'])): ?>
+<?php $cat_plan = $tienda['plan'] ?? 'starter'; $cat_pers = in_array($cat_plan, ['pro', 'business', 'enterprise']); ?>
+<?php if ($cat_pers && !empty($tienda['meta_descripcion'])): ?>
     <meta name="description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
 <?php endif; ?>
-<?php if (!empty($tienda['meta_palabras_clave'])): ?>
+<?php if ($cat_pers && !empty($tienda['meta_palabras_clave'])): ?>
     <meta name="keywords" content="<?php echo htmlspecialchars($tienda['meta_palabras_clave']); ?>">
 <?php endif; ?>
-<?php if (!empty($tienda['codigo_tracking'])): ?>
+<?php if ($cat_pers && !empty($tienda['codigo_tracking'])): ?>
     <?php echo $tienda['codigo_tracking']; ?>
 <?php endif; ?>
-<?php if (!empty($tienda['css_personalizado'])): ?>
+<?php if ($cat_pers && !empty($tienda['css_personalizado'])): ?>
 <style><?php echo $tienda['css_personalizado']; ?></style>
 <?php endif; ?>
 </head>
@@ -140,7 +141,7 @@
                         <span id="cartBadgeNav" class="cart-badge">0</span>
                     </button>
                 </li>
-                <?php if (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url'])): ?>
+                <?php if ($cat_pers && (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url']))): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Redes</a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -156,15 +157,15 @@
     </div>
 </nav>
 
-<div class="hero-shop text-center py-5 mb-5" style="<?php if (!empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
+<div class="hero-shop text-center py-5 mb-5" style="<?php if ($cat_pers && !empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
     <div class="container" style="max-width: 600px;">
-        <?php if (!empty($tienda['banner_url'])): ?>
+        <?php if ($cat_pers && !empty($tienda['banner_url'])): ?>
             <h2 class="fw-bold mb-2" style="color:#fff;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></h2>
         <?php else: ?>
-            <h2 class="fw-bold mb-2"><?php echo htmlspecialchars($tienda['hero_title'] ?? 'Explora nuestra colección'); ?></h2>
+            <h2 class="fw-bold mb-2"><?php echo htmlspecialchars($cat_pers && !empty($tienda['hero_title']) ? $tienda['hero_title'] : 'Explora nuestra colección'); ?></h2>
         <?php endif; ?>
-        <p class="<?php echo !empty($tienda['banner_url']) ? 'text-light' : 'text-muted'; ?> mb-0">
-            <?php echo htmlspecialchars($tienda['hero_subtitle'] ?? $tienda['descripcion'] ?? 'Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.'); ?>
+        <p class="<?php echo ($cat_pers && !empty($tienda['banner_url'])) ? 'text-light' : 'text-muted'; ?> mb-0">
+            <?php echo htmlspecialchars($cat_pers && !empty($tienda['hero_subtitle']) ? $tienda['hero_subtitle'] : ($tienda['descripcion'] ?? 'Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.')); ?>
         </p>
     </div>
 </div>

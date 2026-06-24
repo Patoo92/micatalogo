@@ -83,6 +83,7 @@
                 </div>
 
                 <hr class="my-4">
+                <?php if (plan_limite('personalizacion')): ?>
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:image-area" width="18"></iconify-icon> Imagen de portada (Banner)</h6>
 
                 <div class="mb-3">
@@ -92,6 +93,12 @@
                         <small class="text-muted d-block mt-1">Actual: <?php echo htmlspecialchars($tienda['banner_url']); ?></small>
                     <?php endif; ?>
                 </div>
+                <?php else: ?>
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-0" style="border-radius:12px;">
+                    <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
+                    <span>Personalizá la portada de tu catálogo — disponible en Plan Pro y superiores. <a href="index.html#planes" class="fw-bold text-decoration-underline">Ver planes</a></span>
+                </div>
+                <?php endif; ?>
 
                 <div class="mb-3">
                     <label class="form-label-custom"><iconify-icon icon="mdi:text" width="16"></iconify-icon> Descripción / Bio de la tienda</label>
@@ -99,6 +106,7 @@
                 </div>
 
                 <hr class="my-4">
+                <?php if (plan_limite('personalizacion')): ?>
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:search-web" width="18"></iconify-icon> SEO (Meta Tags)</h6>
 
                 <div class="mb-3">
@@ -153,6 +161,12 @@
                     </label>
                     <input type="text" name="twitter" value="<?php echo htmlspecialchars($tienda['twitter_url'] ?? ''); ?>" class="form-control" placeholder="https://x.com/tutienda">
                 </div>
+                <?php else: ?>
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-0" style="border-radius:12px;">
+                    <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
+                    <span>SEO, hero del catálogo y redes sociales — disponible en Plan Pro y superiores. <a href="index.html#planes" class="fw-bold text-decoration-underline">Ver planes</a></span>
+                </div>
+                <?php endif; ?>
 
                 <hr class="my-4">
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:storefront" width="18"></iconify-icon> Información del negocio</h6>
@@ -183,6 +197,7 @@
                 </div>
 
                 <hr class="my-4">
+                <?php if (plan_limite('personalizacion')): ?>
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:bell-outline" width="18"></iconify-icon> Notificaciones</h6>
 
                 <div class="mb-2 form-check form-switch">
@@ -196,6 +211,7 @@
                     <input type="checkbox" name="notif_stock_bajo" id="notif_stock" class="form-check-input" value="1" <?php echo ($tienda['notif_stock_bajo'] ?? 1) ? 'checked' : ''; ?>>
                     <label class="form-check-label" for="notif_stock">Notificarme cuando un producto tenga stock crítico</label>
                 </div>
+                <?php endif; ?>
 
                 <?php if (plan_limite('marca_blanca')): ?>
                 <hr class="my-4">
@@ -210,6 +226,7 @@
                 </div>
                 <?php endif; ?>
 
+                <?php if (plan_limite('personalizacion')): ?>
                 <hr class="my-4">
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:code-tags" width="18"></iconify-icon> Tracking &amp; Avanzado</h6>
 
@@ -224,6 +241,7 @@
                     <textarea name="css_personalizado" class="form-control" rows="4" placeholder=".clase { color: red; }"><?php echo htmlspecialchars($tienda['css_personalizado'] ?? ''); ?></textarea>
                     <small class="text-muted">Se inyecta en el &lt;head&gt; del catálogo público. Úsalo para sobrescribir estilos.</small>
                 </div>
+                <?php endif; ?>
 
                 <button type="submit" class="btn btn-primary w-100 btn-icon py-2" style="font-weight: 600;">
                     <iconify-icon icon="mdi:content-save" width="18"></iconify-icon> Guardar Cambios
@@ -248,6 +266,7 @@
                 <li class="mb-1"><iconify-icon icon="mdi:store" width="16"></iconify-icon> Tiendas: <?php echo plan_limite('tiendas'); ?></li>
                 <li class="mb-1"><iconify-icon icon="mdi:key-variant" width="16"></iconify-icon> API Keys: <?php echo plan_limite('api_keys'); ?></li>
                 <li class="mb-1"><iconify-icon icon="mdi:palette" width="16"></iconify-icon> Marca blanca: <?php echo plan_limite('marca_blanca') ? 'Sí' : 'No'; ?></li>
+                <li class="mb-1"><iconify-icon icon="mdi:tune" width="16"></iconify-icon> Personalización: <?php echo plan_limite('personalizacion') ? 'Sí' : 'No'; ?></li>
             </ul>
             <a href="index.html#planes" class="btn btn-sm btn-outline-primary mt-3 btn-icon">
                 <iconify-icon icon="mdi:arrow-up-circle" width="16"></iconify-icon> Ver planes

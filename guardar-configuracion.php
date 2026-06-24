@@ -65,6 +65,24 @@ if ($marca_blanca && !plan_limite('marca_blanca')) {
     exit;
 }
 
+if (!plan_limite('personalizacion')) {
+    $instagram       = '';
+    $facebook        = '';
+    $tiktok          = '';
+    $twitter         = '';
+    $mensaje_wp      = '';
+    $meta_desc       = '';
+    $meta_palabras   = '';
+    $codigo_tracking = '';
+    $css_personalizado = '';
+    $hero_title      = '';
+    $hero_subtitle   = '';
+    $notif_pedido    = 0;
+    $notif_stock     = 0;
+    $_FILES['banner']['name'] = '';
+    $banner_url = null;
+}
+
 // Logo upload
 $logo_url = null;
 if (!empty($_FILES['logo']['name'])) {

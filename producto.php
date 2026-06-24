@@ -66,15 +66,16 @@ $prod_precio = number_format($producto['precio'], 2);
     <meta name="twitter:description" content="<?php echo $prod_descripcion ?: 'Disponible en ' . htmlspecialchars($tienda['nombre_tienda']); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($prod_imagen); ?>">
 
-    <?php if (!empty($tienda['meta_descripcion'])): ?>
+    <?php $cat_plan = $tienda['plan'] ?? 'starter'; $cat_pers = in_array($cat_plan, ['pro', 'business', 'enterprise']); ?>
+    <?php if ($cat_pers && !empty($tienda['meta_descripcion'])): ?>
     <meta name="description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
     <meta property="og:description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($tienda['meta_descripcion']); ?>">
     <?php endif; ?>
-    <?php if (!empty($tienda['meta_palabras_clave'])): ?>
+    <?php if ($cat_pers && !empty($tienda['meta_palabras_clave'])): ?>
     <meta name="keywords" content="<?php echo htmlspecialchars($tienda['meta_palabras_clave']); ?>">
     <?php endif; ?>
-    <?php if (!empty($tienda['codigo_tracking'])): ?>
+    <?php if ($cat_pers && !empty($tienda['codigo_tracking'])): ?>
     <?php echo $tienda['codigo_tracking']; ?>
     <?php endif; ?>
 
@@ -125,7 +126,7 @@ $prod_precio = number_format($producto['precio'], 2);
         .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e2e8f0; background: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; transition: all 0.15s; }
         .qty-btn:hover { background: #f1f5f9; border-color: var(--color-principal); }
     </style>
-    <?php if (!empty($tienda['css_personalizado'])): ?>
+    <?php if ($cat_pers && !empty($tienda['css_personalizado'])): ?>
     <style><?php echo $tienda['css_personalizado']; ?></style>
     <?php endif; ?>
 </head>
@@ -176,7 +177,7 @@ $prod_precio = number_format($producto['precio'], 2);
                         <span id="cartBadgeNav" class="cart-badge">0</span>
                     </button>
                 </li>
-                <?php if (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url'])): ?>
+                <?php if ($cat_pers && (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url']))): ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Redes</a>
                     <ul class="dropdown-menu dropdown-menu-end">

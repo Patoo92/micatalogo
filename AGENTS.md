@@ -8,10 +8,10 @@
 ## Estado actual del proyecto
 
 ### Planes y monetización (sin pasarela de pago)
-- **Starter** (gratis, siempre): 1 staff, 1 tienda, 0 API keys, sin marca blanca
-- **Pro**: 3 staff, 1 tienda, 1 API key, sin marca blanca
-- **Business**: 10 staff, 3 tiendas, 5 API keys, marca blanca sí
-- **Enterprise**: staff/tiendas/API keys ilimitados, marca blanca sí
+- **Starter** (gratis, siempre): 1 staff, 1 tienda, 0 API keys, sin marca blanca, sin personalización
+- **Pro** (12€/mes): 3 staff, 1 tienda, 1 API key, personalización completa (SEO, hero, RRSS, CSS, tracking, notificaciones), sin marca blanca
+- **Business** (19€/mes): 10 staff, 3 tiendas, 5 API keys, marca blanca, dominio personalizado, todo lo de Pro
+- **Enterprise** (39€/mes): staff/tiendas/API keys ilimitados, personalización total, soporte dedicado
 - Trial: 3 días solo para Pro/Business; al vencer → downgrade automático a Starter (login.php)
 - Upgrades: gestión manual desde super-admin (sin pasarela de pago aún)
 
@@ -83,6 +83,14 @@
 - `backup.php`: fix `continue` fuera de loop cambiado a `exit`
 - `card-config`: removed `background: transparent !important`
 - Dark mode: agregado a todos los admin pages con toggle persistente
+
+### Personalización por plan (junio 2026)
+- Se agregó `personalizacion` a `plan_limite()` en `helpers.php`
+- Starter: `personalizacion = false` → oculta en config y deshabilita en backend: banner, SEO/meta, hero, RRSS, tracking, CSS personalizado, notificaciones
+- Pro/Business/Enterprise: `personalizacion = true` → muestra todos los campos de personalización
+- `guardar-configuracion.php`: si no tiene permiso, se limpian los campos de personalización antes de guardar
+- `catalogo.php` y `producto.php`: verifican `$tienda['plan']` directamente (no `$_SESSION`) para gatear features en el catálogo público
+- Pricing cards en `index.html` actualizadas con 4 planes (Starter, Pro, Business, Enterprise) y features correctas
 
 ### Archivos relevantes
 - `/micatalogo/`: PHP raíz (cada archivo = una ruta)
