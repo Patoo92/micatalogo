@@ -1,5 +1,19 @@
 <footer class="border-top mt-5 py-4" style="background:#f8fafc;">
     <div class="container">
+        <?php if (!empty($tienda['direccion']) || !empty($tienda['horario'])): ?>
+        <div class="row g-2 mb-3 text-center text-md-start">
+            <?php if (!empty($tienda['direccion'])): ?>
+            <div class="col-md-6">
+                <small class="text-muted d-block"><iconify-icon icon="mdi:map-marker" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['direccion']); ?></small>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($tienda['horario'])): ?>
+            <div class="col-md-6">
+                <small class="text-muted d-block"><iconify-icon icon="mdi:clock-outline" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['horario']); ?></small>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
         <div class="row g-3 align-items-center">
             <div class="col-md-6 text-center text-md-start">
                 <small class="text-muted">

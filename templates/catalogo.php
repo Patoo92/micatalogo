@@ -243,24 +243,6 @@
     </div>
 </div>
 
-<?php if (!empty($tienda['direccion']) || !empty($tienda['horario'])): ?>
-<div class="container pb-5" style="max-width: 900px;">
-    <hr>
-    <div class="row g-3 text-center text-md-start">
-        <?php if (!empty($tienda['direccion'])): ?>
-        <div class="col-md-6">
-            <small class="text-muted d-block"><iconify-icon icon="mdi:map-marker" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['direccion']); ?></small>
-        </div>
-        <?php endif; ?>
-        <?php if (!empty($tienda['horario'])): ?>
-        <div class="col-md-6">
-            <small class="text-muted d-block"><iconify-icon icon="mdi:clock-outline" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['horario']); ?></small>
-        </div>
-        <?php endif; ?>
-    </div>
-</div>
-<?php endif; ?>
-
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
     <div class="offcanvas-header border-bottom">
         <h5 class="fw-bold mb-0"><iconify-icon icon="mdi:cart" width="22"></iconify-icon> Tu Carrito</h5>
