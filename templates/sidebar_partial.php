@@ -2,7 +2,7 @@
     <div class="sidebar-brand">
         <a href="admin.php" class="d-flex align-items-center gap-2 text-white text-decoration-none">
             <iconify-icon icon="mdi:store" width="26" height="26"></iconify-icon>
-            <span class="fw-bold"><?php echo htmlspecialchars($tienda_nombre); ?></span>
+            <span class="fw-bold"><?php echo htmlspecialchars($tienda_nombre ?? $_SESSION['tienda_nombre'] ?? 'Mi Tienda'); ?></span>
             <span class="badge ms-auto fw-normal" style="font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;background:<?php echo $_SESSION['plan'] === 'business' ? '#f59e0b' : ($_SESSION['plan'] === 'pro' ? '#3b82f6' : '#64748b'); ?>;color:#000;"><?php echo htmlspecialchars($_SESSION['plan']); ?></span>
         </a>
     </div>

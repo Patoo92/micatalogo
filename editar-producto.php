@@ -11,6 +11,7 @@ if (!verificar_permiso('productos_editar')) {
 }
 
 $tienda_id = $_SESSION['tienda_id'];
+$tienda_nombre = $_SESSION['tienda_nombre'];
 $producto_id = (int)$_GET['id'];
 $error = '';
 $exito = '';
