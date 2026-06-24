@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
-<body class="bg-light">
+<body class="bg-admin">
 
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
