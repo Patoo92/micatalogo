@@ -63,6 +63,12 @@ if (isset($_GET['success'])) {
     $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El número de WhatsApp no es válido (opcional, déjalo vacío si no lo usas).</div>';
 } elseif (isset($_GET['error']) && $_GET['error'] === 'instagram_invalido') {
     $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> La URL de Instagram no es válida (opcional, déjalo vacío si no lo usas).</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'nombre_vacio') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El nombre de la tienda no puede estar vacío.</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'email_invalido') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El email no es válido.</div>';
+} elseif (isset($_GET['error']) && $_GET['error'] === 'banner_grande') {
+    $mensaje = '<div class="alert alert-danger d-flex align-items-center gap-2"><iconify-icon icon="mdi:alert-circle" width="20"></iconify-icon> El banner no puede superar los 2 MB.</div>';
 }
 
 $stmtKeys = $pdo->prepare("SELECT id, api_key, nombre, activo, created_at FROM api_keys WHERE tienda_id = ? ORDER BY created_at DESC");

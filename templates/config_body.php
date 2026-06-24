@@ -53,26 +53,93 @@
 
             <form action="guardar-configuracion.php" method="POST" enctype="multipart/form-data">
                 <?php echo csrf_field(); ?>
+
                 <div class="mb-3">
-                    <label class="form-label-custom">Logo de tu tienda</label>
+                    <label class="form-label-custom"><iconify-icon icon="mdi:store" width="16"></iconify-icon> Nombre de la tienda</label>
+                    <input type="text" name="nombre_tienda" value="<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:email" width="16"></iconify-icon> Email de contacto / notificaciones</label>
+                    <input type="email" name="email" value="<?php echo htmlspecialchars($tienda['email'] ?? ''); ?>" class="form-control" placeholder="tutienda@ejemplo.com">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:image" width="16"></iconify-icon> Logo de tu tienda</label>
                     <input type="file" name="logo" class="form-control">
                     <?php if (!empty($tienda['logo_url'])): ?>
-                        <small class="text-muted">Logo actual: <?php echo htmlspecialchars($tienda['logo_url']); ?></small>
+                        <small class="text-muted d-block mt-1">Actual: <?php echo htmlspecialchars($tienda['logo_url']); ?></small>
                     <?php endif; ?>
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:palette" width="16"></iconify-icon> Color principal de la marca</label>
+                    <input type="color" name="color" value="<?php echo htmlspecialchars($tienda['color_tema'] ?? '#0d6efd'); ?>" class="form-control form-control-color">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:currency-eur" width="16"></iconify-icon> Moneda</label>
+                    <input type="text" name="moneda" value="<?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?>" class="form-control" placeholder="€" maxlength="10" style="max-width:100px;">
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:image-area" width="18"></iconify-icon> Imagen de portada (Banner)</h6>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">Banner / Portada de la tienda</label>
+                    <input type="file" name="banner" class="form-control" accept="image/*">
+                    <?php if (!empty($tienda['banner_url'])): ?>
+                        <small class="text-muted d-block mt-1">Actual: <?php echo htmlspecialchars($tienda['banner_url']); ?></small>
+                    <?php endif; ?>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:text" width="16"></iconify-icon> Descripción / Bio de la tienda</label>
+                    <textarea name="descripcion" class="form-control" rows="3" placeholder="Breve descripción de tu negocio..."><?php echo htmlspecialchars($tienda['descripcion'] ?? ''); ?></textarea>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:link-variant" width="18"></iconify-icon> Redes Sociales</h6>
+
+                <div class="mb-3">
                     <label class="form-label-custom">
-                        <iconify-icon icon="mdi:instagram" width="16"></iconify-icon> Instagram URL
+                        <iconify-icon icon="mdi:instagram" width="16"></iconify-icon> Instagram
                     </label>
                     <input type="text" name="instagram" value="<?php echo htmlspecialchars($tienda['instagram_url'] ?? ''); ?>" class="form-control" placeholder="https://instagram.com/tutienda">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label-custom">
-                        <iconify-icon icon="mdi:palette" width="16"></iconify-icon> Color principal de la marca
+                        <iconify-icon icon="mdi:facebook" width="16"></iconify-icon> Facebook
                     </label>
-                    <input type="color" name="color" value="<?php echo htmlspecialchars($tienda['color_tema'] ?? '#0d6efd'); ?>" class="form-control form-control-color">
+                    <input type="text" name="facebook" value="<?php echo htmlspecialchars($tienda['facebook_url'] ?? ''); ?>" class="form-control" placeholder="https://facebook.com/tutienda">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">
+                        <iconify-icon icon="mdi:tiktok" width="16"></iconify-icon> TikTok
+                    </label>
+                    <input type="text" name="tiktok" value="<?php echo htmlspecialchars($tienda['tiktok_url'] ?? ''); ?>" class="form-control" placeholder="https://tiktok.com/@tutienda">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom">
+                        <iconify-icon icon="mdi:twitter" width="16"></iconify-icon> X / Twitter
+                    </label>
+                    <input type="text" name="twitter" value="<?php echo htmlspecialchars($tienda['twitter_url'] ?? ''); ?>" class="form-control" placeholder="https://x.com/tutienda">
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:storefront" width="18"></iconify-icon> Información del negocio</h6>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:map-marker" width="16"></iconify-icon> Dirección</label>
+                    <input type="text" name="direccion" value="<?php echo htmlspecialchars($tienda['direccion'] ?? ''); ?>" class="form-control" placeholder="Calle, número, ciudad">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label-custom"><iconify-icon icon="mdi:clock-outline" width="16"></iconify-icon> Horario de atención</label>
+                    <input type="text" name="horario" value="<?php echo htmlspecialchars($tienda['horario'] ?? ''); ?>" class="form-control" placeholder="Lun-Vie 10:00-19:00, Sáb 10:00-14:00">
                 </div>
 
                 <div class="mb-3">
@@ -82,7 +149,32 @@
                     <input type="text" name="whatsapp" value="<?php echo htmlspecialchars($tienda['telefono_whatsapp'] ?? ''); ?>" class="form-control" placeholder="+34600123456">
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label-custom">
+                        <iconify-icon icon="mdi:message-text" width="16"></iconify-icon> Mensaje predeterminado de WhatsApp
+                    </label>
+                    <textarea name="mensaje_whatsapp" class="form-control" rows="2" placeholder="Hola, me interesa..."><?php echo htmlspecialchars($tienda['mensaje_whatsapp'] ?? ''); ?></textarea>
+                    <small class="text-muted">Texto que se prefija al contactar por WhatsApp.</small>
+                </div>
+
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:bell-outline" width="18"></iconify-icon> Notificaciones</h6>
+
+                <div class="mb-2 form-check form-switch">
+                    <input type="hidden" name="notif_nuevo_pedido" value="0">
+                    <input type="checkbox" name="notif_nuevo_pedido" id="notif_pedido" class="form-check-input" value="1" <?php echo ($tienda['notif_nuevo_pedido'] ?? 1) ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="notif_pedido">Notificarme cuando llegue un nuevo pedido</label>
+                </div>
+
+                <div class="mb-3 form-check form-switch">
+                    <input type="hidden" name="notif_stock_bajo" value="0">
+                    <input type="checkbox" name="notif_stock_bajo" id="notif_stock" class="form-check-input" value="1" <?php echo ($tienda['notif_stock_bajo'] ?? 1) ? 'checked' : ''; ?>>
+                    <label class="form-check-label" for="notif_stock">Notificarme cuando un producto tenga stock crítico</label>
+                </div>
+
                 <?php if (plan_limite('marca_blanca')): ?>
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:palette" width="18"></iconify-icon> Marca blanca</h6>
                 <div class="mb-3 form-check form-switch">
                     <input type="hidden" name="marca_blanca" value="0">
                     <input type="checkbox" name="marca_blanca" id="marca_blanca" class="form-check-input" value="1" <?php echo $tienda['marca_blanca'] ? 'checked' : ''; ?>>

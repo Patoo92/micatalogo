@@ -18,11 +18,31 @@ if (!verificar_csrf($_POST['_csrf'] ?? '')) {
     exit;
 }
 
-$instagram = trim($_POST['instagram'] ?? '');
-$color = trim($_POST['color'] ?? '');
-$whatsapp = trim($_POST['whatsapp'] ?? '');
-$marca_blanca = !empty($_POST['marca_blanca']) ? 1 : 0;
+$nombre_tienda   = trim($_POST['nombre_tienda'] ?? '');
+$email           = trim($_POST['email'] ?? '');
+$instagram       = trim($_POST['instagram'] ?? '');
+$facebook        = trim($_POST['facebook'] ?? '');
+$tiktok          = trim($_POST['tiktok'] ?? '');
+$twitter         = trim($_POST['twitter'] ?? '');
+$color           = trim($_POST['color'] ?? '');
+$moneda          = trim($_POST['moneda'] ?? '€');
+$whatsapp        = trim($_POST['whatsapp'] ?? '');
+$mensaje_wp      = trim($_POST['mensaje_whatsapp'] ?? '');
+$descripcion     = trim($_POST['descripcion'] ?? '');
+$direccion       = trim($_POST['direccion'] ?? '');
+$horario         = trim($_POST['horario'] ?? '');
+$marca_blanca    = !empty($_POST['marca_blanca']) ? 1 : 0;
+$notif_pedido    = !empty($_POST['notif_nuevo_pedido']) ? 1 : 0;
+$notif_stock     = !empty($_POST['notif_stock_bajo']) ? 1 : 0;
 
+if (empty($nombre_tienda)) {
+    header("Location: configuracion.php?error=nombre_vacio");
+    exit;
+}
+if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header("Location: configuracion.php?error=email_invalido");
+    exit;
+}
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
     $color = '#0d6efd';
 }
@@ -39,6 +59,7 @@ if ($marca_blanca && !plan_limite('marca_blanca')) {
     exit;
 }
 
+// Logo upload
 $logo_url = null;
 if (!empty($_FILES['logo']['name'])) {
     if ($_FILES['logo']['size'] > 2 * 1024 * 1024) {
@@ -46,10 +67,8 @@ if (!empty($_FILES['logo']['name'])) {
         exit;
     }
     $TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime_real = $finfo->file($_FILES['logo']['tmp_name']);
-
     if (!in_array($mime_real, $TIPOS_PERMITIDOS)) {
         header("Location: configuracion.php?error=tipo_archivo_no_permitido");
         exit;
@@ -67,17 +86,66 @@ if (!empty($_FILES['logo']['name'])) {
     move_uploaded_file($_FILES["logo"]["tmp_name"], $target_dir . basename($logo_url));
 }
 
+// Banner upload
+$banner_url = null;
+if (!empty($_FILES['banner']['name'])) {
+    if ($_FILES['banner']['size'] > 2 * 1024 * 1024) {
+        header("Location: configuracion.php?error=banner_grande");
+        exit;
+    }
+    $TIPOS_PERMITIDOS = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime_real = $finfo->file($_FILES['banner']['tmp_name']);
+    if (!in_array($mime_real, $TIPOS_PERMITIDOS)) {
+        header("Location: configuracion.php?error=tipo_archivo_no_permitido");
+        exit;
+    }
+    $EXT_POR_MIME = [
+        'image/jpeg' => 'jpg',
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
+    ];
+    $ext = $EXT_POR_MIME[$mime_real] ?? 'png';
+    $target_dir = __DIR__ . "/uploads/";
+    if (!is_dir($target_dir)) mkdir($target_dir, 0755, true);
+    $banner_url = "uploads/banner_" . $tienda_id . "_" . time() . "." . $ext;
+    move_uploaded_file($_FILES["banner"]["tmp_name"], $target_dir . basename($banner_url));
+}
+
 $sql = "UPDATE tiendas SET 
+            nombre_tienda     = ?,
+            email             = ?,
             instagram_url     = ?, 
+            facebook_url      = ?,
+            tiktok_url        = ?,
+            twitter_url       = ?,
             color_tema        = ?, 
+            moneda            = ?,
             telefono_whatsapp = ?,
+            mensaje_whatsapp  = ?,
+            descripcion       = ?,
+            direccion         = ?,
+            horario           = ?,
             logo_url          = COALESCE(?, logo_url),
-            marca_blanca      = ?
+            banner_url        = COALESCE(?, banner_url),
+            marca_blanca      = ?,
+            notif_nuevo_pedido = ?,
+            notif_stock_bajo  = ?
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$instagram, $color, $whatsapp, $logo_url, $marca_blanca, $tienda_id]);
+$stmt->execute([
+    $nombre_tienda, $email,
+    $instagram, $facebook, $tiktok, $twitter,
+    $color, $moneda, $whatsapp, $mensaje_wp,
+    $descripcion, $direccion, $horario,
+    $logo_url, $banner_url,
+    $marca_blanca, $notif_pedido, $notif_stock,
+    $tienda_id
+]);
 
+$_SESSION['tienda_nombre'] = $nombre_tienda;
 $_SESSION['marca_blanca'] = $marca_blanca;
 
 $u = obtener_usuario_actual();
@@ -85,4 +153,3 @@ registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la c
 
 header("Location: configuracion.php?success=1");
 exit;
-?>

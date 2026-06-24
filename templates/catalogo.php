@@ -524,5 +524,6 @@ document.getElementById('btnWhatsAppCart').addEventListener('click', enviarWhats
 
 actualizarBadge();
 </script>
+<?php require __DIR__ . '/footer_partial.php'; ?>
 </body>
 </html>
