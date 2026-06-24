@@ -50,7 +50,7 @@
 .glass-table .btn-primary { background: rgba(59,130,246,0.4) !important; border-color: transparent !important; }
 .glass-table a:not(.btn) { color: #93c5fd !important; }
 .card-header.bg-white { background: rgba(255,255,255,0.15) !important; }
-.card-admin, .card-custom, .card-config, .card-orders { background: transparent !important; }
+.card-admin, .card-custom, .card-orders { background: transparent !important; }
 .alert { background: rgba(255,255,255,0.2) !important; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2) !important; color: #fff !important; }
 .bg-admin .navbar-admin { background: rgba(15,23,42,0.8) !important; backdrop-filter: blur(12px); }
 
