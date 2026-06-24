@@ -91,6 +91,9 @@
 - `guardar-configuracion.php`: si no tiene permiso, se limpian los campos de personalización antes de guardar
 - `catalogo.php` y `producto.php`: verifican `$tienda['plan']` directamente (no `$_SESSION`) para gatear features en el catálogo público
 - Pricing cards en `index.html` actualizadas con 4 planes (Starter, Pro, Business, Enterprise) y features correctas
+- CSS personalizado: se inyecta en `<head>` vía `<style>` tag, pero los selectores deben coincidir con las clases del template (`.product-card`, `.card-title`, `.btn-primary`, etc.)
+- Redes sociales: además del dropdown en navbar, se muestran como iconos en el footer (`footer_partial.php`) gated por plan
+- burger-co actualizado a plan `pro` en DB para pruebas
 
 ### Archivos relevantes
 - `/micatalogo/`: PHP raíz (cada archivo = una ruta)
