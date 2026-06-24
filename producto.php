@@ -52,7 +52,7 @@ $prod_precio = number_format($producto['precio'], 2);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo $prod_nombre; ?> - <?php echo htmlspecialchars($tienda['nombre_tienda']); ?></title>
-    <meta name="description" content="<?php echo $prod_descripcion ?: $prod_nombre . ' — ' . $prod_precio . ' €'; ?>">
+    <meta name="description" content="<?php echo $prod_descripcion ?: $prod_nombre . ' — ' . $prod_precio . ' ' . ($tienda['moneda'] ?? '€'); ?>">
 
     <meta property="og:title" content="<?php echo $prod_nombre; ?>">
     <meta property="og:description" content="<?php echo $prod_descripcion ?: 'Disponible en ' . htmlspecialchars($tienda['nombre_tienda']); ?>">
@@ -161,6 +161,17 @@ $prod_precio = number_format($producto['precio'], 2);
                         <span id="cartBadgeNav" class="cart-badge">0</span>
                     </button>
                 </li>
+                <?php if (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url'])): ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Redes</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <?php if (!empty($tienda['instagram_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['instagram_url']); ?>" target="_blank"><iconify-icon icon="mdi:instagram" width="16"></iconify-icon> Instagram</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['facebook_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['facebook_url']); ?>" target="_blank"><iconify-icon icon="mdi:facebook" width="16"></iconify-icon> Facebook</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['tiktok_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['tiktok_url']); ?>" target="_blank"><iconify-icon icon="mdi:tiktok" width="16"></iconify-icon> TikTok</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['twitter_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['twitter_url']); ?>" target="_blank"><iconify-icon icon="mdi:twitter" width="16"></iconify-icon> X / Twitter</a></li><?php endif; ?>
+                    </ul>
+                </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
@@ -192,7 +203,7 @@ $prod_precio = number_format($producto['precio'], 2);
                     <span class="badge bg-secondary mb-2" style="border-radius:20px;font-weight:500;"><?php echo htmlspecialchars($producto['nombre_categoria']); ?></span>
                 <?php endif; ?>
                 <h1 class="fw-bold mb-3" style="font-size:1.75rem;"><?php echo $prod_nombre; ?></h1>
-                <p class="product-price mb-3"><?php echo $prod_precio; ?> €</p>
+                <p class="product-price mb-3"><?php echo $prod_precio; ?> <?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?></p>
 
                 <?php if ($producto['stock'] > 0): ?>
                     <span class="badge bg-success badge-stock-detail mb-3 d-inline-flex align-items-center gap-1"><iconify-icon icon="mdi:check-circle" width="14"></iconify-icon> En stock (<?php echo $producto['stock']; ?> uds)</span>
@@ -217,7 +228,7 @@ $prod_precio = number_format($producto['precio'], 2);
                         <button class="btn btn-secondary btn-lg flex-fill btn-icon py-3" disabled><iconify-icon icon="mdi:close-circle" width="20"></iconify-icon> Agotado</button>
                     <?php endif; ?>
                     <?php if (!empty($tienda['telefono_whatsapp'])): ?>
-                        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']); ?>?text=<?php echo urlencode('Hola, me interesa: ' . $prod_nombre . ' - ' . $prod_precio . ' € - ' . $prod_url); ?>" target="_blank" class="btn btn-success btn-lg btn-icon py-3" style="border-radius:10px;">
+                        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']); ?>?text=<?php echo urlencode('Hola, me interesa: ' . $prod_nombre . ' - ' . $prod_precio . ' ' . ($tienda['moneda'] ?? '€') . ' - ' . $prod_url); ?>" target="_blank" class="btn btn-success btn-lg btn-icon py-3" style="border-radius:10px;">
                             <iconify-icon icon="mdi:whatsapp" width="20"></iconify-icon> Consultar
                         </a>
                     <?php endif; ?>
@@ -237,7 +248,7 @@ $prod_precio = number_format($producto['precio'], 2);
                     <img src="<?php echo htmlspecialchars(imagen_url($rel['imagen_thumb'] ?: $rel['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($rel['nombre']); ?>" loading="lazy">
                     <div class="card-body p-3">
                         <h6 class="fw-bold text-dark mb-1"><?php echo htmlspecialchars($rel['nombre']); ?></h6>
-                        <p class="text-success fw-bold mb-0"><?php echo number_format($rel['precio'], 2); ?> €</p>
+                        <p class="text-success fw-bold mb-0"><?php echo number_format($rel['precio'], 2); ?> <?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?></p>
                     </div>
                 </div>
             </a>
@@ -246,6 +257,24 @@ $prod_precio = number_format($producto['precio'], 2);
     </div>
     <?php endif; ?>
 </div>
+
+<?php if (!empty($tienda['direccion']) || !empty($tienda['horario'])): ?>
+<div class="container pb-5" style="max-width: 1000px;">
+    <hr>
+    <div class="row g-3 text-center text-md-start">
+        <?php if (!empty($tienda['direccion'])): ?>
+        <div class="col-md-6">
+            <small class="text-muted d-block"><iconify-icon icon="mdi:map-marker" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['direccion']); ?></small>
+        </div>
+        <?php endif; ?>
+        <?php if (!empty($tienda['horario'])): ?>
+        <div class="col-md-6">
+            <small class="text-muted d-block"><iconify-icon icon="mdi:clock-outline" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['horario']); ?></small>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
     <div class="offcanvas-header border-bottom">
@@ -272,7 +301,7 @@ $prod_precio = number_format($producto['precio'], 2);
     </div>
 </div>
 
-<a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>" target="_blank" class="text-decoration-none cart-float">
+<a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>?text=<?php echo urlencode($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>" target="_blank" class="text-decoration-none cart-float">
     <button class="btn btn-success shadow-lg d-flex align-items-center justify-content-center">
         <iconify-icon icon="mdi:whatsapp" width="24"></iconify-icon>
     </button>
@@ -283,6 +312,7 @@ $prod_precio = number_format($producto['precio'], 2);
 let carrito = JSON.parse(localStorage.getItem('carrito_' + <?php echo $tienda_id; ?>)) || [];
 let carritoData = [];
 const whatsappNum = '<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>';
+const moneda = '<?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?>';
 const tiendaSlug = '<?php echo htmlspecialchars($tienda['slug']); ?>';
 const csrfToken = '<?php echo csrf_token(); ?>';
 
@@ -319,7 +349,7 @@ function renderCarrito() {
         const img = document.createElement('img'); img.src = prod.imagen; img.alt = prod.nombre; div.appendChild(img);
         const infoDiv = document.createElement('div'); infoDiv.className = 'flex-grow-1';
         const nameDiv = document.createElement('div'); nameDiv.className = 'fw-bold small'; nameDiv.textContent = prod.nombre; infoDiv.appendChild(nameDiv);
-        const priceSmall = document.createElement('small'); priceSmall.className = 'text-success fw-bold'; priceSmall.textContent = prod.precio.toFixed(2) + ' €'; infoDiv.appendChild(priceSmall);
+        const priceSmall = document.createElement('small'); priceSmall.className = 'text-success fw-bold'; priceSmall.textContent = prod.precio.toFixed(2) + ' ' + moneda; infoDiv.appendChild(priceSmall);
         div.appendChild(infoDiv);
         const qtyDiv = document.createElement('div'); qtyDiv.className = 'd-flex align-items-center gap-1';
         const minusBtn = document.createElement('button'); minusBtn.className = 'qty-btn'; minusBtn.textContent = '\u2212';
@@ -400,15 +430,15 @@ function enviarWhatsApp() {
                 btn.innerHTML = '<iconify-icon icon="mdi:whatsapp" width="18"></iconify-icon> Enviar Pedido por WhatsApp';
                 return;
             }
-            let msg = 'Hola, soy *' + nombre + '* y quiero pedir:\n';
+            let msg = '<?php echo htmlspecialchars($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>'.replace(/\\n/g, '\n') + '\n';
             let total = 0;
             carrito.forEach(item => {
                 const prod = carritoData.find(p => p.id === item.id);
                 if (!prod) return;
-                msg += '\n\u2022 ' + prod.nombre + ' x' + item.c + ' = ' + (prod.precio * item.c).toFixed(2) + '\u20AC';
+                msg += '\n\u2022 ' + prod.nombre + ' x' + item.c + ' = ' + (prod.precio * item.c).toFixed(2) + moneda;
                 total += prod.precio * item.c;
             });
-            msg += '\n\n*Total: ' + total.toFixed(2) + '\u20AC*';
+            msg += '\n\n*Total: ' + total.toFixed(2) + moneda + '*';
             localStorage.removeItem('carrito_' + <?php echo $tienda_id; ?>);
             carrito = []; carritoData = [];
             actualizarBadge(); renderCarrito();
@@ -443,7 +473,7 @@ document.addEventListener('keydown', function(e) {
 /* --- compartir --- */
 document.getElementById('btnShareProduct').addEventListener('click', function() {
     const url = '<?php echo htmlspecialchars($prod_url, ENT_QUOTES, 'UTF-8'); ?>';
-    const text = '<?php echo $prod_nombre; ?> - <?php echo $prod_precio; ?> €';
+    const text = '<?php echo $prod_nombre; ?> - <?php echo $prod_precio; ?> ' + moneda;
     if (navigator.share) {
         navigator.share({ title: '<?php echo $prod_nombre; ?>', text: text, url: url }).catch(function(){});
     } else {

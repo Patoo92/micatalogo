@@ -128,15 +128,32 @@
                         <span id="cartBadgeNav" class="cart-badge">0</span>
                     </button>
                 </li>
+                <?php if (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url'])): ?>
+                <li class="nav-item dropdown">
+                    <a class="nav-link nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Redes</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <?php if (!empty($tienda['instagram_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['instagram_url']); ?>" target="_blank"><iconify-icon icon="mdi:instagram" width="16"></iconify-icon> Instagram</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['facebook_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['facebook_url']); ?>" target="_blank"><iconify-icon icon="mdi:facebook" width="16"></iconify-icon> Facebook</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['tiktok_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['tiktok_url']); ?>" target="_blank"><iconify-icon icon="mdi:tiktok" width="16"></iconify-icon> TikTok</a></li><?php endif; ?>
+                        <?php if (!empty($tienda['twitter_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['twitter_url']); ?>" target="_blank"><iconify-icon icon="mdi:twitter" width="16"></iconify-icon> X / Twitter</a></li><?php endif; ?>
+                    </ul>
+                </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="hero-shop text-center py-5 mb-5">
+<div class="hero-shop text-center py-5 mb-5" style="<?php if (!empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
     <div class="container" style="max-width: 600px;">
-        <h2 class="fw-bold mb-2">Explora nuestra colección</h2>
-        <p class="text-muted mb-0">Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.</p>
+        <?php if (!empty($tienda['banner_url'])): ?>
+            <h2 class="fw-bold mb-2" style="color:#fff;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></h2>
+        <?php else: ?>
+            <h2 class="fw-bold mb-2">Explora nuestra colección</h2>
+        <?php endif; ?>
+        <p class="<?php echo !empty($tienda['banner_url']) ? 'text-light' : 'text-muted'; ?> mb-0">
+            <?php echo htmlspecialchars($tienda['descripcion'] ?? 'Agrega productos a tu carrito y envíanos tu orden completa por WhatsApp.'); ?>
+        </p>
     </div>
 </div>
 
@@ -200,7 +217,7 @@
                                 <?php if (!empty($prod['descripcion'])): ?>
                                     <small class="text-muted d-block mb-1" style="line-height:1.3;"><?php echo htmlspecialchars(mb_substr($prod['descripcion'], 0, 60)) . (mb_strlen($prod['descripcion'] ?? '') > 60 ? '…' : ''); ?></small>
                                 <?php endif; ?>
-                                <p class="text-success fw-bold mb-2"><?php echo number_format($prod['precio'], 2); ?> €</p>
+                                <p class="text-success fw-bold mb-2"><?php echo number_format($prod['precio'], 2); ?> <?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?></p>
                             </div>
                             <?php if ($prod['stock'] > 0): ?>
                                 <button class="btn btn-primary btn-sm w-100 py-2 btn-icon btn-add-cart" data-id="<?php echo $prod['id']; ?>" data-nombre="<?php echo htmlspecialchars($prod['nombre'], ENT_QUOTES, 'UTF-8'); ?>" data-precio="<?php echo $prod['precio']; ?>" data-img="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url']), ENT_QUOTES, 'UTF-8'); ?>">
@@ -225,6 +242,24 @@
         <p class="text-muted mt-3">No encontramos productos con ese nombre.</p>
     </div>
 </div>
+
+<?php if (!empty($tienda['direccion']) || !empty($tienda['horario'])): ?>
+<div class="container pb-5" style="max-width: 900px;">
+    <hr>
+    <div class="row g-3 text-center text-md-start">
+        <?php if (!empty($tienda['direccion'])): ?>
+        <div class="col-md-6">
+            <small class="text-muted d-block"><iconify-icon icon="mdi:map-marker" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['direccion']); ?></small>
+        </div>
+        <?php endif; ?>
+        <?php if (!empty($tienda['horario'])): ?>
+        <div class="col-md-6">
+            <small class="text-muted d-block"><iconify-icon icon="mdi:clock-outline" width="14"></iconify-icon> <?php echo htmlspecialchars($tienda['horario']); ?></small>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
     <div class="offcanvas-header border-bottom">
@@ -256,6 +291,7 @@
 let carrito = JSON.parse(localStorage.getItem('carrito_' + <?php echo $tienda_id; ?>)) || [];
 let carritoData = [];
 const whatsappNum = '<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>';
+const moneda = '<?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?>';
 const tiendaSlug = '<?php echo htmlspecialchars($tienda['slug']); ?>';
 const csrfToken = '<?php echo csrf_token(); ?>';
 
@@ -306,7 +342,7 @@ function renderCarrito() {
         infoDiv.appendChild(nameDiv);
         const priceSmall = document.createElement('small');
         priceSmall.className = 'text-success fw-bold';
-        priceSmall.textContent = prod.precio.toFixed(2) + ' €';
+        priceSmall.textContent = prod.precio.toFixed(2) + ' ' + moneda;
         infoDiv.appendChild(priceSmall);
         div.appendChild(infoDiv);
         const qtyDiv = document.createElement('div');
@@ -408,15 +444,15 @@ function enviarWhatsApp() {
                 btn.innerHTML = '<iconify-icon icon="mdi:whatsapp" width="18"></iconify-icon> Enviar Pedido por WhatsApp';
                 return;
             }
-            let msg = 'Hola, soy *' + nombre + '* y quiero pedir:\n';
+            let msg = '<?php echo htmlspecialchars($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>'.replace(/\\n/g, '\n') + '\n';
             let total = 0;
             carrito.forEach(item => {
                 const prod = carritoData.find(p => p.id === item.id);
                 if (!prod) return;
-                msg += '\n• ' + prod.nombre + ' x' + item.c + ' = ' + (prod.precio * item.c).toFixed(2) + '€';
+                msg += '\n• ' + prod.nombre + ' x' + item.c + ' = ' + (prod.precio * item.c).toFixed(2) + moneda;
                 total += prod.precio * item.c;
             });
-            msg += '\n\n*Total: ' + total.toFixed(2) + '€*';
+            msg += '\n\n*Total: ' + total.toFixed(2) + moneda + '*';
             localStorage.removeItem('carrito_' + <?php echo $tienda_id; ?>);
             carrito = []; carritoData = [];
             actualizarBadge(); renderCarrito();
