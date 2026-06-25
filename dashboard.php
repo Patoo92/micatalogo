@@ -142,13 +142,17 @@ try {
             <div class="col-md-7">
                 <div class="chart-card">
                     <h6 class="fw-bold mb-3">Pedidos últimos 7 días</h6>
-                    <canvas id="chartPedidos" height="220"></canvas>
+                    <div style="position:relative;height:220px;">
+                        <canvas id="chartPedidos"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="col-md-5">
                 <div class="chart-card">
                     <h6 class="fw-bold mb-3">Productos por categoría</h6>
-                    <canvas id="chartCategorias" height="220"></canvas>
+                    <div style="position:relative;height:220px;">
+                        <canvas id="chartCategorias"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
