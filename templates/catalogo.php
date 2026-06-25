@@ -201,17 +201,6 @@
                         <span id="cartBadgeNav" class="cart-badge">0</span>
                     </button>
                 </li>
-                <?php if ($cat_pers && (!empty($tienda['instagram_url']) || !empty($tienda['facebook_url']) || !empty($tienda['tiktok_url']) || !empty($tienda['twitter_url']))): ?>
-                <li class="nav-item dropdown">
-                    <a class="nav-link nav-link-custom dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Redes</a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <?php if (!empty($tienda['instagram_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['instagram_url']); ?>" target="_blank"><iconify-icon icon="mdi:instagram" width="16"></iconify-icon> Instagram</a></li><?php endif; ?>
-                        <?php if (!empty($tienda['facebook_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['facebook_url']); ?>" target="_blank"><iconify-icon icon="mdi:facebook" width="16"></iconify-icon> Facebook</a></li><?php endif; ?>
-                        <?php if (!empty($tienda['tiktok_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['tiktok_url']); ?>" target="_blank"><iconify-icon icon="mdi:tiktok" width="16"></iconify-icon> TikTok</a></li><?php endif; ?>
-                        <?php if (!empty($tienda['twitter_url'])): ?><li><a class="dropdown-item" href="<?php echo htmlspecialchars($tienda['twitter_url']); ?>" target="_blank"><iconify-icon icon="mdi:twitter" width="16"></iconify-icon> X / Twitter</a></li><?php endif; ?>
-                    </ul>
-                </li>
-                <?php endif; ?>
             </ul>
         </div>
     </div>
