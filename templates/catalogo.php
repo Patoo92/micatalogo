@@ -13,7 +13,7 @@
         .navbar-ecommerce { background-color: #ffffff !important; border-bottom: 1px solid #e2e8f0; backdrop-filter: blur(12px); background-color: rgba(255,255,255,0.9) !important; }
         .nav-link-custom { color: #64748b !important; font-weight: 500; padding: 0.5rem 1rem !important; transition: color 0.2s; }
         .nav-link-custom:hover, .nav-link-custom.active { color: var(--color-principal) !important; }
-        .hero-shop { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 0 0 24px 24px; }
+        .hero-shop { background-image: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 0 0 24px 24px; }
         .btn-primary { background-color: var(--color-principal) !important; border-color: var(--color-principal) !important; border-radius: 10px !important; font-weight: 600; }
         .btn-outline-primary { color: var(--color-principal); border-color: #e2e8f0; background-color: white; font-weight: 600; }
         .btn-outline-primary:hover { background-color: var(--color-principal); color: white; border-color: var(--color-principal); }
@@ -36,14 +36,15 @@
         .offcanvas.show { transform: none !important; visibility: visible !important; }
 
         /* ===== Public Dark Mode ===== */
-        .btn-dark-mode-public { display: inline-flex; align-items: center; gap: 4px; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.5rem; border-radius: 10px; transition: all 0.2s; }
-        .btn-dark-mode-public:hover { background: rgba(0,0,0,0.05); }
+        .dm-toggle { display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.4rem 0.5rem; border-radius: 8px; transition: all 0.2s; font-size: 1.1rem; line-height: 1; }
+        .dm-toggle:hover { background: rgba(0,0,0,0.05); }
+        .dm-icon { display: inline-block; transition: transform 0.3s; }
         body.public-dark-mode { background-color: #0f172a !important; color: #e2e8f0 !important; }
         body.public-dark-mode .navbar-ecommerce { background: rgba(15,23,42,0.95) !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
         body.public-dark-mode .navbar-ecommerce .navbar-brand { color: #e2e8f0 !important; }
         body.public-dark-mode .nav-link-custom { color: #94a3b8 !important; }
         body.public-dark-mode .nav-link-custom:hover, body.public-dark-mode .nav-link-custom.active { color: var(--color-principal) !important; }
-        body.public-dark-mode .hero-shop { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important; }
+        body.public-dark-mode .hero-shop { background-image: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important; }
         body.public-dark-mode .product-card { background: rgba(30,41,59,0.6) !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2) !important; }
         body.public-dark-mode .product-card:hover { box-shadow: 0 14px 20px -4px rgba(0,0,0,0.3) !important; }
         body.public-dark-mode .product-card .card-title, body.public-dark-mode .product-card h6 { color: #e2e8f0 !important; }
@@ -51,8 +52,7 @@
         body.public-dark-mode .search-wrapper .form-control { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
         body.public-dark-mode .search-wrapper .form-control:focus { background: rgba(30,41,59,0.95) !important; }
         body.public-dark-mode .btn-outline-primary { background: rgba(30,41,59,0.6) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
-        body.public-dark-mode .btn-outline-primary:hover { background: var(--color-principal) !important; }
-        body.public-dark-mode .btn-outline-primary.active { background: var(--color-principal) !important; border-color: var(--color-principal) !important; color: #fff !important; }
+        body.public-dark-mode .btn-outline-primary:hover, body.public-dark-mode .btn-outline-primary.active { background: var(--color-principal) !important; border-color: var(--color-principal) !important; color: #fff !important; }
         body.public-dark-mode .hero-shop h2, body.public-dark-mode .hero-shop p { color: #e2e8f0 !important; }
         body.public-dark-mode .offcanvas { background: #1e293b !important; color: #e2e8f0 !important; }
         body.public-dark-mode .offcanvas .btn-close { filter: invert(1); }
@@ -61,29 +61,32 @@
         body.public-dark-mode .qty-btn:hover { background: rgba(30,41,59,0.95) !important; }
         body.public-dark-mode .footer-custom { background: #0f172a !important; border-top-color: rgba(255,255,255,0.08) !important; }
         body.public-dark-mode .footer-custom, body.public-dark-mode .footer-custom a { color: #94a3b8 !important; }
-        body.public-dark-mode .cards-consent { background: #1e293b !important; border-color: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
-        body.public-dark-mode .btn-dark-mode-public { background: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
-        body.public-dark-mode .btn-dark-mode-public:hover { background: rgba(255,255,255,0.2) !important; }
+        body.public-dark-mode .dm-toggle { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+        body.public-dark-mode .dm-toggle:hover { background: rgba(255,255,255,0.2); }
         body.public-dark-mode h5.fw-bold:not(.product-card *) { color: #e2e8f0 !important; }
         body.public-dark-mode .product-card .text-success { color: #6ee7b7 !important; }
+        body.public-dark-mode .btn-layout { background: rgba(30,41,59,0.6); border-color: rgba(255,255,255,0.15); }
+        body.public-dark-mode .btn-layout:hover { background: rgba(30,41,59,0.9); }
+        body.public-dark-mode .btn-layout.active { background: var(--color-principal); border-color: var(--color-principal); }
 
         /* ===== Parallax hero ===== */
-        .hero-parallax { background-attachment: fixed !important; }
-        @media (max-width: 768px) { .hero-parallax { background-attachment: scroll !important; } }
+        .hero-banner { position: relative; overflow: hidden; }
+        .hero-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)); z-index: 0; }
+        .hero-banner > * { position: relative; z-index: 1; }
+        .hero-parallax { background-attachment: fixed; background-size: cover; background-position: center; }
+        @media (max-width: 768px) { .hero-parallax { background-attachment: scroll; } }
 
         /* ===== Layout toggle: List view ===== */
-        #productGrid.list-view .product-item { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
-        #productGrid.list-view .product-item .product-card { flex-direction: row !important; }
-        #productGrid.list-view .product-item .product-card-img { width: 140px !important; min-height: 120px; flex-shrink: 0; border-radius: 16px 0 0 16px !important; }
-        #productGrid.list-view .product-item .card-img-top { height: 120px !important; border-radius: 16px 0 0 16px !important; }
-        #productGrid.list-view .product-item .card-body { flex: 1 !important; }
-        #productGrid.list-view .product-item .btn-add-cart { max-width: 160px; }
-        .btn-layout { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; padding: 0.4rem 0.7rem; border-radius: 8px; transition: all 0.2s; font-size: 0.85rem; }
+        .btn-layout { display: inline-flex; align-items: center; justify-content: center; gap: 3px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; padding: 0.35rem 0.5rem; border-radius: 8px; transition: all 0.2s; font-size: 0.85rem; line-height: 1; min-width: 32px; }
         .btn-layout:hover { background: #f1f5f9; border-color: var(--color-principal); }
-        .btn-layout.active { background: var(--color-principal); border-color: var(--color-principal); color: #fff; }
-        body.public-dark-mode .btn-layout { background: rgba(30,41,59,0.6); border-color: rgba(255,255,255,0.15); color: #94a3b8; }
-        body.public-dark-mode .btn-layout:hover { background: rgba(30,41,59,0.9); }
-        body.public-dark-mode .btn-layout.active { background: var(--color-principal); color: #fff; }
+        .btn-layout.active { background: var(--color-principal) !important; border-color: var(--color-principal) !important; color: #fff !important; }
+        #productGrid.list-view .product-item { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
+        #productGrid.list-view .product-item .product-card { flex-direction: row !important; align-items: stretch !important; }
+        #productGrid.list-view .product-item .product-card-img { width: 130px !important; min-height: 120px; flex-shrink: 0; border-radius: 16px 0 0 16px !important; overflow: hidden; }
+        #productGrid.list-view .product-item .card-img-top { width: 130px !important; height: 130px !important; border-radius: 16px 0 0 16px !important; object-fit: cover !important; min-width: 130px; }
+        #productGrid.list-view .product-item .card-body { flex: 1 !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
+        #productGrid.list-view .product-item .btn-add-cart { max-width: 160px; align-self: flex-start; }
+        #productGrid.list-view .product-item .share-overlay { display: none; }
 
         /* buscador */
         .search-wrapper { position: relative; flex: 1; }
@@ -186,9 +189,9 @@
                 </li>
                 <?php endif; ?>
                 <?php if ($cat_pers): ?>
-                <li class="nav-item d-flex align-items-center">
-                    <button id="darkModeTogglePublic" class="btn-dark-mode-public" title="Modo oscuro">
-                        <iconify-icon id="darkModeIconPublic" icon="mdi:weather-night" width="16"></iconify-icon>
+                <li class="nav-item">
+                    <button id="darkModeTogglePublic" class="dm-toggle nav-link nav-link-custom border-0 bg-transparent" title="Modo oscuro" style="padding:0.4rem 0.6rem !important;">
+                        <span class="dm-icon" id="dmIcon">&#9790;</span>
                     </button>
                 </li>
                 <?php endif; ?>
@@ -214,7 +217,7 @@
     </div>
 </nav>
 
-<div class="hero-shop text-center py-5 mb-5 <?php echo $cat_pers ? 'hero-parallax' : ''; ?>" style="<?php if ($cat_pers && !empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
+<div class="hero-shop text-center py-5 mb-5 <?php if ($cat_pers && !empty($tienda['banner_url'])): ?>hero-banner hero-parallax<?php elseif ($cat_pers): ?>hero-parallax<?php endif; ?>" style="<?php if ($cat_pers && !empty($tienda['banner_url'])): ?>background-image: url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); color: #fff;<?php endif; ?>">
     <div class="container" style="max-width: 600px;">
         <?php if ($cat_pers && !empty($tienda['banner_url'])): ?>
             <h2 class="fw-bold mb-2" style="color:#fff;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></h2>
@@ -651,20 +654,20 @@ actualizarBadge();
 
 /* --- public dark mode --- */
 (function() {
-    var key = 'public_dark_mode_<?php echo $tienda_id; ?>';
+    var key = 'dm_public_<?php echo $tienda_id; ?>';
     var body = document.body;
     var toggle = document.getElementById('darkModeTogglePublic');
-    var icon = document.getElementById('darkModeIconPublic');
+    var icon = document.getElementById('dmIcon');
     if (localStorage.getItem(key) === '1') {
         body.classList.add('public-dark-mode');
-        if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+        if (icon) icon.innerHTML = '&#9728;';
     }
     if (toggle) {
         toggle.addEventListener('click', function() {
             body.classList.toggle('public-dark-mode');
             var isDark = body.classList.contains('public-dark-mode');
             localStorage.setItem(key, isDark ? '1' : '0');
-            if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+            if (icon) icon.innerHTML = isDark ? '&#9728;' : '&#9790;';
         });
     }
 })();

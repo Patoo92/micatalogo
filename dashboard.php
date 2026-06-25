@@ -10,11 +10,11 @@ if (!isset($_SESSION['tienda_id'])) {
 $tienda_id = $_SESSION['tienda_id'];
 $tienda_nombre = $_SESSION['tienda_nombre'];
 
-$stmtMoneda = $pdo->prepare("SELECT moneda, tema_admin FROM tiendas WHERE id = ?");
-$stmtMoneda->execute([$tienda_id]);
-$row = $stmtMoneda->fetch();
-$moneda_tienda = $row['moneda'] ?: '€';
-$tema_admin = $row['tema_admin'] ?? 'default';
+$stmt = $pdo->prepare("SELECT moneda, tema_admin FROM tiendas WHERE id = ?");
+$stmt->execute([$tienda_id]);
+$row = $stmt->fetch();
+$moneda_tienda = $row ? ($row['moneda'] ?: '€') : '€';
+$tema_admin = $row ? ($row['tema_admin'] ?? 'default') : 'default';
 
 $stats = [];
 $s = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?"); $s->execute([$tienda_id]); $stats['total_productos'] = (int)$s->fetchColumn();
@@ -25,32 +25,24 @@ $s = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND stock
 $s = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND DATE(fecha_pedido) = CURDATE()"); $s->execute([$tienda_id]); $stats['hoy'] = (int)$s->fetchColumn();
 $s = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND fecha_pedido >= DATE_SUB(NOW(), INTERVAL 7 DAY)"); $s->execute([$tienda_id]); $stats['semana'] = (int)$s->fetchColumn();
 
-// Últimos 7 días: pedidos por día
-$s = $pdo->prepare("SELECT DATE(fecha_pedido) AS dia, COUNT(*) AS total FROM pedidos WHERE tienda_id = ? AND fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(fecha_pedido) ORDER BY dia");
-$s->execute([$tienda_id]);
-$pedidos_por_dia = [];
-$fechas = [];
-for ($i = 6; $i >= 0; $i--) {
-    $d = date('Y-m-d', strtotime("-$i days"));
-    $fechas[] = $d;
-    $pedidos_por_dia[$d] = 0;
-}
-foreach ($s->fetchAll() as $row) {
-    $pedidos_por_dia[$row['dia']] = (int)$row['total'];
-}
-$labels_dias = json_encode(array_map(fn($d) => date('d/m', strtotime($d)), $fechas));
-$data_pedidos = json_encode(array_values(array_merge(array_intersect_key($pedidos_por_dia, array_flip($fechas)))));
+$labels_dias = '[]'; $data_pedidos = '[]'; $cats_labels_json = '[]'; $cats_data_json = '[]';
 
-// Productos por categoría
-$s = $pdo->prepare("SELECT c.nombre_categoria, COUNT(p.id) AS total FROM productos p LEFT JOIN categorias c ON p.categoria_id = c.id WHERE p.tienda_id = ? GROUP BY p.categoria_id ORDER BY total DESC LIMIT 10");
-$s->execute([$tienda_id]);
-$cats_labels = []; $cats_data = [];
-foreach ($s->fetchAll() as $row) {
-    $cats_labels[] = $row['nombre_categoria'] ?? 'Sin categoría';
-    $cats_data[] = (int)$row['total'];
-}
-$cats_labels_json = json_encode($cats_labels);
-$cats_data_json = json_encode($cats_data);
+try {
+    $s = $pdo->prepare("SELECT DATE(fecha_pedido) AS dia, COUNT(*) AS total FROM pedidos WHERE tienda_id = ? AND fecha_pedido >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(fecha_pedido) ORDER BY dia");
+    $s->execute([$tienda_id]);
+    $pedidos_por_dia = []; $fechas = [];
+    for ($i = 6; $i >= 0; $i--) { $d = date('Y-m-d', strtotime("-$i days")); $fechas[] = $d; $pedidos_por_dia[$d] = 0; }
+    foreach ($s->fetchAll() as $r) { $pedidos_por_dia[$r['dia']] = (int)$r['total']; }
+    $labels_dias = json_encode(array_map(function($d) { return date('d/m', strtotime($d)); }, $fechas));
+    $data_pedidos = json_encode(array_values($pedidos_por_dia));
+
+    $s = $pdo->prepare("SELECT COALESCE(c.nombre_categoria, 'Sin categoría') AS cat, COUNT(p.id) AS total FROM productos p LEFT JOIN categorias c ON p.categoria_id = c.id WHERE p.tienda_id = ? GROUP BY p.categoria_id ORDER BY total DESC LIMIT 10");
+    $s->execute([$tienda_id]);
+    $cats_labels = []; $cats_data = [];
+    foreach ($s->fetchAll() as $r) { $cats_labels[] = $r['cat']; $cats_data[] = (int)$r['total']; }
+    $cats_labels_json = json_encode($cats_labels);
+    $cats_data_json = json_encode($cats_data);
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -65,18 +57,20 @@ $cats_data_json = json_encode($cats_data);
     <link rel="stylesheet" href="css/style.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .chart-card { border: none; border-radius: 16px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); padding: 1.25rem; height: 100%; }
+        .chart-card { border: none; border-radius: 16px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 1.25rem; height: 100%; }
         .stat-card { border: none; border-radius: 16px; padding: 1.25rem; height: 100%; }
+        .stat-card iconify-icon { opacity: 0.7; }
+        body.dark-mode .chart-card { background: rgba(30,41,59,0.6); }
     </style>
 </head>
-<body class="bg-admin sidebar-open <?php echo htmlspecialchars($tema_admin !== 'default' ? 'theme-' . $tema_admin : ''); ?>">
+<body class="bg-admin sidebar-open<?php echo $tema_admin !== 'default' ? ' theme-' . $tema_admin : ''; ?>">
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
-                <iconify-icon icon="mdi:chart-bar" width="28" height="28"></iconify-icon>
+                <iconify-icon icon="mdi:chart-bar" width="28"></iconify-icon>
                 <?php echo htmlspecialchars($tienda_nombre); ?>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#dashNav">
@@ -98,25 +92,25 @@ $cats_data_json = json_encode($cats_data);
 
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="stat-card bg-primary bg-opacity-10 text-center">
+                <div class="stat-card bg-primary bg-opacity-10 text-center d-flex flex-column align-items-center justify-content-center">
                     <div class="fw-bold fs-3 text-primary"><?php echo $stats['total_productos']; ?></div>
                     <small class="text-muted">Productos</small>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card bg-success bg-opacity-10 text-center">
+                <div class="stat-card bg-success bg-opacity-10 text-center d-flex flex-column align-items-center justify-content-center">
                     <div class="fw-bold fs-3 text-success"><?php echo $stats['total_pedidos']; ?></div>
                     <small class="text-muted">Total pedidos</small>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card <?php echo $stats['pendientes'] > 0 ? 'bg-warning bg-opacity-10' : 'bg-success bg-opacity-10'; ?> text-center">
+                <div class="stat-card <?php echo $stats['pendientes'] > 0 ? 'bg-warning bg-opacity-10' : 'bg-success bg-opacity-10'; ?> text-center d-flex flex-column align-items-center justify-content-center">
                     <div class="fw-bold fs-3 <?php echo $stats['pendientes'] > 0 ? 'text-warning' : 'text-success'; ?>"><?php echo $stats['pendientes']; ?></div>
                     <small class="text-muted">Pendientes</small>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card <?php echo $stats['stock_bajo'] + $stats['agotados'] > 0 ? 'bg-danger bg-opacity-10' : 'bg-success bg-opacity-10'; ?> text-center">
+                <div class="stat-card <?php echo $stats['stock_bajo'] + $stats['agotados'] > 0 ? 'bg-danger bg-opacity-10' : 'bg-success bg-opacity-10'; ?> text-center d-flex flex-column align-items-center justify-content-center">
                     <div class="fw-bold fs-3 <?php echo $stats['stock_bajo'] + $stats['agotados'] > 0 ? 'text-danger' : 'text-success'; ?>"><?php echo $stats['stock_bajo']; ?> / <?php echo $stats['agotados']; ?></div>
                     <small class="text-muted">Stock bajo / Agotados</small>
                 </div>
@@ -160,36 +154,41 @@ $cats_data_json = json_encode($cats_data);
         </div>
     </div>
 
-    <script nonce="<?= $csp_nonce ?>">
+    <script nonce="<?php echo $csp_nonce; ?>">
     document.addEventListener('DOMContentLoaded', function() {
-        new Chart(document.getElementById('chartPedidos'), {
-            type: 'bar',
-            data: {
-                labels: <?php echo $labels_dias; ?>,
-                datasets: [{ label: 'Pedidos', data: <?php echo $data_pedidos; ?>, backgroundColor: '#3b82f6', borderRadius: 6 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-        });
-        new Chart(document.getElementById('chartCategorias'), {
-            type: 'doughnut',
-            data: {
-                labels: <?php echo $cats_labels_json; ?>,
-                datasets: [{ data: <?php echo $cats_data_json; ?>, backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'] }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
-        });
+        if (typeof Chart === 'undefined') return;
+        try {
+            new Chart(document.getElementById('chartPedidos'), {
+                type: 'bar',
+                data: {
+                    labels: <?php echo $labels_dias; ?>,
+                    datasets: [{ label: 'Pedidos', data: <?php echo $data_pedidos; ?>, backgroundColor: '#3b82f6', borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        } catch(e) { console.log('Chart error:', e); }
+        try {
+            new Chart(document.getElementById('chartCategorias'), {
+                type: 'doughnut',
+                data: {
+                    labels: <?php echo $cats_labels_json; ?>,
+                    datasets: [{ data: <?php echo $cats_data_json; ?>, backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } } }
+            });
+        } catch(e) { console.log('Chart error:', e); }
     });
     </script>
 
-    <script nonce="<?= $csp_nonce ?>">
+    <script nonce="<?php echo $csp_nonce; ?>">
     (function() {
         if (localStorage.getItem('dark_mode') === '1') document.body.classList.add('dark-mode');
         var toggle = document.getElementById('darkModeToggle');
-        var icon = toggle && toggle.querySelector('iconify-icon');
-        var span = toggle && toggle.querySelector('span');
-        if (localStorage.getItem('dark_mode') === '1') { if (icon) icon.setAttribute('icon', 'mdi:weather-sunny'); if (span) span.textContent = 'Modo claro'; }
         if (toggle) {
+            var icon = toggle.querySelector('iconify-icon');
+            var span = toggle.querySelector('span');
+            if (localStorage.getItem('dark_mode') === '1') { if (icon) icon.setAttribute('icon', 'mdi:weather-sunny'); if (span) span.textContent = 'Modo claro'; }
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 document.body.classList.toggle('dark-mode');

@@ -23,6 +23,13 @@
 - **Efecto parallax**: clase `hero-parallax` en hero-shop del catálogo, solo Pro+. `background-attachment: fixed` con fallback scroll en móvil
 - **Layout alternativo**: toggle grid/lista en catálogo (Pro+). Clase `list-view` en #productGrid, persiste en localStorage
 - **Tema visual admin**: columna `tema_admin` en tiendas. Selector en configuración (Pro+). 5 temas: default, ocean, forest, sunset, midnight. Almacenado en `$_SESSION['tema_admin']`, aplicado como clase `theme-{nombre}` al body de todas las páginas admin. Estilos en css/style.css
+
+### Fixes (post-implementación)
+- **Dark mode público**: reemplazado iconify-icon por emoji unicode (&#9790;/&#9728;) para evitar dependencia CSP connect-src. CSS usa `background-image` en vez de `background` shorthand para no resetear `background-attachment`
+- **Parallax hero**: `.hero-shop` cambió a `background-image` (separado de attachment). Banner con `::before` pseudo-element para overlay, `background-image` inline para la imagen, `hero-parallax` class para attachment
+- **List view**: CSS más robusto con `!important` en todas las propiedades clave para resistir CSS personalizado. Imagen 130x130 fija, tarjeta horizontal con flex
+- **Dashboard**: agregado try/catch en Chart.js, fallback si no hay datos, eliminada query rota duplicada
+- **Theme variants**: agregados estilos para `.navbar-admin`, `.glass-card`, `.glass-table`, `.btn-primary` en cada tema
 - **reset-password.php**: corregida validación de contraseña (solo min 10 chars, sin mayúscula/número)
 
 ### Features implementadas

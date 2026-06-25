@@ -144,8 +144,9 @@ $prod_precio = number_format($producto['precio'], 2);
         .qty-btn:hover { background: #f1f5f9; border-color: var(--color-principal); }
 
         /* ===== Public Dark Mode ===== */
-        .btn-dark-mode-public { display: inline-flex; align-items: center; gap: 4px; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.5rem; border-radius: 10px; transition: all 0.2s; }
-        .btn-dark-mode-public:hover { background: rgba(0,0,0,0.05); }
+        .dm-toggle { display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.4rem 0.5rem; border-radius: 8px; transition: all 0.2s; font-size: 1.1rem; line-height: 1; }
+        .dm-toggle:hover { background: rgba(0,0,0,0.05); }
+        .dm-icon { display: inline-block; transition: transform 0.3s; }
         body.public-dark-mode { background-color: #0f172a !important; color: #e2e8f0 !important; }
         body.public-dark-mode .navbar-ecommerce { background: rgba(15,23,42,0.95) !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
         body.public-dark-mode .navbar-ecommerce .navbar-brand { color: #e2e8f0 !important; }
@@ -209,9 +210,9 @@ $prod_precio = number_format($producto['precio'], 2);
                 </li>
                 <?php endif; ?>
                 <?php if ($cat_pers): ?>
-                <li class="nav-item d-flex align-items-center">
-                    <button id="darkModeTogglePublic" class="btn-dark-mode-public" title="Modo oscuro">
-                        <iconify-icon id="darkModeIconPublic" icon="mdi:weather-night" width="16"></iconify-icon>
+                <li class="nav-item">
+                    <button id="darkModeTogglePublic" class="dm-toggle nav-link nav-link-custom border-0 bg-transparent" title="Modo oscuro" style="padding:0.4rem 0.6rem !important;">
+                        <span class="dm-icon" id="dmIcon">&#9790;</span>
                     </button>
                 </li>
                 <?php endif; ?>
@@ -538,20 +539,20 @@ actualizarBadge();
 
 /* --- public dark mode --- */
 (function() {
-    var key = 'public_dark_mode_<?php echo $tienda_id; ?>';
+    var key = 'dm_public_<?php echo $tienda_id; ?>';
     var body = document.body;
     var toggle = document.getElementById('darkModeTogglePublic');
-    var icon = document.getElementById('darkModeIconPublic');
+    var icon = document.getElementById('dmIcon');
     if (localStorage.getItem(key) === '1') {
         body.classList.add('public-dark-mode');
-        if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+        if (icon) icon.innerHTML = '&#9728;';
     }
     if (toggle) {
         toggle.addEventListener('click', function() {
             body.classList.toggle('public-dark-mode');
             var isDark = body.classList.contains('public-dark-mode');
             localStorage.setItem(key, isDark ? '1' : '0');
-            if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+            if (icon) icon.innerHTML = isDark ? '&#9728;' : '&#9790;';
         });
     }
 })();
