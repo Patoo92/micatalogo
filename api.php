@@ -25,12 +25,17 @@ if (!$api_key) {
     responder(false, 'API key requerida.', 401);
 }
 
-$stmt = $pdo->prepare("SELECT tienda_id FROM api_keys WHERE api_key = ? AND activo = 1");
+$stmt = $pdo->prepare("SELECT k.tienda_id, t.plan FROM api_keys k JOIN tiendas t ON k.tienda_id = t.id WHERE k.api_key = ? AND k.activo = 1");
 $stmt->execute([$api_key]);
 $key = $stmt->fetch();
 
 if (!$key) {
     responder(false, 'API key inválida o desactivada.', 401);
+}
+
+$planes_api = ['business', 'enterprise'];
+if (!in_array($key['plan'], $planes_api)) {
+    responder(false, 'API Keys disponibles solo en plan Business+.', 403);
 }
 
 $tienda_id = (int)$key['tienda_id'];

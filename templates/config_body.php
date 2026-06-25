@@ -305,6 +305,7 @@
             <p class="text-muted small mt-2 mb-0">Los cambios de plan se gestionan manualmente. <a href="https://wa.me/34123456789" target="_blank" rel="noopener">Contactanos por WhatsApp</a> para mejorar tu plan.</p>
         </div>
 
+        <?php if (plan_limite('marca_blanca')): ?>
         <div class="card card-config glass-card p-4 mt-4">
             <h5 class="mb-3 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:key-variant" width="24"></iconify-icon>
@@ -364,6 +365,7 @@
             });
         });
         </script>
+        <?php endif; ?>
         <script nonce="<?= $csp_nonce ?>">
         (function() {
             if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
