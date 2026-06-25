@@ -45,7 +45,7 @@ $action = $_GET['action'] ?? '';
 switch ($action) {
 
     case 'productos':
-        $stmt = $pdo->prepare("SELECT id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, imagen_url, imagen_thumb, created_at FROM productos WHERE tienda_id = ? ORDER BY nombre");
+        $stmt = $pdo->prepare("SELECT id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, destacado, etiqueta, imagen_url, imagen_thumb FROM productos WHERE tienda_id = ? ORDER BY nombre");
         $stmt->execute([$tienda_id]);
         responder(true, 'OK', 200, $stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
@@ -53,7 +53,7 @@ switch ($action) {
     case 'producto':
         $id = (int)($_GET['id'] ?? 0);
         if (!$id) responder(false, 'ID de producto requerido.', 400);
-        $stmt = $pdo->prepare("SELECT id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, imagen_url, imagen_thumb, created_at FROM productos WHERE id = ? AND tienda_id = ?");
+        $stmt = $pdo->prepare("SELECT id, categoria_id, nombre, descripcion, precio, stock, stock_minimo, destacado, etiqueta, imagen_url, imagen_thumb FROM productos WHERE id = ? AND tienda_id = ?");
         $stmt->execute([$id, $tienda_id]);
         $prod = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$prod) responder(false, 'Producto no encontrado.', 404);
@@ -61,13 +61,13 @@ switch ($action) {
         break;
 
     case 'categorias':
-        $stmt = $pdo->prepare("SELECT id, nombre_categoria, created_at FROM categorias WHERE tienda_id = ? ORDER BY nombre_categoria");
+        $stmt = $pdo->prepare("SELECT id, nombre_categoria FROM categorias WHERE tienda_id = ? ORDER BY nombre_categoria");
         $stmt->execute([$tienda_id]);
         responder(true, 'OK', 200, $stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
 
     case 'pedidos':
-        $stmt = $pdo->prepare("SELECT p.id, p.producto_id, pr.nombre AS producto_nombre, p.nombre_cliente, p.email_cliente, p.estado, p.created_at FROM pedidos p LEFT JOIN productos pr ON p.producto_id = pr.id WHERE p.tienda_id = ? ORDER BY p.created_at DESC");
+        $stmt = $pdo->prepare("SELECT p.id, p.producto_id, pr.nombre AS producto_nombre, p.nombre_cliente, p.email_cliente, p.estado, p.fecha_pedido FROM pedidos p LEFT JOIN productos pr ON p.producto_id = pr.id WHERE p.tienda_id = ? ORDER BY p.fecha_pedido DESC");
         $stmt->execute([$tienda_id]);
         responder(true, 'OK', 200, $stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
