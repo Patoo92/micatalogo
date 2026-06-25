@@ -18,6 +18,31 @@ $flash_message = $_SESSION['flash_message'] ?? null;
 $flash_type = $_SESSION['flash_type'] ?? null;
 unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 
+// Dashboard stats
+$stmtTotalProd = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
+$stmtTotalProd->execute([$tienda_id]);
+$stats_total_productos = (int)$stmtTotalProd->fetchColumn();
+
+$stmtTotalPed = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ?");
+$stmtTotalPed->execute([$tienda_id]);
+$stats_total_pedidos = (int)$stmtTotalPed->fetchColumn();
+
+$stmtPend = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND estado = 'Pendiente'");
+$stmtPend->execute([$tienda_id]);
+$stats_pendientes = (int)$stmtPend->fetchColumn();
+
+$stmtBajo = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND stock <= stock_minimo AND stock > 0");
+$stmtBajo->execute([$tienda_id]);
+$stats_stock_bajo = (int)$stmtBajo->fetchColumn();
+
+$stmtAgot = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND stock = 0");
+$stmtAgot->execute([$tienda_id]);
+$stats_agotados = (int)$stmtAgot->fetchColumn();
+
+$stmtHoy = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND DATE(created_at) = CURDATE()");
+$stmtHoy->execute([$tienda_id]);
+$stats_pedidos_hoy = (int)$stmtHoy->fetchColumn();
+
 $pagina = max(1, (int)($_GET['p'] ?? 1));
 $por_pagina = 20;
 $offset = ($pagina - 1) * $por_pagina;

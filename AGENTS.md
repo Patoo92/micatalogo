@@ -15,6 +15,11 @@
 - Trial: 3 días solo para Pro/Business; al vencer → downgrade automático a Starter (login.php)
 - Upgrades: gestión manual desde super-admin (sin pasarela de pago aún)
 
+### Nuevas implementaciones (25 junio 2026)
+- **Dashboard stats**: admin.php ahora muestra cards con total productos, pedidos totales, pendientes, stock bajo/agotados, pedidos hoy y esta semana
+- **Dominio personalizado**: columna `dominio` en tiendas, campo en config (Business+), routing automático en index.php y producto.php — si el HTTP_HOST coincide con un dominio registrado, carga esa tienda sin necesidad de `?tienda=`
+- **reset-password.php**: corregida validación de contraseña (solo min 10 chars, sin mayúscula/número)
+
 ### Features implementadas
 - Registro con selección de plan, trial, validación completa (NIST password: min 10 chars, sin reglas de mayúscula/número)
 - Login con downgrade automático de trial vencido
@@ -126,8 +131,8 @@
 - `C:\xampp\micatalogo-config\email.php`: config SMTP Brevo
 
 ### Próximos pasos
-1. Integrar Stripe/Mercado Pago como pasarela de pago
-2. Encontrar/subir capturas de pantalla para la landing
+1. Subir capturas de pantalla reales a la landing (imagenes/captura-admin.jpg, captura-movil.jpg)
+2. Integrar Stripe/Mercado Pago como pasarela de pago
 3. Desplegar en hosting real (PHP 8.2+, MySQL, Apache)
 4. Configurar dominio + DNS + HTTPS + SMTP (Brevo) + Cloudflare CDN
 

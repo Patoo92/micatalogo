@@ -40,6 +40,7 @@ $codigo_tracking = $_POST['codigo_tracking'] ?? '';
 $css_personalizado = $_POST['css_personalizado'] ?? '';
 $hero_title      = trim($_POST['hero_title'] ?? '');
 $hero_subtitle   = trim($_POST['hero_subtitle'] ?? '');
+$dominio         = trim($_POST['dominio'] ?? '');
 
 if (empty($nombre_tienda)) {
     header("Location: configuracion.php?error=nombre_vacio");
@@ -63,6 +64,13 @@ if (!empty($instagram) && !preg_match('/^(https?:\/\/)?([a-zA-Z0-9_.]+\/?)+$/', 
 if ($marca_blanca && !plan_limite('marca_blanca')) {
     header("Location: configuracion.php?error=permiso");
     exit;
+}
+if (!empty($dominio) && !preg_match('/^(https?:\/\/)?([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i', $dominio)) {
+    header("Location: configuracion.php?error=dominio_invalido");
+    exit;
+}
+if (!empty($dominio) && !plan_limite('marca_blanca')) {
+    $dominio = '';
 }
 
 if (!plan_limite('personalizacion')) {
@@ -161,7 +169,8 @@ $sql = "UPDATE tiendas SET
             codigo_tracking    = ?,
             css_personalizado  = ?,
             hero_title         = ?,
-            hero_subtitle      = ?
+            hero_subtitle      = ?,
+            dominio            = ?
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
@@ -174,6 +183,7 @@ $stmt->execute([
     $marca_blanca, $notif_pedido, $notif_stock,
     $meta_desc, $meta_palabras, $codigo_tracking, $css_personalizado,
     $hero_title, $hero_subtitle,
+    $dominio ?: null,
     $tienda_id
 ]);
 

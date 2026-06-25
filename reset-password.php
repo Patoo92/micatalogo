@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
         $password = $_POST['password'];
         $confirm = $_POST['password_confirm'];
 
-        if (strlen($password) < 10 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password)) {
-            $error = "La contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
+        if (strlen($password) < 10) {
+            $error = "La contraseña debe tener al menos 10 caracteres.";
         } elseif ($password !== $confirm) {
             $error = "Las contraseñas no coinciden.";
         } else {
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
                 <?php echo csrf_field(); ?>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Nueva contraseña</label>
-                    <input type="password" name="password" class="form-control" minlength="8" placeholder="Mínimo 8 caracteres" required>
+                    <input type="password" name="password" class="form-control" minlength="10" placeholder="Mínimo 10 caracteres" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Confirmar contraseña</label>

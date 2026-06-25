@@ -215,7 +215,7 @@
 
                 <?php if (plan_limite('marca_blanca')): ?>
                 <hr class="my-4">
-                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:palette" width="18"></iconify-icon> Marca blanca</h6>
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:palette" width="18"></iconify-icon> Marca blanca &amp; Dominio</h6>
                 <div class="mb-3 form-check form-switch">
                     <input type="hidden" name="marca_blanca" value="0">
                     <input type="checkbox" name="marca_blanca" id="marca_blanca" class="form-check-input" value="1" <?php echo $tienda['marca_blanca'] ? 'checked' : ''; ?>>
@@ -223,6 +223,11 @@
                         <iconify-icon icon="mdi:palette" width="16"></iconify-icon> Marca blanca
                         <small class="text-muted d-block">Oculta el branding de micatalogo.app en emails y catálogo público</small>
                     </label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">Dominio personalizado</label>
+                    <input type="text" name="dominio" class="form-control" placeholder="tutienda.com" value="<?php echo htmlspecialchars($tienda['dominio'] ?? ''); ?>">
+                    <small class="text-muted">Configurá un dominio propio. Debe apuntar con un CNAME a tu hosting. Solo visible en planes Business+.</small>
                 </div>
                 <?php endif; ?>
 

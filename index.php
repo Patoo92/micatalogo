@@ -2,12 +2,26 @@
 require_once 'init_session.php';
 require_once 'conexion.php';
 
-if (!isset($_GET['tienda']) || empty($_GET['tienda'])) {
+// Dominio personalizado: si el host coincide con una tienda, se usa esa
+$dominio_host = $_SERVER['HTTP_HOST'] ?? '';
+$dominio_host = preg_replace('/^www\./', '', $dominio_host);
+
+if (isset($_GET['tienda']) && !empty($_GET['tienda'])) {
+    $slug_tienda = $_GET['tienda'];
+} elseif (!empty($dominio_host)) {
+    $stmtDom = $pdo->prepare("SELECT slug FROM tiendas WHERE dominio = ? AND activo = 1");
+    $stmtDom->execute([$dominio_host]);
+    $domRow = $stmtDom->fetch();
+    if ($domRow) {
+        $slug_tienda = $domRow['slug'];
+    } else {
+        header("Location: index.html");
+        exit;
+    }
+} else {
     header("Location: index.html");
     exit;
 }
-
-$slug_tienda = $_GET['tienda'];
 
 try {
     $stmtTienda = $pdo->prepare("SELECT * FROM tiendas WHERE slug = ?");

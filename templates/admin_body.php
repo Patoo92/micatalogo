@@ -57,6 +57,60 @@
     </div>
     <?php endif; ?>
 
+    <div class="container mt-3" style="max-width: 900px;">
+        <div class="row g-2 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 glass-card p-3 text-center h-100">
+                    <div class="fw-bold fs-4 text-primary"><?php echo $stats_total_productos; ?></div>
+                    <small class="text-muted">Productos</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 glass-card p-3 text-center h-100">
+                    <div class="fw-bold fs-4 text-success"><?php echo $stats_total_pedidos; ?></div>
+                    <small class="text-muted">Pedidos totales</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 glass-card p-3 text-center h-100">
+                    <div class="fw-bold fs-4 <?php echo $stats_pendientes > 0 ? 'text-warning' : 'text-success'; ?>"><?php echo $stats_pendientes; ?></div>
+                    <small class="text-muted">Pendientes</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 glass-card p-3 text-center h-100">
+                    <div class="fw-bold fs-4 <?php echo $stats_stock_bajo + $stats_agotados > 0 ? 'text-danger' : 'text-success'; ?>"><?php echo $stats_stock_bajo; ?> / <?php echo $stats_agotados; ?></div>
+                    <small class="text-muted">Stock bajo / Agotados</small>
+                </div>
+            </div>
+        </div>
+        <div class="row g-2 mb-4">
+            <div class="col-12 col-md-6">
+                <div class="card border-0 glass-card p-3 d-flex flex-row align-items-center gap-3">
+                    <iconify-icon icon="mdi:cart" width="32" style="color: var(--color-principal);"></iconify-icon>
+                    <div>
+                        <div class="fw-bold fs-5"><?php echo $stats_pedidos_hoy; ?> pedidos hoy</div>
+                        <small class="text-muted"><?php echo date('d/m/Y'); ?></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card border-0 glass-card p-3 d-flex flex-row align-items-center gap-3">
+                    <iconify-icon icon="mdi:calendar-clock" width="32" style="color: #10b981;"></iconify-icon>
+                    <div>
+                        <div class="fw-bold fs-5">
+                            <?php
+                            $stmtSem = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+                            $stmtSem->execute([$tienda_id]);
+                            echo (int)$stmtSem->fetchColumn(); ?> esta semana
+                        </div>
+                        <small class="text-muted">últimos 7 días</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
