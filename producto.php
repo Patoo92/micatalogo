@@ -142,6 +142,26 @@ $prod_precio = number_format($producto['precio'], 2);
         .cart-item img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
         .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e2e8f0; background: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; transition: all 0.15s; }
         .qty-btn:hover { background: #f1f5f9; border-color: var(--color-principal); }
+
+        /* ===== Public Dark Mode ===== */
+        .btn-dark-mode-public { display: inline-flex; align-items: center; gap: 4px; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.5rem; border-radius: 10px; transition: all 0.2s; }
+        .btn-dark-mode-public:hover { background: rgba(0,0,0,0.05); }
+        body.public-dark-mode { background-color: #0f172a !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .navbar-ecommerce { background: rgba(15,23,42,0.95) !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+        body.public-dark-mode .navbar-ecommerce .navbar-brand { color: #e2e8f0 !important; }
+        body.public-dark-mode .nav-link-custom { color: #94a3b8 !important; }
+        body.public-dark-mode .nav-link-custom:hover, body.public-dark-mode .nav-link-custom.active { color: var(--color-principal) !important; }
+        body.public-dark-mode .product-detail-card { background: rgba(30,41,59,0.6) !important; border-color: rgba(255,255,255,0.1) !important; }
+        body.public-dark-mode .product-detail-card, body.public-dark-mode .product-detail-card p { color: #e2e8f0 !important; }
+        body.public-dark-mode .descripcion-text { color: #94a3b8 !important; }
+        body.public-dark-mode .related-card { background: rgba(30,41,59,0.6) !important; }
+        body.public-dark-mode .btn-outline-primary { background: rgba(30,41,59,0.6) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .btn-outline-primary:hover { background: var(--color-principal) !important; }
+        body.public-dark-mode .footer-custom { background: #0f172a !important; border-top-color: rgba(255,255,255,0.08) !important; }
+        body.public-dark-mode .footer-custom, body.public-dark-mode .footer-custom a { color: #94a3b8 !important; }
+        body.public-dark-mode h5, body.public-dark-mode h4 { color: #e2e8f0 !important; }
+        body.public-dark-mode .breadcrumb-item a { color: var(--color-principal) !important; }
+        body.public-dark-mode .breadcrumb-item.active { color: #94a3b8 !important; }
     </style>
     <?php if ($cat_pers && !empty($tienda['css_personalizado'])): ?>
     <style><?php echo $tienda['css_personalizado']; ?></style>
@@ -186,6 +206,13 @@ $prod_precio = number_format($producto['precio'], 2);
                 <?php if (!empty($tienda['telefono_whatsapp'])): ?>
                 <li class="nav-item">
                     <a class="nav-link nav-link-custom" href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']); ?>" target="_blank">Contacto</a>
+                </li>
+                <?php endif; ?>
+                <?php if ($cat_pers): ?>
+                <li class="nav-item d-flex align-items-center">
+                    <button id="darkModeTogglePublic" class="btn-dark-mode-public" title="Modo oscuro">
+                        <iconify-icon id="darkModeIconPublic" icon="mdi:weather-night" width="16"></iconify-icon>
+                    </button>
                 </li>
                 <?php endif; ?>
                 <li class="nav-item position-relative">
@@ -508,6 +535,26 @@ document.getElementById('btnToggleCart').addEventListener('click', toggleCart);
 document.getElementById('btnWhatsAppCart').addEventListener('click', enviarWhatsApp);
 
 actualizarBadge();
+
+/* --- public dark mode --- */
+(function() {
+    var key = 'public_dark_mode_<?php echo $tienda_id; ?>';
+    var body = document.body;
+    var toggle = document.getElementById('darkModeTogglePublic');
+    var icon = document.getElementById('darkModeIconPublic');
+    if (localStorage.getItem(key) === '1') {
+        body.classList.add('public-dark-mode');
+        if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+    }
+    if (toggle) {
+        toggle.addEventListener('click', function() {
+            body.classList.toggle('public-dark-mode');
+            var isDark = body.classList.contains('public-dark-mode');
+            localStorage.setItem(key, isDark ? '1' : '0');
+            if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+        });
+    }
+})();
 </script>
 <?php require __DIR__ . '/templates/footer_partial.php'; ?>
 </body>

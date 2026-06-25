@@ -33,7 +33,7 @@ $staff = $stmt->fetchAll();
         .btn-action-sm { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 0; }
     </style>
 </head>
-<body class="bg-admin sidebar-open">
+<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
 

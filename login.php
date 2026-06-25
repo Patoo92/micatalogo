@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = trim($_POST['password']);
 
         if (!empty($usuario) && !empty($password)) {
-            $stmt = $pdo->prepare("SELECT id, nombre_tienda, slug, password, activo, marca_blanca, plan, trial_ends_at FROM tiendas WHERE usuario = ?");
+            $stmt = $pdo->prepare("SELECT id, nombre_tienda, slug, password, activo, marca_blanca, plan, trial_ends_at, tema_admin FROM tiendas WHERE usuario = ?");
             $stmt->execute([$usuario]);
             $tienda = $stmt->fetch();
 
@@ -44,13 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['tienda_slug']   = $tienda['slug'];
                     $_SESSION['plan']          = $plan_actual;
                     $_SESSION['marca_blanca']  = (int)($tienda['marca_blanca'] ?? 0);
+                    $_SESSION['tema_admin']    = $tienda['tema_admin'] ?? 'default';
                     registrar_actividad($pdo, $tienda['id'], $tienda['nombre_tienda'], 'owner', 'Inició sesión');
                     header("Location: admin.php");
                     exit;
                 }
             } else {
                     $stmt = $pdo->prepare("
-                        SELECT s.*, t.nombre_tienda, t.slug, t.activo AS tienda_activo, t.marca_blanca, t.plan, t.trial_ends_at
+                        SELECT s.*, t.nombre_tienda, t.slug, t.activo AS tienda_activo, t.marca_blanca, t.plan, t.trial_ends_at, t.tema_admin
                         FROM store_staff s 
                         JOIN tiendas t ON s.tienda_id = t.id 
                         WHERE s.usuario = ?
@@ -71,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['tienda_slug']    = $staff['slug'];
                         $_SESSION['plan']           = $staff['plan'] ?? 'starter';
                         $_SESSION['marca_blanca']   = (int)($staff['marca_blanca'] ?? 0);
+                        $_SESSION['tema_admin']     = $staff['tema_admin'] ?? 'default';
                         $_SESSION['staff_id']       = $staff['id'];
                         $_SESSION['staff_usuario']  = $staff['usuario'];
                         $_SESSION['staff_permisos'] = json_decode($staff['permisos'], true) ?? [];

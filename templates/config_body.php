@@ -18,7 +18,7 @@
         }
     </style>
 </head>
-<body class="bg-admin sidebar-open">
+<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
 
     <?php require __DIR__ . '/sidebar_partial.php'; ?>
 
@@ -232,6 +232,20 @@
                 <?php endif; ?>
 
                 <?php if (plan_limite('personalizacion')): ?>
+                <hr class="my-4">
+                <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:palette" width="18"></iconify-icon> Tema visual del panel</h6>
+                <div class="mb-3">
+                    <label class="form-label-custom">Tema de administración</label>
+                    <select name="tema_admin" class="form-select">
+                        <option value="default" <?php echo ($tienda['tema_admin'] ?? 'default') === 'default' ? 'selected' : ''; ?>>Default (Púrpura)</option>
+                        <option value="ocean" <?php echo ($tienda['tema_admin'] ?? '') === 'ocean' ? 'selected' : ''; ?>>Océano (Azul)</option>
+                        <option value="forest" <?php echo ($tienda['tema_admin'] ?? '') === 'forest' ? 'selected' : ''; ?>>Bosque (Verde)</option>
+                        <option value="sunset" <?php echo ($tienda['tema_admin'] ?? '') === 'sunset' ? 'selected' : ''; ?>>Atardecer (Naranja)</option>
+                        <option value="midnight" <?php echo ($tienda['tema_admin'] ?? '') === 'midnight' ? 'selected' : ''; ?>>Medianoche (Índigo)</option>
+                    </select>
+                    <small class="text-muted">Cambiá el esquema de colores del panel de administración.</small>
+                </div>
+
                 <hr class="my-4">
                 <h6 class="fw-bold mb-3"><iconify-icon icon="mdi:code-tags" width="18"></iconify-icon> Tracking &amp; Avanzado</h6>
 

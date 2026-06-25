@@ -35,8 +35,58 @@
         .offcanvas-backdrop { position: fixed; inset: 0; z-index: 1040; background: rgba(0,0,0,0.5); }
         .offcanvas.show { transform: none !important; visibility: visible !important; }
 
+        /* ===== Public Dark Mode ===== */
+        .btn-dark-mode-public { display: inline-flex; align-items: center; gap: 4px; border: none; background: transparent; color: #64748b; cursor: pointer; padding: 0.5rem; border-radius: 10px; transition: all 0.2s; }
+        .btn-dark-mode-public:hover { background: rgba(0,0,0,0.05); }
+        body.public-dark-mode { background-color: #0f172a !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .navbar-ecommerce { background: rgba(15,23,42,0.95) !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+        body.public-dark-mode .navbar-ecommerce .navbar-brand { color: #e2e8f0 !important; }
+        body.public-dark-mode .nav-link-custom { color: #94a3b8 !important; }
+        body.public-dark-mode .nav-link-custom:hover, body.public-dark-mode .nav-link-custom.active { color: var(--color-principal) !important; }
+        body.public-dark-mode .hero-shop { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important; }
+        body.public-dark-mode .product-card { background: rgba(30,41,59,0.6) !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2) !important; }
+        body.public-dark-mode .product-card:hover { box-shadow: 0 14px 20px -4px rgba(0,0,0,0.3) !important; }
+        body.public-dark-mode .product-card .card-title, body.public-dark-mode .product-card h6 { color: #e2e8f0 !important; }
+        body.public-dark-mode .product-card .text-muted { color: #94a3b8 !important; }
+        body.public-dark-mode .search-wrapper .form-control { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .search-wrapper .form-control:focus { background: rgba(30,41,59,0.95) !important; }
+        body.public-dark-mode .btn-outline-primary { background: rgba(30,41,59,0.6) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .btn-outline-primary:hover { background: var(--color-principal) !important; }
+        body.public-dark-mode .btn-outline-primary.active { background: var(--color-principal) !important; border-color: var(--color-principal) !important; color: #fff !important; }
+        body.public-dark-mode .hero-shop h2, body.public-dark-mode .hero-shop p { color: #e2e8f0 !important; }
+        body.public-dark-mode .offcanvas { background: #1e293b !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .offcanvas .btn-close { filter: invert(1); }
+        body.public-dark-mode .cart-item { border-bottom-color: rgba(255,255,255,0.08) !important; }
+        body.public-dark-mode .qty-btn { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .qty-btn:hover { background: rgba(30,41,59,0.95) !important; }
+        body.public-dark-mode .footer-custom { background: #0f172a !important; border-top-color: rgba(255,255,255,0.08) !important; }
+        body.public-dark-mode .footer-custom, body.public-dark-mode .footer-custom a { color: #94a3b8 !important; }
+        body.public-dark-mode .cards-consent { background: #1e293b !important; border-color: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .btn-dark-mode-public { background: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
+        body.public-dark-mode .btn-dark-mode-public:hover { background: rgba(255,255,255,0.2) !important; }
+        body.public-dark-mode h5.fw-bold:not(.product-card *) { color: #e2e8f0 !important; }
+        body.public-dark-mode .product-card .text-success { color: #6ee7b7 !important; }
+
+        /* ===== Parallax hero ===== */
+        .hero-parallax { background-attachment: fixed !important; }
+        @media (max-width: 768px) { .hero-parallax { background-attachment: scroll !important; } }
+
+        /* ===== Layout toggle: List view ===== */
+        #productGrid.list-view .product-item { width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
+        #productGrid.list-view .product-item .product-card { flex-direction: row !important; }
+        #productGrid.list-view .product-item .product-card-img { width: 140px !important; min-height: 120px; flex-shrink: 0; border-radius: 16px 0 0 16px !important; }
+        #productGrid.list-view .product-item .card-img-top { height: 120px !important; border-radius: 16px 0 0 16px !important; }
+        #productGrid.list-view .product-item .card-body { flex: 1 !important; }
+        #productGrid.list-view .product-item .btn-add-cart { max-width: 160px; }
+        .btn-layout { display: inline-flex; align-items: center; gap: 4px; border: 1px solid #e2e8f0; background: #fff; color: #64748b; cursor: pointer; padding: 0.4rem 0.7rem; border-radius: 8px; transition: all 0.2s; font-size: 0.85rem; }
+        .btn-layout:hover { background: #f1f5f9; border-color: var(--color-principal); }
+        .btn-layout.active { background: var(--color-principal); border-color: var(--color-principal); color: #fff; }
+        body.public-dark-mode .btn-layout { background: rgba(30,41,59,0.6); border-color: rgba(255,255,255,0.15); color: #94a3b8; }
+        body.public-dark-mode .btn-layout:hover { background: rgba(30,41,59,0.9); }
+        body.public-dark-mode .btn-layout.active { background: var(--color-principal); color: #fff; }
+
         /* buscador */
-        .search-wrapper { position: relative; }
+        .search-wrapper { position: relative; flex: 1; }
         .search-wrapper .form-control { padding-left: 2.5rem; border-radius: 40px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 0.95rem; }
         .search-wrapper .form-control:focus { background: #fff; border-color: var(--color-principal); box-shadow: 0 0 0 3px rgba(var(--color-principal), 0.1); }
         .search-wrapper .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
@@ -135,6 +185,13 @@
                     <a class="nav-link nav-link-custom" href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']); ?>" target="_blank">Contacto</a>
                 </li>
                 <?php endif; ?>
+                <?php if ($cat_pers): ?>
+                <li class="nav-item d-flex align-items-center">
+                    <button id="darkModeTogglePublic" class="btn-dark-mode-public" title="Modo oscuro">
+                        <iconify-icon id="darkModeIconPublic" icon="mdi:weather-night" width="16"></iconify-icon>
+                    </button>
+                </li>
+                <?php endif; ?>
                 <li class="nav-item position-relative">
                     <button id="btnToggleCart" class="nav-link nav-link-custom border-0 bg-transparent" style="cursor:pointer;">
                         <iconify-icon icon="mdi:cart-outline" width="22"></iconify-icon>
@@ -157,7 +214,7 @@
     </div>
 </nav>
 
-<div class="hero-shop text-center py-5 mb-5" style="<?php if ($cat_pers && !empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
+<div class="hero-shop text-center py-5 mb-5 <?php echo $cat_pers ? 'hero-parallax' : ''; ?>" style="<?php if ($cat_pers && !empty($tienda['banner_url'])): ?>background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3)), url(<?php echo htmlspecialchars(imagen_url($tienda['banner_url'])); ?>); background-size: cover; background-position: center; color: #fff;<?php endif; ?>">
     <div class="container" style="max-width: 600px;">
         <?php if ($cat_pers && !empty($tienda['banner_url'])): ?>
             <h2 class="fw-bold mb-2" style="color:#fff;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></h2>
@@ -212,9 +269,17 @@
         </div>
     </div>
 
-    <div class="search-wrapper mb-4">
-        <iconify-icon icon="mdi:magnify" class="search-icon" width="18"></iconify-icon>
-        <input type="text" id="searchInput" class="form-control" placeholder="Buscar productos…" autocomplete="off">
+    <div class="d-flex gap-2 align-items-center mb-4">
+        <div class="search-wrapper">
+            <iconify-icon icon="mdi:magnify" class="search-icon" width="18"></iconify-icon>
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar productos…" autocomplete="off">
+        </div>
+        <?php if ($cat_pers): ?>
+        <div class="d-flex gap-1 flex-shrink-0">
+            <button id="layoutGrid" class="btn-layout active" title="Cuadrícula"><iconify-icon icon="mdi:grid" width="16"></iconify-icon></button>
+            <button id="layoutList" class="btn-layout" title="Lista"><iconify-icon icon="mdi:view-list" width="16"></iconify-icon></button>
+        </div>
+        <?php endif; ?>
     </div>
 
     <h5 class="fw-bold mb-3">Nuestro Catálogo</h5>
@@ -583,6 +648,51 @@ document.getElementById('btnToggleCart').addEventListener('click', toggleCart);
 document.getElementById('btnWhatsAppCart').addEventListener('click', enviarWhatsApp);
 
 actualizarBadge();
+
+/* --- public dark mode --- */
+(function() {
+    var key = 'public_dark_mode_<?php echo $tienda_id; ?>';
+    var body = document.body;
+    var toggle = document.getElementById('darkModeTogglePublic');
+    var icon = document.getElementById('darkModeIconPublic');
+    if (localStorage.getItem(key) === '1') {
+        body.classList.add('public-dark-mode');
+        if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
+    }
+    if (toggle) {
+        toggle.addEventListener('click', function() {
+            body.classList.toggle('public-dark-mode');
+            var isDark = body.classList.contains('public-dark-mode');
+            localStorage.setItem(key, isDark ? '1' : '0');
+            if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
+        });
+    }
+})();
+
+/* --- layout toggle --- */
+(function() {
+    var grid = document.getElementById('productGrid');
+    var btnGrid = document.getElementById('layoutGrid');
+    var btnList = document.getElementById('layoutList');
+    var layoutKey = 'catalog_layout_<?php echo $tienda_id; ?>';
+    if (!grid || !btnGrid || !btnList) return;
+    function setLayout(layout) {
+        if (layout === 'list') {
+            grid.classList.add('list-view');
+            btnGrid.classList.remove('active');
+            btnList.classList.add('active');
+        } else {
+            grid.classList.remove('list-view');
+            btnGrid.classList.add('active');
+            btnList.classList.remove('active');
+        }
+        localStorage.setItem(layoutKey, layout);
+    }
+    var saved = localStorage.getItem(layoutKey);
+    if (saved === 'list') setLayout('list');
+    btnGrid.addEventListener('click', function() { setLayout('grid'); });
+    btnList.addEventListener('click', function() { setLayout('list'); });
+})();
 </script>
 <?php require __DIR__ . '/footer_partial.php'; ?>
 </body>

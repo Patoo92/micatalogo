@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
         .container { max-width: 600px; }
     </style>
 </head>
-<body class="bg-admin sidebar-open">
+<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <div class="container my-5">
         <div class="card glass-card p-4">

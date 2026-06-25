@@ -18,7 +18,7 @@
         }
     </style>
 </head>
-<body class="bg-admin sidebar-open">
+<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
 
     <?php require __DIR__ . '/sidebar_partial.php'; ?>
     <?php require __DIR__ . '/toast_partial.php'; ?>

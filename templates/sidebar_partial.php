@@ -8,6 +8,10 @@
     </div>
 
     <nav class="sidebar-nav flex-grow-1">
+        <a href="dashboard.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>">
+            <iconify-icon icon="mdi:chart-bar" width="18"></iconify-icon>
+            Dashboard
+        </a>
         <a href="admin.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) === 'admin.php' ? 'active' : ''; ?>">
             <iconify-icon icon="mdi:package-variant-closed" width="18"></iconify-icon>
             Productos

@@ -18,6 +18,11 @@
 ### Nuevas implementaciones (25 junio 2026)
 - **Dashboard stats**: admin.php ahora muestra cards con total productos, pedidos totales, pendientes, stock bajo/agotados, pedidos hoy y esta semana
 - **Dominio personalizado**: columna `dominio` en tiendas, campo en config (Business+), routing automático en index.php y producto.php — si el HTTP_HOST coincide con un dominio registrado, carga esa tienda sin necesidad de `?tienda=`
+- **Dashboard.php con gráficos**: nueva página dedicada con Chart.js (pedidos/7 días, productos por categoría). Stats movidas de admin.php a dashboard.php como tab independiente
+- **Modo oscuro público**: toggle en navbar de catálogo y producto.php, gated por plan Pro+. Persiste en localStorage por tienda (`public_dark_mode_{id}`)
+- **Efecto parallax**: clase `hero-parallax` en hero-shop del catálogo, solo Pro+. `background-attachment: fixed` con fallback scroll en móvil
+- **Layout alternativo**: toggle grid/lista en catálogo (Pro+). Clase `list-view` en #productGrid, persiste en localStorage
+- **Tema visual admin**: columna `tema_admin` en tiendas. Selector en configuración (Pro+). 5 temas: default, ocean, forest, sunset, midnight. Almacenado en `$_SESSION['tema_admin']`, aplicado como clase `theme-{nombre}` al body de todas las páginas admin. Estilos en css/style.css
 - **reset-password.php**: corregida validación de contraseña (solo min 10 chars, sin mayúscula/número)
 
 ### Features implementadas
