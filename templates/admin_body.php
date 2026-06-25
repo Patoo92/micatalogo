@@ -100,7 +100,7 @@
                     <div>
                         <div class="fw-bold fs-5">
                             <?php
-                            $stmtSem = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)");
+                            $stmtSem = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND fecha_pedido >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
                             $stmtSem->execute([$tienda_id]);
                             echo (int)$stmtSem->fetchColumn(); ?> esta semana
                         </div>

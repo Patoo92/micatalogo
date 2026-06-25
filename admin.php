@@ -39,7 +39,7 @@ $stmtAgot = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AN
 $stmtAgot->execute([$tienda_id]);
 $stats_agotados = (int)$stmtAgot->fetchColumn();
 
-$stmtHoy = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND DATE(created_at) = CURDATE()");
+$stmtHoy = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE tienda_id = ? AND DATE(fecha_pedido) = CURDATE()");
 $stmtHoy->execute([$tienda_id]);
 $stats_pedidos_hoy = (int)$stmtHoy->fetchColumn();
 
