@@ -53,7 +53,9 @@ try {
     $tienda_id = $tienda['id'];
     $creados = 0;
 
+    $pdo->beginTransaction();
     $stmtPedido = $pdo->prepare("INSERT INTO pedidos (tienda_id, producto_id, nombre_cliente, email_cliente, estado) VALUES (?, ?, ?, ?, 'Pendiente')");
+    $stmtStock  = $pdo->prepare("UPDATE productos SET stock = GREATEST(stock - 1, 0) WHERE id = ? AND tienda_id = ?");
 
     foreach ($items as $item) {
         $producto_id = (int)($item['id'] ?? 0);
@@ -69,11 +71,13 @@ try {
         $email_db = !empty($email_cliente) ? $email_cliente : null;
         for ($i = 0; $i < $cantidad; $i++) {
             $stmtPedido->execute([$tienda_id, $producto_id, $nombre_cliente, $email_db]);
+            $stmtStock->execute([$producto_id, $tienda_id]);
             $creados++;
         }
     }
 
     if ($creados === 0) {
+        $pdo->rollBack();
         echo json_encode(['success' => false, 'message' => 'No se pudo guardar ningún producto.']);
         exit;
     }
@@ -93,9 +97,11 @@ try {
         enviar_email($email_cliente, $asunto, $cuerpo, $from_name);
     }
 
+    $pdo->commit();
     echo json_encode(['success' => true, 'message' => "Pedido guardado ($creados producto(s))."]);
 
 } catch (\PDOException $e) {
+    $pdo->rollBack();
     error_log("Error al guardar pedido: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Error al procesar el pedido.']);
 }

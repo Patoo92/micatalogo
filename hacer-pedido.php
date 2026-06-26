@@ -42,11 +42,15 @@ if (isset($_POST['nombre_cliente']) && isset($_POST['producto_id']) && isset($_P
             mostrar_error("Producto no encontrado", "El producto no existe o no pertenece a esta tienda.");
         }
 
+        $pdo->beginTransaction();
         $sql  = "INSERT INTO pedidos (tienda_id, producto_id, nombre_cliente, estado) VALUES (?, ?, ?, 'Pendiente')";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$tienda['id'], $producto_id, $nombre_cliente]);
-
         $id_pedido = $pdo->lastInsertId();
+
+        $stmtUpd = $pdo->prepare("UPDATE productos SET stock = GREATEST(stock - 1, 0) WHERE id = ? AND tienda_id = ?");
+        $stmtUpd->execute([$producto_id, $tienda['id']]);
+        $pdo->commit();
 
         $moneda = htmlspecialchars($tienda['moneda'] ?? '€');
         $textoMensaje = "¡Hola! Soy " . $nombre_cliente . ". Me interesa el producto: " . $producto['nombre'] . " (Precio: " . $producto['precio'] . $moneda . "). Mi código de pedido es el #" . $id_pedido;

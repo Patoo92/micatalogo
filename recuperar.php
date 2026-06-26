@@ -17,12 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($tienda) {
             $token = bin2hex(random_bytes(32));
+            $stmt = $pdo->prepare("UPDATE password_resets SET usado = 1 WHERE email = ? AND usado = 0");
+            $stmt->execute([$email]);
             $stmt = $pdo->prepare("INSERT INTO password_resets (email, token) VALUES (?, ?)");
             $stmt->execute([$email, $token]);
 
             $host = $_SERVER['HTTP_HOST'] ?? '';
             if (!preg_match('/^[a-z0-9\.\-:]+$/i', $host)) { $host = 'localhost'; }
-            $link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $host . '/micatalogo/reset-password.php?token=' . urlencode($token);
+            $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+            $link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $host . $basePath . '/reset-password.php?token=' . urlencode($token);
             $footer = '';
             if (empty($tienda['marca_blanca'])) {
                 $footer = '<hr><small style="color:#94a3b8;">micatalogo.app — tu tienda online</small>';

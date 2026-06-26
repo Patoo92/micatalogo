@@ -36,6 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $plan_actual = 'starter';
                         $_SESSION['flash_message'] = 'Tu período de prueba ha finalizado. Has sido cambiado al plan Starter.';
                         $_SESSION['flash_type'] = 'warning';
+                    } elseif ($plan_actual !== 'starter' && !empty($tienda['trial_ends_at'])) {
+                        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+                        $dias_restantes = (strtotime($tienda['trial_ends_at']) - time()) / 86400;
+                        if ($dias_restantes <= 3 && $dias_restantes > 0 && empty($_SESSION['_trial_notified'])) {
+                            $_SESSION['_trial_notified'] = true;
+                            require_once 'email_helper.php';
+                            $stmtTrialInfo = $pdo->prepare("SELECT nombre_tienda, marca_blanca FROM tiendas WHERE id = ?");
+                            $stmtTrialInfo->execute([$tienda['id']]);
+                            $trialInfo = $stmtTrialInfo->fetch();
+                            $from_name = !empty($trialInfo['marca_blanca']) ? $trialInfo['nombre_tienda'] : null;
+                            $dias_mostrar = max(1, (int)ceil($dias_restantes));
+                            $asunto = 'Tu prueba gratuita de ' . $trialInfo['nombre_tienda'] . ' termina pronto';
+                            $cuerpo = '<h2>Tu período de prueba está por terminar</h2>'
+                                . '<p>Hola, tu prueba gratuita vence en <strong>' . $dias_mostrar . ' día(s)</strong>.</p>'
+                                . '<p>Si quieres seguir disfrutando de las funciones ' . htmlspecialchars($plan_actual) . ', puedes actualizar tu plan desde el panel de administración.</p>'
+                                . '<p style="text-align:center;margin:30px 0;"><a href="' . $basePath . '/configuracion.php#plan" style="background:#10b981;color:#fff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;">Ver Planes</a></p>'
+                                . '<p>Al finalizar la prueba, tu tienda pasará al plan Starter (gratuito) sin perder datos.</p>';
+                            enviar_email($tienda['email'], $asunto, $cuerpo, $from_name);
+                        }
                     }
                     limpiar_intentos_login($pdo, 'login');
                     session_regenerate_id(true);

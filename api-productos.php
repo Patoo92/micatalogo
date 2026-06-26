@@ -1,6 +1,14 @@
 <?php
 header('Content-Type: application/json');
 require_once 'conexion.php';
+require_once 'helpers.php';
+
+if (!verificar_rate_limit($pdo, 'api_productos', 60, 1)) {
+    http_response_code(429);
+    echo json_encode(['success' => false, 'message' => 'Demasiadas solicitudes.']);
+    exit;
+}
+registrar_intento_login($pdo, 'api_productos');
 
 $ids = $_GET['ids'] ?? '';
 $tienda_id_param = isset($_GET['tienda']) ? (int)$_GET['tienda'] : 0;

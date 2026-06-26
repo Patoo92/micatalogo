@@ -72,6 +72,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: super-admin.php");
         exit;
     }
+
+    if (isset($_POST['crear_factura']) && isset($_POST['id'])) {
+        $tienda_id = (int)$_POST['id'];
+        $plan = $_POST['plan'] ?? 'starter';
+        $periodo = $_POST['periodo'] ?? 'mensual';
+        $monto = (float)($_POST['monto'] ?? 0);
+        $estado = $_POST['estado'] ?? 'pendiente';
+        $metodo_pago = trim($_POST['metodo_pago'] ?? '');
+        $notas = trim($_POST['notas'] ?? '');
+        $fecha_emision = $_POST['fecha_emision'] ?? date('Y-m-d');
+        $fecha_vencimiento = $_POST['fecha_vencimiento'] ?? null;
+        if ($monto > 0 && in_array($plan, ['starter','pro','business','enterprise']) && in_array($periodo, ['mensual','anual'])) {
+            $numero = 'INV-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+            $stmt = $pdo->prepare("INSERT INTO facturas (tienda_id, numero_factura, plan, periodo, monto, estado, metodo_pago, notas, fecha_emision, fecha_vencimiento) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$tienda_id, $numero, $plan, $periodo, $monto, $estado, $metodo_pago ?: null, $notas ?: null, $fecha_emision, $fecha_vencimiento]);
+            if ($estado === 'pagada') {
+                $stmt = $pdo->prepare("UPDATE facturas SET fecha_pago = ? WHERE id = ?");
+                $stmt->execute([date('Y-m-d'), $pdo->lastInsertId()]);
+            }
+        }
+        header("Location: super-admin.php?tab=facturas");
+        exit;
+    }
+
+    if (isset($_POST['actualizar_estado_factura']) && isset($_POST['factura_id'])) {
+        $factura_id = (int)$_POST['factura_id'];
+        $nuevo_estado = $_POST['nuevo_estado'] ?? 'pendiente';
+        if (in_array($nuevo_estado, ['pendiente','pagada','cancelada','vencida'])) {
+            $stmt = $pdo->prepare("UPDATE facturas SET estado = ?, fecha_pago = IF(? = 'pagada' AND fecha_pago IS NULL, CURDATE(), fecha_pago) WHERE id = ?");
+            $stmt->execute([$nuevo_estado, $nuevo_estado, $factura_id]);
+        }
+        header("Location: super-admin.php?tab=facturas");
+        exit;
+    }
 }
 
 $stmt = $pdo->query("
@@ -109,6 +143,16 @@ $stmtAct = $pdo->query("
     LIMIT 100
 ");
 $actividades = $stmtAct->fetchAll();
+
+$stmtFact = $pdo->query("
+    SELECT f.*, t.nombre_tienda
+    FROM facturas f
+    LEFT JOIN tiendas t ON f.tienda_id = t.id
+    ORDER BY f.created_at DESC
+    LIMIT 100
+");
+$facturas = $stmtFact->fetchAll();
+$total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE estado = 'pendiente'")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -141,6 +185,9 @@ $actividades = $stmtAct->fetchAll();
         <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
                 <a class="nav-link <?php echo $tab === 'tiendas' ? 'active' : ''; ?>" href="super-admin.php?tab=tiendas"><iconify-icon icon="mdi:store" width="18"></iconify-icon> Tiendas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?php echo $tab === 'facturas' ? 'active' : ''; ?>" href="super-admin.php?tab=facturas"><iconify-icon icon="mdi:file-document" width="18"></iconify-icon> Facturas <?php if ($total_facturas_pendientes > 0): ?><span class="badge bg-danger ms-1"><?php echo $total_facturas_pendientes; ?></span><?php endif; ?></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link <?php echo $tab === 'historial' ? 'active' : ''; ?>" href="super-admin.php?tab=historial"><iconify-icon icon="mdi:history" width="18"></iconify-icon> Historial Global</a>
@@ -279,6 +326,15 @@ $actividades = $stmtAct->fetchAll();
                                             <input type="number" name="dias_trial" value="7" min="1" max="365" class="form-control form-control-sm d-inline" style="width:50px;">
                                             <button type="submit" name="extender_trial" class="btn btn-sm btn-ghost-success" title="Extender trial">⏱️</button>
                                         </form>
+                                        <form method="POST" action="super-admin.php?tab=facturas" class="d-inline" title="Crear factura">
+                                            <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
+                                            <input type="hidden" name="plan" value="<?php echo $tienda['plan'] ?? 'starter'; ?>">
+                                            <input type="hidden" name="periodo" value="mensual">
+                                            <input type="hidden" name="monto" value="0">
+                                            <input type="hidden" name="estado" value="pendiente">
+                                            <?php echo csrf_field(); ?>
+                                            <button type="submit" name="crear_factura" class="btn btn-sm btn-ghost-info" title="Crear factura">🧾</button>
+                                        </form>
                                         <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.">
                                             <input type="hidden" name="delete" value="<?php echo $tienda['id']; ?>">
                                             <input type="hidden" name="confirm" value="1">
@@ -294,6 +350,81 @@ $actividades = $stmtAct->fetchAll();
                 </table>
             </div>
         </div>
+        </div>
+
+        <?php endif; ?>
+
+        <?php if ($tab === 'facturas'): ?>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Facturas e Historial de Pagos</h3>
+            </div>
+            <div class="card-body">
+            <?php if (empty($facturas)): ?>
+                <div class="empty">
+                    <div class="empty-icon"><iconify-icon icon="mdi:file-document-outline" width="48" style="color: #94a3b8;"></iconify-icon></div>
+                    <p class="empty-title">No hay facturas registradas.</p>
+                    <p class="empty-subtitle text-muted">Las facturas se generan al crear un pago manual desde el panel de tiendas.</p>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-vcenter card-table">
+                        <thead>
+                            <tr>
+                                <th># Factura</th>
+                                <th>Tienda</th>
+                                <th>Plan</th>
+                                <th>Periodo</th>
+                                <th>Monto</th>
+                                <th>Emisión</th>
+                                <th>Vencimiento</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($facturas as $f): ?>
+                            <tr>
+                                <td style="font-size:0.8rem;font-family:monospace;color:#64748b;"><?php echo htmlspecialchars($f['numero_factura']); ?></td>
+                                <td><?php echo htmlspecialchars($f['nombre_tienda'] ?? '—'); ?></td>
+                                <td><span class="badge bg-info-lt text-uppercase"><?php echo htmlspecialchars($f['plan']); ?></span></td>
+                                <td><?php echo $f['periodo']; ?></td>
+                                <td class="fw-semibold"><?php echo number_format($f['monto'], 2); ?> <?php echo htmlspecialchars($f['moneda']); ?></td>
+                                <td style="font-size:0.8rem;color:#64748b;"><?php echo $f['fecha_emision']; ?></td>
+                                <td style="font-size:0.8rem;color:#64748b;"><?php echo $f['fecha_vencimiento'] ?? '—'; ?></td>
+                                <td>
+                                    <?php if ($f['estado'] === 'pagada'): ?>
+                                        <span class="badge bg-success">Pagada</span>
+                                    <?php elseif ($f['estado'] === 'pendiente'): ?>
+                                        <span class="badge bg-warning text-dark">Pendiente</span>
+                                    <?php elseif ($f['estado'] === 'vencida'): ?>
+                                        <span class="badge bg-danger">Vencida</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Cancelada</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-end">
+                                    <form method="POST" action="super-admin.php?tab=facturas" class="d-inline">
+                                        <input type="hidden" name="factura_id" value="<?php echo $f['id']; ?>">
+                                        <input type="hidden" name="nuevo_estado" value="pagada">
+                                        <?php echo csrf_field(); ?>
+                                        <button type="submit" name="actualizar_estado_factura" class="btn btn-sm btn-ghost-success" title="Marcar como pagada">✓</button>
+                                    </form>
+                                    <form method="POST" action="super-admin.php?tab=facturas" class="d-inline">
+                                        <input type="hidden" name="factura_id" value="<?php echo $f['id']; ?>">
+                                        <input type="hidden" name="nuevo_estado" value="cancelada">
+                                        <?php echo csrf_field(); ?>
+                                        <button type="submit" name="actualizar_estado_factura" class="btn btn-sm btn-ghost-danger" title="Cancelar">✕</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+            </div>
         </div>
 
         <?php endif; ?>

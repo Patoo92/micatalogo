@@ -1,7 +1,17 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
-header('Access-Control-Allow-Origin: ' . $origin);
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowedOrigins = [];
+$requestHost = $_SERVER['HTTP_HOST'] ?? '';
+if ($requestHost) {
+    $allowedOrigins[] = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $requestHost;
+}
+if ($origin && in_array($origin, $allowedOrigins)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+} elseif (!$origin) {
+    header('Access-Control-Allow-Origin: *');
+}
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
@@ -87,15 +97,17 @@ switch ($action) {
         $producto = $stmt->fetch();
         if (!$producto) responder(false, 'Producto no disponible.', 404);
 
-        $stmt = $pdo->prepare("SELECT slug, telefono_whatsapp FROM tiendas WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT slug, telefono_whatsapp, moneda FROM tiendas WHERE id = ?");
         $stmt->execute([$tienda_id]);
         $tienda = $stmt->fetch();
+
+        $moneda = htmlspecialchars($tienda['moneda'] ?? '€');
 
         $stmt = $pdo->prepare("INSERT INTO pedidos (tienda_id, producto_id, nombre_cliente, email_cliente, estado) VALUES (?, ?, ?, ?, 'Pendiente')");
         $stmt->execute([$tienda_id, $producto_id, $nombre, $email ?: null]);
         $pedido_id = $pdo->lastInsertId();
 
-        $texto = "¡Hola! Soy $nombre. Me interesa: {$producto['nombre']} ({$producto['precio']}€). Pedido #$pedido_id";
+        $texto = "¡Hola! Soy $nombre. Me interesa: {$producto['nombre']} ({$producto['precio']}$moneda). Pedido #$pedido_id";
         $url = "https://wa.me/" . preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp']) . "?text=" . urlencode($texto);
 
         responder(true, 'Pedido creado.', 201, [

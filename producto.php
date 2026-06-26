@@ -49,7 +49,7 @@ try {
         mostrar_error("Producto no encontrado", "El producto que buscas no existe o fue eliminado.", "index.php?tienda=" . urlencode($slug_tienda), "Ver catálogo");
     }
 
-    $stmtRel = $pdo->prepare("SELECT id, nombre, precio, imagen_thumb, imagen_url FROM productos WHERE tienda_id = ? AND categoria_id = ? AND id != ? ORDER BY RAND() LIMIT 4");
+    $stmtRel = $pdo->prepare("SELECT id, nombre, precio, imagen_thumb, imagen_url FROM productos WHERE tienda_id = ? AND categoria_id = ? AND id != ? ORDER BY destacado DESC, id DESC LIMIT 4");
     $stmtRel->execute([$tienda_id, $producto['categoria_id'], $producto_id]);
     $relacionados = $stmtRel->fetchAll();
 
