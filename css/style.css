@@ -18,10 +18,12 @@ iconify-icon { vertical-align: -2px; display: inline-flex; }
 .badge-stock { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: var(--border-radius-badge); }
 .badge-stock.bg-success { color: #064e27; }
 .badge-stock.bg-danger { color: #ffffff; }
+.badge.bg-primary { color: #ffffff; }
 .badge.bg-secondary { color: #ffffff; }
 [data-bs-theme="dark"] .badge-stock.bg-success { color: #bbf7d0; }
 [data-bs-theme="dark"] .badge-stock.bg-danger { color: #ffffff; }
 [data-bs-theme="dark"] .badge.bg-secondary { color: #ffffff; }
+[data-bs-theme="dark"] .badge.bg-primary { color: #ffffff; }
 .btn-action { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--border-radius-sm); padding: 0; }
 
 .product-card {
