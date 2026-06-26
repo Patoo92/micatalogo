@@ -23,14 +23,25 @@ if (isset($_GET['tienda']) && !empty($_GET['tienda'])) {
     exit;
 }
 
+// Rate limiting para prevenir enumeración de slugs
+$ip_slug = ip_normalizada();
+$stmtSlugCheck = $pdo->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip_address = ? AND tipo = 'slug_lookup' AND created_at >= ?");
+$stmtSlugCheck->execute([$ip_slug, date('Y-m-d H:i:s', time() - 900)]);
+if ($stmtSlugCheck->fetchColumn() >= 30) {
+    header("HTTP/1.0 429 Too Many Requests");
+    mostrar_error("Demasiadas solicitudes", "Has superado el límite de solicitudes. Intenta de nuevo más tarde.");
+}
+
 try {
     $stmtTienda = $pdo->prepare("SELECT * FROM tiendas WHERE slug = ?");
     $stmtTienda->execute([$slug_tienda]);
     $tienda = $stmtTienda->fetch();
 
     if (!$tienda) {
+        $stmtLog = $pdo->prepare("INSERT INTO login_attempts (ip_address, tipo) VALUES (?, 'slug_lookup')");
+        $stmtLog->execute([$ip_slug]);
         header("HTTP/1.0 404 Not Found");
-        mostrar_error("Tienda no encontrada", "La tienda '" . htmlspecialchars($slug_tienda) . "' no existe.");
+        mostrar_error("Tienda no encontrada", "La tienda solicitada no existe.");
     }
 
     if ($tienda['activo'] == 0) {
