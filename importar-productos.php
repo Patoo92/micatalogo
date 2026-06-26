@@ -65,17 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Productos CSV</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .container { max-width: 600px; }
     </style>
 </head>
-<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
+<body>
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
+    <div class="page-wrapper">
     <div class="container my-5">
-        <div class="card glass-card p-4">
+        <div class="card p-4">
             <h4 class="fw-bold mb-3"><iconify-icon icon="mdi:file-upload" width="24"></iconify-icon> Importar Productos CSV</h4>
             <?php echo $mensaje; ?>
             <form method="POST" enctype="multipart/form-data">
@@ -93,25 +94,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
     </div>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
-        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var html = document.documentElement;
         var toggle = document.getElementById('darkModeToggle');
         var icon = toggle && toggle.querySelector('iconify-icon');
         var span = toggle && toggle.querySelector('span');
         if (localStorage.getItem('dark_mode') === '1') {
+            html.setAttribute('data-bs-theme', 'dark');
             if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
             if (span) span.textContent = 'Modo claro';
         }
         if (toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.body.classList.toggle('dark-mode');
-                var isDark = document.body.classList.contains('dark-mode');
-                localStorage.setItem('dark_mode', isDark ? '1' : '0');
-                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                var isDark = html.getAttribute('data-bs-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-bs-theme');
+                } else {
+                    html.setAttribute('data-bs-theme', 'dark');
+                }
+                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
+                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
             });
         }
     })();
     </script>
+    </div>
 </body>
 </html>

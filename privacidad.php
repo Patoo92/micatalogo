@@ -7,17 +7,13 @@ require_once 'conexion.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Política de Privacidad</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f7fafc; padding: 40px 0; }
-        .container { max-width: 800px; }
-        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
-        h2 { font-size: 1.25rem; font-weight: 600; margin-top: 32px; margin-bottom: 12px; }
-        p, li { color: #475569; line-height: 1.7; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container py-4" style="max-width:800px;">
         <div class="card shadow-sm p-4 p-md-5 border-0">
             <h1>Política de Privacidad</h1>
             <p class="text-muted">Última actualización: <?php echo date('d/m/Y'); ?></p>

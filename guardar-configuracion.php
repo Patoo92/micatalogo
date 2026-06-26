@@ -41,11 +41,6 @@ $css_personalizado = $_POST['css_personalizado'] ?? '';
 $hero_title      = trim($_POST['hero_title'] ?? '');
 $hero_subtitle   = trim($_POST['hero_subtitle'] ?? '');
 $dominio         = trim($_POST['dominio'] ?? '');
-$tema_admin      = trim($_POST['tema_admin'] ?? 'default');
-
-if (!in_array($tema_admin, ['default', 'ocean', 'forest', 'sunset', 'midnight'])) {
-    $tema_admin = 'default';
-}
 
 if (empty($nombre_tienda)) {
     header("Location: configuracion.php?error=nombre_vacio");
@@ -175,8 +170,7 @@ $sql = "UPDATE tiendas SET
             css_personalizado  = ?,
             hero_title         = ?,
             hero_subtitle      = ?,
-            dominio            = ?,
-            tema_admin         = ?
+            dominio            = ?
         WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
@@ -190,13 +184,11 @@ $stmt->execute([
     $meta_desc, $meta_palabras, $codigo_tracking, $css_personalizado,
     $hero_title, $hero_subtitle,
     $dominio ?: null,
-    $tema_admin,
     $tienda_id
 ]);
 
 $_SESSION['tienda_nombre'] = $nombre_tienda;
 $_SESSION['marca_blanca'] = $marca_blanca;
-$_SESSION['tema_admin'] = $tema_admin;
 
 $u = obtener_usuario_actual();
 registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la configuración de la tienda');

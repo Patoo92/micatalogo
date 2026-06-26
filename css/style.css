@@ -1,190 +1,30 @@
-/* ===== Admin body con gradiente sutil para glassmorphism ===== */
-.bg-admin {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-}
-
-/* ===== Glassmorphism para inventario ===== */
-.glass-card {
-    background: rgba(255,255,255,0.35) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.3) !important;
-    border-radius: var(--border-radius-card);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-}
-.glass-card:hover {
-    background: rgba(255,255,255,0.42) !important;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-}
-.glass-card .card-header {
-    background: rgba(255,255,255,0.15) !important;
-    border-bottom: 1px solid rgba(255,255,255,0.2) !important;
-}
-.glass-card a:not(.btn) { color: #2563eb !important; }
-/* glass-table solo para tablas de admin */
-.glass-table {
-    background: rgba(255,255,255,0.25) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.3) !important;
-    border-radius: var(--border-radius-card);
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-}
-.glass-table .table { background: transparent !important; color: #fff !important; }
-.glass-table .table thead th { background: rgba(255,255,255,0.15) !important; color: #fff !important; }
-.glass-table .table tbody tr { background: transparent !important; color: #fff !important; }
-.glass-table .table tbody tr:hover { background: rgba(255,255,255,0.2) !important; }
-.glass-table .fw-bold, .glass-table .text-dark { color: #fff !important; }
-.glass-table .text-muted { color: rgba(255,255,255,0.7) !important; }
-.glass-table .badge.bg-secondary { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
-.glass-table .btn-light { background: rgba(255,255,255,0.2) !important; border-color: rgba(255,255,255,0.3) !important; color: #fff !important; }
-.glass-table .btn-light:hover { background: rgba(255,255,255,0.35) !important; }
-.glass-table .btn-outline-secondary { border-color: rgba(255,255,255,0.3) !important; color: #fff !important; }
-.glass-table .btn-outline-secondary:hover { background: rgba(255,255,255,0.2) !important; }
-.glass-table .btn-outline-danger { border-color: rgba(255,255,255,0.3) !important; color: #fca5a5 !important; }
-.glass-table .btn-outline-danger:hover { background: rgba(255,255,255,0.2) !important; color: #fff !important; }
-.glass-table .btn-danger { background: rgba(239,68,68,0.4) !important; border-color: transparent !important; }
-.glass-table .btn-success { background: rgba(16,185,129,0.4) !important; border-color: transparent !important; }
-.glass-table .btn-primary { background: rgba(59,130,246,0.4) !important; border-color: transparent !important; }
-.glass-table a:not(.btn) { color: #93c5fd !important; }
-.card-header.bg-white { background: rgba(255,255,255,0.15) !important; }
-.card-admin, .card-custom, .card-orders { background: transparent !important; }
-.alert { background: rgba(255,255,255,0.2) !important; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2) !important; color: #fff !important; }
-.bg-admin .navbar-admin { background: rgba(15,23,42,0.8) !important; backdrop-filter: blur(12px); }
-
-/* ===== Dark Mode ===== */
-body.dark-mode .bg-admin { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-body.dark-mode .glass-card { background: rgba(30,41,59,0.6) !important; border-color: rgba(255,255,255,0.1) !important; }
-body.dark-mode .glass-table { background: rgba(30,41,59,0.5) !important; border-color: rgba(255,255,255,0.1) !important; }
-body.dark-mode .glass-table .table { color: #e2e8f0 !important; }
-body.dark-mode .glass-table .table thead th { background: rgba(255,255,255,0.05) !important; }
-body.dark-mode .glass-table .table tbody tr:hover { background: rgba(255,255,255,0.08) !important; }
-body.dark-mode .text-dark { color: #e2e8f0 !important; }
-body.dark-mode .text-muted { color: #94a3b8 !important; }
-body.dark-mode .sidebar-admin { background: linear-gradient(180deg, #0a0f1a 0%, #0f172a 100%) !important; }
-body.dark-mode .sidebar-link { color: #94a3b8 !important; }
-body.dark-mode .sidebar-link:hover { background: rgba(255,255,255,0.08) !important; color: #e2e8f0 !important; }
-body.dark-mode .navbar-admin { background: rgba(10,15,26,0.9) !important; }
-body.dark-mode .card { background: rgba(30,41,59,0.6) !important; }
-body.dark-mode .form-control, body.dark-mode .form-select { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
-body.dark-mode .form-control:focus, body.dark-mode .form-select:focus { background: rgba(30,41,59,0.95) !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 0.2rem rgba(59,130,246,0.25) !important; }
-body.dark-mode .form-label, body.dark-mode .form-check-label { color: #e2e8f0 !important; }
-body.dark-mode .form-text { color: #94a3b8 !important; }
-body.dark-mode .form-check-input { background-color: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.2) !important; }
-body.dark-mode .form-check-input:checked { background-color: #3b82f6 !important; border-color: #3b82f6 !important; }
-body.dark-mode .form-label-custom { color: #cbd5e1 !important; }
-body.dark-mode .btn-outline-secondary { border-color: rgba(255,255,255,0.2) !important; color: #94a3b8 !important; }
-body.dark-mode .btn-outline-secondary:hover { background: rgba(255,255,255,0.1) !important; color: #e2e8f0 !important; }
-body.dark-mode .btn-outline-success { border-color: rgba(16,185,129,0.4) !important; color: #6ee7b7 !important; }
-body.dark-mode .btn-outline-success:hover { background: rgba(16,185,129,0.15) !important; color: #fff !important; }
-body.dark-mode .btn-outline-info { border-color: rgba(56,189,248,0.4) !important; color: #7dd3fc !important; }
-body.dark-mode .btn-outline-info:hover { background: rgba(56,189,248,0.15) !important; color: #fff !important; }
-body.dark-mode .btn-outline-danger { border-color: rgba(239,68,68,0.4) !important; color: #fca5a5 !important; }
-body.dark-mode .btn-outline-danger:hover { background: rgba(239,68,68,0.15) !important; color: #fff !important; }
-body.dark-mode .btn-success { background: rgba(16,185,129,0.5) !important; border-color: transparent !important; }
-body.dark-mode .btn-success:hover { background: rgba(16,185,129,0.7) !important; }
-body.dark-mode .btn-primary { background: rgba(59,130,246,0.5) !important; border-color: transparent !important; }
-body.dark-mode .btn-primary:hover { background: rgba(59,130,246,0.7) !important; }
-body.dark-mode .btn-light { background: rgba(255,255,255,0.1) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
-body.dark-mode .btn-light:hover { background: rgba(255,255,255,0.2) !important; }
-body.dark-mode .table-admin { color: #e2e8f0 !important; }
-body.dark-mode .page-link { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.1) !important; color: #94a3b8 !important; }
-body.dark-mode .page-item.active .page-link { background: #3b82f6 !important; border-color: #3b82f6 !important; color: #fff !important; }
-body.dark-mode .border-top, body.dark-mode .border-bottom { border-color: rgba(255,255,255,0.08) !important; }
-body.dark-mode hr { border-color: rgba(255,255,255,0.08) !important; }
-body.dark-mode .empty-state iconify-icon { color: #64748b !important; }
-body.dark-mode .product-card { background: rgba(30,41,59,0.6) !important; }
-body.dark-mode .badge.bg-secondary { background: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
-body.dark-mode .badge.bg-success { background: rgba(16,185,129,0.5) !important; color: #fff !important; }
-body.dark-mode .badge.bg-danger { background: rgba(239,68,68,0.5) !important; color: #fff !important; }
-body.dark-mode .text-primary { color: #60a5fa !important; }
-body.dark-mode .table-responsive { background: transparent !important; }
-body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 { color: #e2e8f0 !important; }
-body.dark-mode p { color: #94a3b8 !important; }
-body.dark-mode .card.bg-light { background: rgba(30,41,59,0.5) !important; }
-body.dark-mode .table-custom { background: transparent !important; }
-body.dark-mode .table-custom thead th { background: rgba(255,255,255,0.05) !important; color: #94a3b8 !important; border-bottom-color: rgba(255,255,255,0.1) !important; }
-body.dark-mode .table-custom td { border-bottom-color: rgba(255,255,255,0.06) !important; }
-body.dark-mode .input-wrapper input { background: rgba(30,41,59,0.8) !important; border-color: rgba(255,255,255,0.15) !important; color: #e2e8f0 !important; }
-body.dark-mode .password-toggle { color: #94a3b8 !important; }
-
-/* ===== Sidebar Admin ===== */
-.sidebar-admin {
-    position: fixed; top: 0; left: 0; bottom: 0; width: 240px; z-index: 1030;
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    flex-direction: column; padding: 0;
-}
-.sidebar-brand {
-    padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-.sidebar-nav {
-    padding: 12px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;
-}
-.sidebar-link {
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-    border-radius: 10px; color: #94a3b8; text-decoration: none; font-size: 0.9rem; font-weight: 500;
-    transition: all 0.15s ease;
-}
-.sidebar-link:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
-.sidebar-link.active { background: rgba(59,130,246,0.15); color: #60a5fa; }
-.sidebar-link.text-danger:hover { background: rgba(239,68,68,0.12); color: #f87171 !important; }
-.sidebar-footer {
-    padding: 12px; border-top: 1px solid rgba(255,255,255,0.06);
-    display: flex; flex-direction: column; gap: 2px;
-}
-body.sidebar-open { padding-left: 240px; }
-@media (max-width: 991.98px) { body.sidebar-open { padding-left: 0; } }
-
-/* ===== Variables globales ===== */
 :root {
     --border-radius-card: 16px;
     --border-radius-btn: 10px;
     --border-radius-badge: 20px;
     --border-radius-sm: 8px;
+    --badge-stock-success: #000000;
 }
 
-html {
-    scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
 
-/* ===== Admin nav ===== */
-.navbar-admin { background: linear-gradient(135deg, #1e293b, #0f172a) !important; }
-
-/* ===== Admin cards ===== */
-.card-admin, .card-config, .card-custom, .card-orders {
-    border: none;
-    border-radius: var(--border-radius-card);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    transition: box-shadow 0.2s;
-}
-.card-admin:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-
-/* ===== Botón con icono ===== */
 .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
-
-/* ===== Iconify reset ===== */
 iconify-icon { vertical-align: -2px; display: inline-flex; }
-
-/* ===== Toast global ===== */
 .toast-container-custom { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-
-/* ===== Badge de estado ===== */
 .badge-status { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: var(--border-radius-badge); }
-
-/* ===== Empty state ===== */
 .empty-state { text-align: center; padding: 3rem 1rem; color: #94a3b8; }
 .empty-state iconify-icon { opacity: 0.5; margin-bottom: 0.5rem; }
 .empty-state p { margin: 0; font-size: 0.95rem; }
-
-/* ===== Stock badge ===== */
 .badge-stock { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: var(--border-radius-badge); }
-
-/* ===== Action button (32x32) ===== */
+.badge-stock.bg-success { color: #064e27; }
+.badge-stock.bg-danger { color: #ffffff; }
+.badge.bg-secondary { color: #ffffff; }
+[data-bs-theme="dark"] .badge-stock.bg-success { color: #bbf7d0; }
+[data-bs-theme="dark"] .badge-stock.bg-danger { color: #ffffff; }
+[data-bs-theme="dark"] .badge.bg-secondary { color: #ffffff; }
 .btn-action { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--border-radius-sm); padding: 0; }
 
-/* ===== Product cards ===== */
 .product-card {
     border: none !important;
     border-radius: 16px !important;
@@ -197,13 +37,6 @@ iconify-icon { vertical-align: -2px; display: inline-flex; }
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05) !important;
 }
 
-/* Base */
-body {
-    overflow-x: hidden;
-}
-
-/* 2. Tablas responsivas: el problema más común */
-/* Esto hace que si la tabla es muy ancha, puedas deslizarla con el dedo */
 .table-responsive {
     display: block;
     width: 100%;
@@ -211,79 +44,16 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* 3. Botones "Touch-friendly" */
-/* En móvil los botones pequeños son difíciles de apretar */
-.btn {
-    padding: 10px 16px !important;
-    font-size: 16px !important; /* Evita que el iPhone haga zoom al hacer clic */
-}
-.btn-sm {
-    padding: 6px 12px !important;
-    font-size: 0.875rem !important;
-}
-.btn-group .btn, .btn-group .btn-sm {
-    padding: 6px 12px !important;
-    font-size: 0.875rem !important;
-}
-
-/* 4. Inputs de formulario */
 input, select, textarea {
-    font-size: 16px !important; /* Imprescindible para evitar el auto-zoom de iOS */
+    font-size: 16px !important;
 }
 
-/* 5. Tarjetas (Cards) en móvil */
 @media (max-width: 768px) {
     .container { padding: 10px; }
-    .card { border-radius: 0 !important; border: none !important; }
+    .card { box-shadow: none !important; }
 }
 
-/* Asegura que la tabla no rompa el ancho del móvil */
-.table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* Opcional: reducir el tamaño de letra en móvil para que quepa más */
 @media (max-width: 576px) {
     .table { font-size: 0.85rem; }
     .table td, .table th { padding: 0.5rem; }
 }
-
-/* ===== Admin Theme Variants ===== */
-body.theme-ocean .bg-admin { background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%) !important; }
-body.theme-ocean .sidebar-admin { background: linear-gradient(180deg, #082f49 0%, #0c4a6e 100%) !important; }
-body.theme-ocean .navbar-admin { background: linear-gradient(135deg, #082f49, #0c4a6e) !important; }
-body.theme-ocean .glass-card { background: rgba(12,74,110,0.25) !important; }
-body.theme-ocean .glass-table { background: rgba(12,74,110,0.2) !important; }
-body.theme-ocean .btn-primary { background: #0284c7 !important; border-color: #0284c7 !important; }
-body.theme-forest .bg-admin { background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important; }
-body.theme-forest .sidebar-admin { background: linear-gradient(180deg, #022c22 0%, #064e3b 100%) !important; }
-body.theme-forest .navbar-admin { background: linear-gradient(135deg, #022c22, #064e3b) !important; }
-body.theme-forest .glass-card { background: rgba(6,78,59,0.25) !important; }
-body.theme-forest .glass-table { background: rgba(6,78,59,0.2) !important; }
-body.theme-forest .btn-primary { background: #059669 !important; border-color: #059669 !important; }
-body.theme-sunset .bg-admin { background: linear-gradient(135deg, #7c2d12 0%, #b45309 100%) !important; }
-body.theme-sunset .sidebar-admin { background: linear-gradient(180deg, #431407 0%, #7c2d12 100%) !important; }
-body.theme-sunset .navbar-admin { background: linear-gradient(135deg, #431407, #7c2d12) !important; }
-body.theme-sunset .glass-card { background: rgba(124,45,18,0.25) !important; }
-body.theme-sunset .glass-table { background: rgba(124,45,18,0.2) !important; }
-body.theme-sunset .btn-primary { background: #d97706 !important; border-color: #d97706 !important; }
-body.theme-midnight .bg-admin { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important; }
-body.theme-midnight .sidebar-admin { background: linear-gradient(180deg, #0f0d2e 0%, #1e1b4b 100%) !important; }
-body.theme-midnight .navbar-admin { background: linear-gradient(135deg, #0f0d2e, #1e1b4b) !important; }
-body.theme-midnight .glass-card { background: rgba(30,27,75,0.25) !important; }
-body.theme-midnight .glass-table { background: rgba(30,27,75,0.2) !important; }
-body.theme-midnight .btn-primary { background: #4f46e5 !important; border-color: #4f46e5 !important; }
-body.theme-ocean.dark-mode .bg-admin { background: linear-gradient(135deg, #020617 0%, #0c4a6e 100%) !important; }
-body.theme-forest.dark-mode .bg-admin { background: linear-gradient(135deg, #020617 0%, #064e3b 100%) !important; }
-body.theme-sunset.dark-mode .bg-admin { background: linear-gradient(135deg, #020617 0%, #7c2d12 100%) !important; }
-body.theme-midnight.dark-mode .bg-admin { background: linear-gradient(135deg, #020617 0%, #1e1b4b 100%) !important; }
-body.theme-ocean.dark-mode .sidebar-admin { background: linear-gradient(180deg, #020617 0%, #082f49 100%) !important; }
-body.theme-forest.dark-mode .sidebar-admin { background: linear-gradient(180deg, #020617 0%, #022c22 100%) !important; }
-body.theme-sunset.dark-mode .sidebar-admin { background: linear-gradient(180deg, #020617 0%, #431407 100%) !important; }
-body.theme-midnight.dark-mode .sidebar-admin { background: linear-gradient(180deg, #020617 0%, #0f0d2e 100%) !important; }

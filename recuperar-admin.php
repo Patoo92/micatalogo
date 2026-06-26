@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div style="font-size:0.8rem;color:#64748b;display:flex;align-items:center;gap:6px;"><iconify-icon icon="mdi:alert" width="14"></iconify-icon> Si cerrás esta página sin copiarla, tendrás que generar otra.</div>
             </div>
             <div class="text-center mt-2">
-                <a href="login-admin.php" class="btn-admin" style="display:inline-flex;padding:10px 24px;width:auto;">Ir al inicio de sesión</a>
+                <a href="login-admin.php" class="btn btn-success" style="display:inline-flex;padding:10px 24px;width:auto;">Ir al inicio de sesión</a>
             </div>';
 
         } else {
@@ -40,56 +40,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Acceso Master</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 1rem;
-        }
-        .card-rec { background: #1e293b; border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 420px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: fadeUp 0.4s ease; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card-rec h2 { color: #f1f5f9; font-size: 1.4rem; font-weight: 700; }
-        .card-rec p { color: #94a3b8; font-size: 0.9rem; }
-        label { color: #cbd5e1; font-size: 0.875rem; font-weight: 500; }
-        .btn-admin {
-            background: #10b981; color: white; font-weight: 600; border: none; border-radius: 10px;
-            padding: 12px; width: 100%; transition: all 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
-        }
-        .btn-admin:hover { background: #059669; transform: translateY(-1px); }
-        iconify-icon { display: inline-flex; vertical-align: -2px; }
-        .alert { border-radius: 12px; border: none; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="card-rec">
-        <div class="text-center mb-3">
-            <iconify-icon icon="mdi:shield-lock" width="40" style="color: #10b981;"></iconify-icon>
-            <h2 class="d-flex align-items-center justify-content-center gap-2 mt-2"><iconify-icon icon="mdi:lock-reset" width="24" style="color:#10b981;"></iconify-icon> Recuperar Acceso</h2>
-            <p>Si pierdes la contraseña, puedes generar una nueva aquí.</p>
-        </div>
+<body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
+    <div class="card card-md">
+        <div class="card-body">
+            <div class="text-center mb-3">
+                <iconify-icon icon="mdi:shield-lock" width="40" style="color: #10b981;"></iconify-icon>
+                <h2 class="d-flex align-items-center justify-content-center gap-2 mt-2"><iconify-icon icon="mdi:lock-reset" width="24" style="color:#10b981;"></iconify-icon> Recuperar Acceso</h2>
+                <p class="text-muted">Si pierdes la contraseña, puedes generar una nueva aquí.</p>
+            </div>
 
-        <?php if ($mensaje): ?>
-            <?php echo $mensaje; ?>
-        <?php else: ?>
-            <form method="POST">
-                <?php echo csrf_field(); ?>
-                <p class="text-muted small mb-3">Al hacer clic en "Restablecer", se generará una nueva contraseña de administrador. La actual quedará invalidada.</p>
-                <button type="submit" class="btn-admin">
-                    <iconify-icon icon="mdi:refresh" width="18"></iconify-icon> Restablecer Contraseña
-                </button>
-                <div class="text-center mt-3">
-                    <a href="login-admin.php" class="text-decoration-none small text-secondary">← Volver al login</a>
-                </div>
-            </form>
-        <?php endif; ?>
+            <?php if ($mensaje): ?>
+                <?php echo $mensaje; ?>
+            <?php else: ?>
+                <form method="POST">
+                    <?php echo csrf_field(); ?>
+                    <p class="text-muted small mb-3">Al hacer clic en "Restablecer", se generará una nueva contraseña de administrador. La actual quedará invalidada.</p>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        <iconify-icon icon="mdi:refresh" width="18"></iconify-icon> Restablecer Contraseña
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="login-admin.php" class="text-decoration-none small text-secondary">← Volver al login</a>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
     </div>
 </body>
 </html>

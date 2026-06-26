@@ -55,43 +55,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nueva Contraseña</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body { background: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, sans-serif; }
-        .card { border: none; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); padding: 2.5rem; max-width: 440px; width: 100%; animation: fadeUp 0.3s ease; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        iconify-icon { vertical-align: -2px; display: inline-flex; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="card">
-        <div class="text-center mb-4">
-            <iconify-icon icon="mdi:form-textbox-password" width="48" style="color: #10b981;"></iconify-icon>
-            <h4 class="fw-bold mt-2">Nueva Contraseña</h4>
-        </div>
+<body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
+    <div class="card card-md">
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <iconify-icon icon="mdi:form-textbox-password" width="48" style="color: #10b981;"></iconify-icon>
+                <h4 class="fw-bold mt-2">Nueva Contraseña</h4>
+            </div>
 
-        <?php if ($error): ?>
-            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-        <?php elseif ($exito): ?>
-            <div class="alert alert-success"><?php echo htmlspecialchars($exito); ?></div>
-        <?php else: ?>
-            <form method="POST">
-                <?php echo csrf_field(); ?>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Nueva contraseña</label>
-                    <input type="password" name="password" class="form-control" minlength="10" placeholder="Mínimo 10 caracteres" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Confirmar contraseña</label>
-                    <input type="password" name="password_confirm" class="form-control" placeholder="Repite la contraseña" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100 fw-bold py-2">Cambiar contraseña</button>
-            </form>
-        <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <?php elseif ($exito): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($exito); ?></div>
+            <?php else: ?>
+                <form method="POST">
+                    <?php echo csrf_field(); ?>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nueva contraseña</label>
+                        <input type="password" name="password" class="form-control" minlength="10" placeholder="Mínimo 10 caracteres" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Confirmar contraseña</label>
+                        <input type="password" name="password_confirm" class="form-control" placeholder="Repite la contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">Cambiar contraseña</button>
+                </form>
+            <?php endif; ?>
 
-        <div class="text-center mt-3">
-            <a href="login.php" class="text-decoration-none small">← Volver al inicio de sesión</a>
+            <div class="text-center mt-3">
+                <a href="login.php" class="text-decoration-none small">← Volver al inicio de sesión</a>
+            </div>
         </div>
     </div>
 </body>

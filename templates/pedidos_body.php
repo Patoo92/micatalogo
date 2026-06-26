@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gestión de Pedidos - <?php echo htmlspecialchars($tienda_nombre); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -18,16 +18,17 @@
         }
     </style>
 </head>
-<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
+<body>
 
     <?php require __DIR__ . '/sidebar_partial.php'; ?>
+    <div class="page-wrapper">
     <?php require __DIR__ . '/toast_partial.php'; ?>
 
     <?php if ($flash_message): ?>
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($flash_message); ?>, '<?php echo in_array($flash_type, ['success','danger','warning','info']) ? $flash_type : 'info'; ?>'); });</script>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
@@ -46,7 +47,7 @@
         </div>
     </nav>
 
-    <div class="container glass-card my-5" style="max-width: 800px;">
+    <div class="container card my-5" style="max-width: 800px;">
 
         <div class="mb-4 d-flex align-items-center gap-2">
             <iconify-icon icon="mdi:format-list-bulleted" width="32"></iconify-icon>
@@ -69,7 +70,7 @@
                 $grupo_id = 'pedido-' . md5($grupo['fecha_agrupada']);
                 $items_count = count($grupo['items']);
             ?>
-            <div class="card card-orders glass-card mb-3">
+            <div class="card mb-3">
                 <div class="card-header bg-white d-flex align-items-center justify-content-between py-3 px-4 grupo-toggle" style="cursor:pointer;border-bottom:1px solid #e2e8f0;" data-grupo="<?php echo $grupo_id; ?>">
                     <div class="d-flex align-items-center gap-3 flex-wrap">
                         <div>
@@ -199,25 +200,31 @@
     </script>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
-        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var html = document.documentElement;
         var toggle = document.getElementById('darkModeToggle');
         var icon = toggle && toggle.querySelector('iconify-icon');
         var span = toggle && toggle.querySelector('span');
         if (localStorage.getItem('dark_mode') === '1') {
+            html.setAttribute('data-bs-theme', 'dark');
             if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
             if (span) span.textContent = 'Modo claro';
         }
         if (toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.body.classList.toggle('dark-mode');
-                var isDark = document.body.classList.contains('dark-mode');
-                localStorage.setItem('dark_mode', isDark ? '1' : '0');
-                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                var isDark = html.getAttribute('data-bs-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-bs-theme');
+                } else {
+                    html.setAttribute('data-bs-theme', 'dark');
+                }
+                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
+                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
             });
         }
     })();
     </script>
+    </div>
 </body>
 </html>

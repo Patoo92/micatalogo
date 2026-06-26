@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Configuración de Tienda</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -25,11 +25,12 @@
         }
     </style>
 </head>
-<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
+<body>
 
     <?php require __DIR__ . '/sidebar_partial.php'; ?>
+    <div class="page-wrapper">
 
-            <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+            <nav class="navbar navbar-expand-lg navbar-dark shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
@@ -50,7 +51,7 @@
     </nav>
 
     <div class="container py-5" style="max-width: 600px;">
-        <div class="card card-config glass-card p-4">
+        <div class="card p-4">
             <h4 class="mb-4 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:cog" width="28"></iconify-icon>
                 Configuración de Tienda
@@ -178,18 +179,7 @@
                             <input type="text" name="hero_subtitle" value="<?php echo htmlspecialchars($tienda['hero_subtitle'] ?? ''); ?>" class="form-control" placeholder="Agrega productos a tu carrito y envíanos tu orden por WhatsApp">
                         </div>
 
-                        <h6 class="fw-bold mt-4 mb-3"><iconify-icon icon="mdi:palette" width="18"></iconify-icon> Tema visual del panel</h6>
-                        <div class="mb-3">
-                            <label class="form-label-custom">Tema de administración</label>
-                            <select name="tema_admin" class="form-select">
-                                <option value="default" <?php echo ($tienda['tema_admin'] ?? 'default') === 'default' ? 'selected' : ''; ?>>Default (Púrpura)</option>
-                                <option value="ocean" <?php echo ($tienda['tema_admin'] ?? '') === 'ocean' ? 'selected' : ''; ?>>Océano (Azul)</option>
-                                <option value="forest" <?php echo ($tienda['tema_admin'] ?? '') === 'forest' ? 'selected' : ''; ?>>Bosque (Verde)</option>
-                                <option value="sunset" <?php echo ($tienda['tema_admin'] ?? '') === 'sunset' ? 'selected' : ''; ?>>Atardecer (Naranja)</option>
-                                <option value="midnight" <?php echo ($tienda['tema_admin'] ?? '') === 'midnight' ? 'selected' : ''; ?>>Medianoche (Índigo)</option>
-                            </select>
-                            <small class="text-muted">Cambiá el esquema de colores del panel de administración.</small>
-                        </div>
+
 
                         <div class="mb-3">
                             <label class="form-label-custom"><iconify-icon icon="mdi:code-tags" width="16"></iconify-icon> CSS personalizado</label>
@@ -197,7 +187,7 @@
                             <small class="text-muted">Se inyecta en el &lt;head&gt; del catálogo público.</small>
                         </div>
                         <?php else: ?>
-                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" style="border-radius:12px;">
+                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" >
                             <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
                             <span>Personalización visual disponible en Plan Pro y superiores. <a href="index.html#planes" class="fw-bold text-decoration-underline">Ver planes</a></span>
                         </div>
@@ -223,7 +213,7 @@
                             <input type="text" name="twitter" value="<?php echo htmlspecialchars($tienda['twitter_url'] ?? ''); ?>" class="form-control" placeholder="https://x.com/tutienda">
                         </div>
                         <?php else: ?>
-                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" style="border-radius:12px;">
+                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" >
                             <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
                             <span>Redes sociales disponibles en Plan Pro y superiores. <a href="index.html#planes" class="fw-bold text-decoration-underline">Ver planes</a></span>
                         </div>
@@ -249,7 +239,7 @@
                             <small class="text-muted">Se inyecta en el &lt;head&gt; del catálogo público.</small>
                         </div>
                         <?php else: ?>
-                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" style="border-radius:12px;">
+                        <div class="alert alert-info d-flex align-items-center gap-2 py-2" >
                             <iconify-icon icon="mdi:lock" width="18"></iconify-icon>
                             <span>SEO y tracking disponibles en Plan Pro y superiores. <a href="index.html#planes" class="fw-bold text-decoration-underline">Ver planes</a></span>
                         </div>
@@ -368,26 +358,32 @@
         <?php endif; ?>
         <script nonce="<?= $csp_nonce ?>">
         (function() {
-            if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+            var html = document.documentElement;
             var toggle = document.getElementById('darkModeToggle');
             var icon = toggle && toggle.querySelector('iconify-icon');
             var span = toggle && toggle.querySelector('span');
             if (localStorage.getItem('dark_mode') === '1') {
+                html.setAttribute('data-bs-theme', 'dark');
                 if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
                 if (span) span.textContent = 'Modo claro';
             }
             if (toggle) {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
-                    document.body.classList.toggle('dark-mode');
-                    var isDark = document.body.classList.contains('dark-mode');
-                    localStorage.setItem('dark_mode', isDark ? '1' : '0');
-                    if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                    if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                    var isDark = html.getAttribute('data-bs-theme') === 'dark';
+                    if (isDark) {
+                        html.removeAttribute('data-bs-theme');
+                    } else {
+                        html.setAttribute('data-bs-theme', 'dark');
+                    }
+                    localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
+                    if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                    if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
                 });
             }
         })();
         </script>
+    </div>
     </div>
 </body>
 </html>

@@ -146,19 +146,15 @@ function mostrar_error($titulo, $mensaje, $enlace = null, $texto_enlace = null) 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title><?php echo htmlspecialchars($titulo); ?></title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
         <style>
-            body { background: #f8fafc; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, sans-serif; }
-            .error-card { background: #fff; border-radius: 20px; padding: 3rem; max-width: 480px; width: 100%; box-shadow: 0 1px 3px rgba(0,0,0,0.06); text-align: center; animation: fadeUp 0.3s ease; }
-            @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-            .error-card h2 { font-weight: 700; color: #0f172a; }
-            .error-card p { color: #64748b; }
+            body { font-family: 'Inter', sans-serif; }
         </style>
     </head>
-    <body>
-        <div class="error-card">
-            <h2><?php echo htmlspecialchars($titulo); ?></h2>
-            <p class="mb-4"><?php echo htmlspecialchars($mensaje); ?></p>
+    <body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
+        <div class="card p-4 text-center" style="max-width:480px;width:100%;">
+            <h2 class="fw-bold mt-2"><?php echo htmlspecialchars($titulo); ?></h2>
+            <p class="text-muted mb-4"><?php echo htmlspecialchars($mensaje); ?></p>
             <?php if ($enlace): ?>
                 <a href="<?php echo htmlspecialchars($enlace); ?>" class="btn btn-primary"><?php echo htmlspecialchars($texto_enlace ?? 'Volver'); ?></a>
             <?php endif; ?>

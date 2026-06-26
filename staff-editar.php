@@ -78,16 +78,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Editar Staff</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
+
 </head>
-<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
+<body>
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
+    <div class="page-wrapper">
     <?php require __DIR__ . '/templates/toast_partial.php'; ?>
 
     <?php if ($exito): ?>
@@ -96,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script nonce="<?= $csp_nonce ?>">window.addEventListener('DOMContentLoaded', function() { mostrarToast(<?php echo js_escape($error); ?>, 'danger'); });</script>
     <?php endif; ?>
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
@@ -117,25 +116,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <div class="container py-5" style="max-width: 600px;">
-        <div class="card card-custom glass-card p-4">
-            <h4 class="mb-4 d-flex align-items-center gap-2">
-                <iconify-icon icon="mdi:account-edit" width="28"></iconify-icon>
-                Editar Staff: <?php echo htmlspecialchars($staff['usuario']); ?>
-            </h4>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title d-flex align-items-center gap-2"><iconify-icon icon="mdi:account-edit" width="24"></iconify-icon> Editar Staff: <?php echo htmlspecialchars($staff['usuario']); ?></h3>
+            </div>
+            <div class="card-body">
 
             <form method="POST">
                 <?php echo csrf_field(); ?>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Usuario</label>
+                    <label class="form-label">Usuario</label>
                     <input type="text" class="form-control" value="<?php echo htmlspecialchars($staff['usuario']); ?>" disabled>
                     <div class="form-text">No se puede cambiar el nombre de usuario.</div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Email</label>
+                    <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($staff['email'] ?? ''); ?>">
                 </div>
                 <div class="mb-4">
-                    <label class="form-label fw-semibold">Nueva contraseña <span class="text-muted">(dejar vacío para mantener)</span></label>
+                    <label class="form-label">Nueva contraseña <span class="text-muted">(dejar vacío para mantener)</span></label>
                     <input type="password" name="password" class="form-control" minlength="8">
                 </div>
 
@@ -158,36 +157,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endforeach; ?>
                 </div>
 
-                <div class="d-flex gap-2">
-                    <a href="staff.php" class="btn btn-outline-secondary w-50 fw-bold">← Volver</a>
-                    <button type="submit" class="btn btn-primary w-50 fw-bold btn-icon" data-loading="Guardando…">
+                <div class="form-footer d-flex gap-2">
+                    <a href="staff.php" class="btn btn-outline-secondary w-50">← Volver</a>
+                    <button type="submit" class="btn btn-primary w-50" data-loading="Guardando…">
                         <iconify-icon icon="mdi:content-save" width="18"></iconify-icon> Guardar Cambios
                     </button>
                 </div>
             </form>
         </div>
+        </div>
     </div>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
-        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var html = document.documentElement;
         var toggle = document.getElementById('darkModeToggle');
         var icon = toggle && toggle.querySelector('iconify-icon');
         var span = toggle && toggle.querySelector('span');
         if (localStorage.getItem('dark_mode') === '1') {
+            html.setAttribute('data-bs-theme', 'dark');
             if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
             if (span) span.textContent = 'Modo claro';
         }
         if (toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.body.classList.toggle('dark-mode');
-                var isDark = document.body.classList.contains('dark-mode');
-                localStorage.setItem('dark_mode', isDark ? '1' : '0');
-                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                var isDark = html.getAttribute('data-bs-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-bs-theme');
+                } else {
+                    html.setAttribute('data-bs-theme', 'dark');
+                }
+                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
+                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
             });
         }
     })();
     </script>
+    </div>
 </body>
 </html>

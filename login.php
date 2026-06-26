@@ -98,71 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Acceso al Panel - Administrador</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 1rem;
-        }
-        .login-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            animation: fadeUp 0.4s ease;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .login-card h2 { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
-        .login-card p { color: #64748b; font-size: 0.9rem; }
-        label { font-weight: 600; font-size: 0.875rem; color: #374151; }
-        .form-control {
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.9rem;
-        }
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
-        }
-        .btn-primary {
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        iconify-icon { display: inline-flex; vertical-align: -2px; }
-        .password-toggle {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px; }
         .password-toggle:hover { color: #64748b; }
         .input-wrapper { position: relative; }
     </style>
 </head>
-<body>
+<body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
 
-    <div class="login-card">
-        <div class="text-center mb-4">
+    <div class="card card-md" style="max-width:400px;width:100%;">
+        <div class="card-body text-center p-4">
             <iconify-icon icon="mdi:store" width="48" style="color: #0d6efd;"></iconify-icon>
-            <h2 class="d-flex align-items-center justify-content-center gap-2 mt-2"><iconify-icon icon="mdi:shield-account" width="24"></iconify-icon> Panel de Control</h2>
-            <p class="mb-0">Inicia sesión para gestionar tu tienda</p>
-        </div>
+            <h2 class="h3 mt-3 d-flex align-items-center justify-content-center gap-2"><iconify-icon icon="mdi:shield-account" width="24"></iconify-icon> Panel de Control</h2>
+            <p class="text-muted mb-4">Inicia sesión para gestionar tu tienda</p>
 
         <?php if ($flash_message): ?>
             <div class="alert alert-<?php echo htmlspecialchars($flash_type ?? 'info'); ?> d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
@@ -202,6 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="recuperar.php" class="text-decoration-none small text-muted">¿Olvidaste tu contraseña?</a>
             </div>
         </form>
+        </div>
     </div>
 
     <script nonce="<?= $csp_nonce ?>">

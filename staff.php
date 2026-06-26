@@ -20,9 +20,9 @@ $staff = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gestión de Staff</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
         .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
@@ -33,11 +33,12 @@ $staff = $stmt->fetchAll();
         .btn-action-sm { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 0; }
     </style>
 </head>
-<body class="bg-admin sidebar-open <?php echo ($_SESSION['tema_admin'] ?? 'default') !== 'default' ? 'theme-' . $_SESSION['tema_admin'] : ''; ?>">
+<body>
 
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
+    <div class="page-wrapper">
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-admin shadow-sm d-lg-none">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm d-lg-none">
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2 text-white" href="admin.php">
                 <iconify-icon icon="mdi:store" width="28" height="28"></iconify-icon>
@@ -68,12 +69,12 @@ $staff = $stmt->fetchAll();
         </div>
 
         <?php if (empty($staff)): ?>
-            <div class="card card-custom glass-card p-5 text-center">
+            <div class="card p-5 text-center">
                 <iconify-icon icon="mdi:account-off" width="48" style="color: #94a3b8;"></iconify-icon>
                 <p class="text-muted mt-2 mb-0">No hay miembros de staff. Crea el primero.</p>
             </div>
         <?php else: ?>
-            <div class="card card-custom glass-card">
+            <div class="card">
                 <div class="table-responsive">
                     <table class="table table-custom align-middle mb-0">
                         <thead>
@@ -130,25 +131,31 @@ $staff = $stmt->fetchAll();
     </div>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
-        if (localStorage.getItem('dark_mode') === '1') { document.body.classList.add('dark-mode'); }
+        var html = document.documentElement;
         var toggle = document.getElementById('darkModeToggle');
         var icon = toggle && toggle.querySelector('iconify-icon');
         var span = toggle && toggle.querySelector('span');
         if (localStorage.getItem('dark_mode') === '1') {
+            html.setAttribute('data-bs-theme', 'dark');
             if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
             if (span) span.textContent = 'Modo claro';
         }
         if (toggle) {
             toggle.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.body.classList.toggle('dark-mode');
-                var isDark = document.body.classList.contains('dark-mode');
-                localStorage.setItem('dark_mode', isDark ? '1' : '0');
-                if (icon) icon.setAttribute('icon', isDark ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+                var isDark = html.getAttribute('data-bs-theme') === 'dark';
+                if (isDark) {
+                    html.removeAttribute('data-bs-theme');
+                } else {
+                    html.setAttribute('data-bs-theme', 'dark');
+                }
+                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
+                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
+                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
             });
         }
     })();
     </script>
+    </div>
 </body>
 </html>

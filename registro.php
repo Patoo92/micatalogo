@@ -92,152 +92,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear tu Tienda — Registro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f7fafc;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem 1rem;
-        }
-        .register-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 480px;
-        }
-        .brand-badge {
-            display: inline-block;
-            background: #10b981;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-bottom: 1rem;
-        }
-        .slug-preview {
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
-        .slug-preview span {
-            color: #10b981;
-            font-weight: 600;
-        }
-        .btn-register {
-            background-color: #10b981;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 12px;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .btn-register:hover { background-color: #059669; color: white; }
-        label { font-weight: 500; font-size: 0.9rem; color: #374151; }
-        .form-control:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="register-card">
-        <div class="brand-badge"><?php echo $plan_seleccionado === 'starter' ? 'Gratis' : '3 días gratis'; ?></div>
-        <h2 class="fw-bold mb-1" style="font-size: 1.6rem;"><?php echo $plan_seleccionado === 'starter' ? 'Crea tu tienda gratis' : 'Prueba ' . htmlspecialchars(ucfirst($plan_seleccionado)) . ' 3 días'; ?></h2>
-        <p class="text-muted mb-4" style="font-size: 0.95rem;">Rellena los datos y empieza a vender por WhatsApp hoy mismo.</p>
+<body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
+    <div class="card card-md">
+        <div class="card-body">
+            <div class="badge bg-success text-white fw-bold mb-3"><?php echo $plan_seleccionado === 'starter' ? 'Gratis' : '3 días gratis'; ?></div>
+            <h2 class="fw-bold mb-1" style="font-size: 1.6rem;"><?php echo $plan_seleccionado === 'starter' ? 'Crea tu tienda gratis' : 'Prueba ' . htmlspecialchars(ucfirst($plan_seleccionado)) . ' 3 días'; ?></h2>
+            <p class="text-muted mb-4" style="font-size: 0.95rem;">Rellena los datos y empieza a vender por WhatsApp hoy mismo.</p>
 
-        <div class="d-flex gap-2 mb-4">
-            <?php foreach (['starter' => 'Starter', 'pro' => 'Pro', 'business' => 'Business'] as $key => $label): ?>
-                <a href="registro.php?plan=<?php echo $key; ?>" class="btn <?php echo $plan_seleccionado === $key ? 'btn-dark' : 'btn-outline-secondary'; ?> flex-fill fw-semibold py-2" style="border-radius:10px;font-size:0.9rem;">
-                    <?php echo $label; ?>
-                    <small class="d-block" style="font-size:0.65rem;opacity:0.7;">
-                        <?php echo $key === 'starter' ? 'Gratis' : '3 días gratis'; ?>
-                    </small>
-                </a>
-            <?php endforeach; ?>
+            <div class="d-flex gap-2 mb-4">
+                <?php foreach (['starter' => 'Starter', 'pro' => 'Pro', 'business' => 'Business'] as $key => $label): ?>
+                    <a href="registro.php?plan=<?php echo $key; ?>" class="btn <?php echo $plan_seleccionado === $key ? 'btn-dark' : 'btn-outline-secondary'; ?> flex-fill fw-semibold py-2" style="border-radius:10px;font-size:0.9rem;">
+                        <?php echo $label; ?>
+                        <small class="d-block" style="font-size:0.65rem;opacity:0.7;">
+                            <?php echo $key === 'starter' ? 'Gratis' : '3 días gratis'; ?>
+                        </small>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if ($error): ?>
+                <div class="alert alert-danger py-2"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if ($exito): ?>
+                <div class="alert alert-success py-2"><?php echo htmlspecialchars($exito); ?></div>
+            <?php else: ?>
+
+            <form method="POST" action="registro.php">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="plan" value="<?php echo htmlspecialchars($plan_seleccionado); ?>">
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre de tu tienda *</label>
+                    <input type="text" name="nombre_tienda" class="form-control"
+                           placeholder="Ej: Ropa Sofía" value="<?php echo htmlspecialchars($_POST['nombre_tienda'] ?? ''); ?>"
+                           minlength="3" maxlength="100" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">URL de tu catálogo *</label>
+                    <input type="text" name="slug" id="slug" class="form-control"
+                           placeholder="Ej: ropa-sofia" value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>"
+                           pattern="[a-z0-9\-]+" minlength="4" maxlength="60" required>
+                    <div class="text-muted small mt-1">Tu catálogo estará en: tudominio.com/<span class="text-success fw-semibold" id="slug-preview">ropa-sofia</span></div>
+                    <small class="text-muted">Minúsculas, números y guiones. 4-60 caracteres.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Usuario para el panel *</label>
+                    <input type="text" name="usuario" class="form-control"
+                           placeholder="Ej: sofia123" value="<?php echo htmlspecialchars($_POST['usuario'] ?? ''); ?>"
+                           pattern="[a-zA-Z0-9_]+" minlength="4" maxlength="30" required>
+                    <small class="text-muted">Letras, números y guión bajo. 4-30 caracteres.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contraseña *</label>
+                    <input type="password" name="password" class="form-control" id="regPassword"
+                           placeholder="Mínimo 10 caracteres" minlength="10" required>
+                    <small class="text-muted">Mínimo 10 caracteres. Puede ser una frase larga.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Repetir contraseña *</label>
+                    <input type="password" name="password_confirm" class="form-control" id="regPasswordConfirm"
+                           placeholder="Repite la contraseña" minlength="10" required>
+                    <small class="text-muted" id="passwordMatchMsg" style="display:none;"></small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email <span class="text-muted">(opcional)</span></label>
+                    <input type="email" name="email" class="form-control"
+                           placeholder="Ej: sofia@ejemplo.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                           maxlength="254">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Número de WhatsApp *</label>
+                    <input type="tel" name="telefono_whatsapp" class="form-control"
+                           placeholder="Ej: +34600123456" value="<?php echo htmlspecialchars($_POST['telefono_whatsapp'] ?? ''); ?>"
+                           pattern="\+[1-9][0-9]{6,14}" required>
+                    <small class="text-muted">Incluye código de país. Ej: +54911..., +34600...</small>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 fw-bold py-2">Crear mi tienda →</button>
+            </form>
+
+            <p class="text-center text-muted mt-3" style="font-size: 0.85rem;">
+                ¿Ya tienes cuenta? <a href="login.php" class="text-success">Inicia sesión aquí</a>
+            </p>
+
+            <?php endif; ?>
         </div>
-
-        <?php if ($error): ?>
-            <div class="alert alert-danger py-2"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
-
-        <?php if ($exito): ?>
-            <div class="alert alert-success py-2"><?php echo htmlspecialchars($exito); ?></div>
-        <?php else: ?>
-
-        <form method="POST" action="registro.php">
-            <?php echo csrf_field(); ?>
-            <input type="hidden" name="plan" value="<?php echo htmlspecialchars($plan_seleccionado); ?>">
-
-            <div class="mb-3">
-                <label>Nombre de tu tienda *</label>
-                <input type="text" name="nombre_tienda" class="form-control mt-1"
-                       placeholder="Ej: Ropa Sofía" value="<?php echo htmlspecialchars($_POST['nombre_tienda'] ?? ''); ?>"
-                       minlength="3" maxlength="100" required>
-            </div>
-
-            <div class="mb-3">
-                <label>URL de tu catálogo *</label>
-                <input type="text" name="slug" id="slug" class="form-control mt-1"
-                       placeholder="Ej: ropa-sofia" value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>"
-                       pattern="[a-z0-9\-]+" minlength="4" maxlength="60" required>
-                <div class="slug-preview">Tu catálogo estará en: tudominio.com/<span id="slug-preview">ropa-sofia</span></div>
-                <small class="text-muted">Minúsculas, números y guiones. 4-60 caracteres.</small>
-            </div>
-
-            <div class="mb-3">
-                <label>Usuario para el panel *</label>
-                <input type="text" name="usuario" class="form-control mt-1"
-                       placeholder="Ej: sofia123" value="<?php echo htmlspecialchars($_POST['usuario'] ?? ''); ?>"
-                       pattern="[a-zA-Z0-9_]+" minlength="4" maxlength="30" required>
-                <small class="text-muted">Letras, números y guión bajo. 4-30 caracteres.</small>
-            </div>
-
-            <div class="mb-3">
-                <label>Contraseña *</label>
-                <input type="password" name="password" class="form-control mt-1" id="regPassword"
-                       placeholder="Mínimo 10 caracteres" minlength="10" required>
-                <small class="text-muted">Mínimo 10 caracteres. Puede ser una frase larga.</small>
-            </div>
-
-            <div class="mb-3">
-                <label>Repetir contraseña *</label>
-                <input type="password" name="password_confirm" class="form-control mt-1" id="regPasswordConfirm"
-                       placeholder="Repite la contraseña" minlength="10" required>
-                <small class="text-muted" id="passwordMatchMsg" style="display:none;"></small>
-            </div>
-
-            <div class="mb-3">
-                <label>Email <span class="text-muted">(opcional)</span></label>
-                <input type="email" name="email" class="form-control mt-1"
-                       placeholder="Ej: sofia@ejemplo.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                       maxlength="254">
-            </div>
-
-            <div class="mb-4">
-                <label>Número de WhatsApp *</label>
-                <input type="tel" name="telefono_whatsapp" class="form-control mt-1"
-                       placeholder="Ej: +34600123456" value="<?php echo htmlspecialchars($_POST['telefono_whatsapp'] ?? ''); ?>"
-                       pattern="\+[1-9][0-9]{6,14}" required>
-                <small class="text-muted">Incluye código de país. Ej: +54911..., +34600...</small>
-            </div>
-
-            <button type="submit" class="btn-register">Crear mi tienda →</button>
-        </form>
-
-        <p class="text-center text-muted mt-3" style="font-size: 0.85rem;">
-            ¿Ya tienes cuenta? <a href="login.php" style="color: #10b981;">Inicia sesión aquí</a>
-        </p>
-
-        <?php endif; ?>
     </div>
 
     <script nonce="<?= $csp_nonce ?>">

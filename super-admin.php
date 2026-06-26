@@ -117,90 +117,31 @@ $actividades = $stmtAct->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin — Panel de Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body { background-color: #0f172a; font-family: 'Inter', sans-serif; color: #e2e8f0; }
-
-        .top-bar {
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .top-bar .brand { font-weight: 700; font-size: 1.1rem; color: #f1f5f9; }
-        .top-bar .brand span { color: #10b981; }
-
-        .stat-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 1.25rem 1.5rem;
-        }
-        .stat-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; }
-        .stat-card .value { font-size: 2rem; font-weight: 700; color: #f1f5f9; line-height: 1.1; }
-        .stat-card .value.green { color: #10b981; }
-
-        .table-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .table-card thead th {
-            background: #0f172a;
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            font-weight: 600;
-            border-color: #334155;
-            padding: 0.75rem 1rem;
-        }
-        .table-card tbody td {
-            border-color: #334155;
-            color: #cbd5e1;
-            padding: 0.85rem 1rem;
-            vertical-align: middle;
-        }
-        .table-card tbody tr:hover td { background: rgba(255,255,255,0.02); }
-
-        .badge-activa    { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-        .badge-bloqueada { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-        .badge-custom { font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-block; }
-
-        .btn-bloquear    { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.3);  font-size: 0.8rem; padding: 4px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.15s; }
-        .btn-bloquear:hover    { background: rgba(239,68,68,0.25); color: #f87171; }
-        .btn-desbloquear { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-size: 0.8rem; padding: 4px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: all 0.15s; }
-        .btn-desbloquear:hover { background: rgba(16,185,129,0.25); color: #10b981; }
-
-        .slug-link { color: #38bdf8; font-size: 0.8rem; font-family: monospace; }
-
-        .logout-btn { color: #64748b; font-size: 0.85rem; text-decoration: none; }
-        .logout-btn:hover { color: #f87171; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="brand">⚙️ Super<span>Admin</span></div>
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <span class="navbar-brand mb-0 h1">⚙️ Super<span style="color:#10b981;">Admin</span></span>
         <div class="d-flex align-items-center gap-3">
-            <span style="color: #64748b; font-size: 0.85rem;">Sesión: <strong style="color:#94a3b8;"><?php echo htmlspecialchars($_SESSION['admin_usuario']); ?></strong></span>
-            <a href="backup.php" class="logout-btn" style="display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo BD</a>
-            <a href="logout-admin.php" class="logout-btn">Cerrar sesión →</a>
+            <span class="text-secondary" style="font-size: 0.85rem;">Sesión: <strong class="text-light"><?php echo htmlspecialchars($_SESSION['admin_usuario']); ?></strong></span>
+            <a href="backup.php" class="text-secondary text-decoration-none small" style="display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo BD</a>
+            <a href="logout-admin.php" class="text-secondary text-decoration-none small">Cerrar sesión →</a>
         </div>
-    </div>
+    </nav>
 
     <div class="container-fluid py-4 px-4" style="max-width: 1100px;">
 
-        <ul class="nav nav-tabs border-0 mb-4" style="border-bottom: 1px solid #334155 !important;">
+        <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
-                <a class="nav-link fw-semibold <?php echo $tab === 'tiendas' ? 'active' : ''; ?>" <?php echo $tab === 'tiendas' ? 'style="background:#1e293b;border-color:#334155;color:#f1f5f9;"' : 'style="color:#64748b;border-color:transparent;"'; ?> href="super-admin.php?tab=tiendas"><iconify-icon icon="mdi:store" width="18"></iconify-icon> Tiendas</a>
+                <a class="nav-link <?php echo $tab === 'tiendas' ? 'active' : ''; ?>" href="super-admin.php?tab=tiendas"><iconify-icon icon="mdi:store" width="18"></iconify-icon> Tiendas</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link fw-semibold <?php echo $tab === 'historial' ? 'active' : ''; ?>" <?php echo $tab === 'historial' ? 'style="background:#1e293b;border-color:#334155;color:#f1f5f9;"' : 'style="color:#64748b;border-color:transparent;"'; ?> href="super-admin.php?tab=historial"><iconify-icon icon="mdi:history" width="18"></iconify-icon> Historial Global</a>
+                <a class="nav-link <?php echo $tab === 'historial' ? 'active' : ''; ?>" href="super-admin.php?tab=historial"><iconify-icon icon="mdi:history" width="18"></iconify-icon> Historial Global</a>
             </li>
         </ul>
 
@@ -208,34 +149,34 @@ $actividades = $stmtAct->fetchAll();
 
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="label">Total tiendas</div>
-                    <div class="value"><?php echo $total_tiendas; ?></div>
+                <div class="card p-3">
+                    <div class="text-secondary text-uppercase small fw-semibold">Total tiendas</div>
+                    <div class="h2 mb-0"><?php echo $total_tiendas; ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="label">Tiendas activas</div>
-                    <div class="value green"><?php echo count($tiendas_activas); ?></div>
+                <div class="card p-3">
+                    <div class="text-secondary text-uppercase small fw-semibold">Tiendas activas</div>
+                    <div class="h2 mb-0 text-success"><?php echo count($tiendas_activas); ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="label">Bloqueadas</div>
-                    <div class="value" style="color:#f87171;"><?php echo $total_tiendas - count($tiendas_activas); ?></div>
+                <div class="card p-3">
+                    <div class="text-secondary text-uppercase small fw-semibold">Bloqueadas</div>
+                    <div class="h2 mb-0 text-danger"><?php echo $total_tiendas - count($tiendas_activas); ?></div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
-                    <div class="label">Total pedidos</div>
-                    <div class="value"><?php echo array_sum(array_column($tiendas, 'total_pedidos')); ?></div>
+                <div class="card p-3">
+                    <div class="text-secondary text-uppercase small fw-semibold">Total pedidos</div>
+                    <div class="h2 mb-0"><?php echo array_sum(array_column($tiendas, 'total_pedidos')); ?></div>
                 </div>
             </div>
         </div>
 
-        <div class="table-card">
+        <div class="card">
             <div class="table-responsive">
-                <table class="table mb-0">
+                <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -264,12 +205,12 @@ $actividades = $stmtAct->fetchAll();
                                 <td style="color: #475569;">#<?php echo $tienda['id']; ?></td>
                                 <td>
                                     <div style="color: #f1f5f9; font-weight: 600;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></div>
-                                    <a href="index.php?tienda=<?php echo $tienda['slug']; ?>" target="_blank" class="slug-link">/<?php echo $tienda['slug']; ?></a>
+                                    <a href="index.php?tienda=<?php echo $tienda['slug']; ?>" target="_blank" class="text-info small font-monospace text-decoration-none">/<?php echo $tienda['slug']; ?></a>
                                 </td>
                                 <td><?php echo htmlspecialchars($tienda['usuario']); ?></td>
                                 <td style="font-size:0.8rem;color:#94a3b8;"><?php echo htmlspecialchars($tienda['email'] ?? '—'); ?></td>
                                 <td>
-                                    <span class="badge-custom" style="background:rgba(56,189,248,0.1);color:#38bdf8;border-color:rgba(56,189,248,0.3);text-transform:uppercase;"><?php echo htmlspecialchars($tienda['plan'] ?? 'starter'); ?></span>
+                                    <span class="badge bg-info-lt text-uppercase"><?php echo htmlspecialchars($tienda['plan'] ?? 'starter'); ?></span>
                                 </td>
                                 <td style="font-size:0.8rem;color:#94a3b8;">
                                     <?php if (!empty($tienda['trial_ends_at'])): ?>
@@ -285,9 +226,9 @@ $actividades = $stmtAct->fetchAll();
                                 <td class="text-center"><?php echo $tienda['total_pedidos']; ?></td>
                                 <td class="text-center">
                                     <?php if ($tienda['activo']): ?>
-                                        <span class="badge-custom badge-activa">● Activa</span>
+                                        <span class="badge bg-success">● Activa</span>
                                     <?php else: ?>
-                                        <span class="badge-custom badge-bloqueada">● Bloqueada</span>
+                                        <span class="badge bg-danger">● Bloqueada</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end" style="min-width:200px;">
@@ -297,38 +238,38 @@ $actividades = $stmtAct->fetchAll();
                                             <input type="hidden" name="toggle" value="0">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-bloquear" style="border:none;cursor:pointer;" title="Bloquear">🔒</button>
+                                            <button type="submit" class="btn btn-sm btn-ghost-danger" title="Bloquear">🔒</button>
                                         </form>
                                     <?php else: ?>
                                         <form method="POST" action="super-admin.php" class="d-inline">
                                             <input type="hidden" name="toggle" value="1">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-desbloquear" style="border:none;cursor:pointer;" title="Desbloquear">✅</button>
+                                            <button type="submit" class="btn btn-sm btn-ghost-success" title="Desbloquear">✅</button>
                                         </form>
                                     <?php endif; ?>
                                         <form method="POST" action="super-admin.php" class="d-inline">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <select name="nuevo_plan" class="form-select d-inline" style="width:auto;font-size:0.75rem;padding:2px 6px;background:#1e293b;color:#cbd5e1;border-color:#334155;">
+                                            <select name="nuevo_plan" class="form-select form-select-sm d-inline" style="width:auto;">
                                                 <option value="starter" <?php echo ($tienda['plan'] ?? '') === 'starter' ? 'selected' : ''; ?>>Starter</option>
                                                 <option value="pro" <?php echo ($tienda['plan'] ?? '') === 'pro' ? 'selected' : ''; ?>>Pro</option>
                                                 <option value="business" <?php echo ($tienda['plan'] ?? '') === 'business' ? 'selected' : ''; ?>>Business</option>
                                                 <option value="enterprise" <?php echo ($tienda['plan'] ?? '') === 'enterprise' ? 'selected' : ''; ?>>Enterprise</option>
                                             </select>
-                                            <button type="submit" name="cambiar_plan" class="btn-desbloquear" style="border:none;cursor:pointer;font-size:0.75rem;padding:2px 8px;" title="Cambiar plan">⇄</button>
+                                            <button type="submit" name="cambiar_plan" class="btn btn-sm btn-ghost-success" title="Cambiar plan">⇄</button>
                                         </form>
                                         <form method="POST" action="super-admin.php" class="d-inline">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
                                             <?php echo csrf_field(); ?>
-                                            <input type="number" name="dias_trial" value="7" min="1" max="365" style="width:40px;font-size:0.7rem;padding:2px 4px;background:#1e293b;color:#cbd5e1;border:1px solid #334155;border-radius:4px;">
-                                            <button type="submit" name="extender_trial" class="btn-desbloquear" style="border:none;cursor:pointer;font-size:0.75rem;padding:2px 8px;" title="Extender trial">⏱️</button>
+                                            <input type="number" name="dias_trial" value="7" min="1" max="365" class="form-control form-control-sm d-inline" style="width:50px;">
+                                            <button type="submit" name="extender_trial" class="btn btn-sm btn-ghost-success" title="Extender trial">⏱️</button>
                                         </form>
                                         <form method="POST" action="super-admin.php" class="d-inline form-confirm" data-confirm="¿Eliminar permanentemente la tienda «<?php echo htmlspecialchars($tienda['nombre_tienda']); ?>»? Se borrarán todos sus productos, pedidos y datos.">
                                             <input type="hidden" name="delete" value="<?php echo $tienda['id']; ?>">
                                             <input type="hidden" name="confirm" value="1">
                                             <?php echo csrf_field(); ?>
-                                            <button type="submit" class="btn-bloquear" style="border-color:rgba(239,68,68,0.3);border:none;cursor:pointer;" title="Eliminar">🗑️</button>
+                                            <button type="submit" class="btn btn-sm btn-ghost-danger" title="Eliminar">🗑️</button>
                                         </form>
                                     </div>
                                 </td>
@@ -344,9 +285,9 @@ $actividades = $stmtAct->fetchAll();
 
         <?php if ($tab === 'historial'): ?>
 
-        <div class="table-card">
+        <div class="card">
             <div class="table-responsive">
-                <table class="table mb-0">
+                <table class="table table-vcenter card-table">
                     <thead>
                         <tr>
                             <th>Fecha</th>
@@ -398,6 +339,14 @@ $actividades = $stmtAct->fetchAll();
             }
         }
     });
+    </script>
+    <script nonce="<?= $csp_nonce ?>">
+    (function() {
+        var html = document.documentElement;
+        if (localStorage.getItem('dark_mode') === '1') {
+            html.setAttribute('data-bs-theme', 'dark');
+        }
+    })();
     </script>
 </body>
 </html>
