@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gesti√≥n de Pedidos - <?php echo htmlspecialchars($tienda_nombre); ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+<?php $page_title = 'GestiÛn de Pedidos - ' . htmlspecialchars($tienda_nombre); ?>
+<?php require __DIR__ . '/head.php'; ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .table-orders thead th { background: #f8fafc !important; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
@@ -198,33 +191,7 @@
         });
     });
     </script>
-    <script nonce="<?= $csp_nonce ?>">
-    (function() {
-        var html = document.documentElement;
-        var toggle = document.getElementById('darkModeToggle');
-        var icon = toggle && toggle.querySelector('iconify-icon');
-        var span = toggle && toggle.querySelector('.nav-link-title');
-        if (localStorage.getItem('dark_mode') === '1') {
-            html.setAttribute('data-bs-theme', 'dark');
-            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
-            if (span) span.textContent = 'Modo claro';
-        }
-        if (toggle) {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                var isDark = html.getAttribute('data-bs-theme') === 'dark';
-                if (isDark) {
-                    html.removeAttribute('data-bs-theme');
-                } else {
-                    html.setAttribute('data-bs-theme', 'dark');
-                }
-                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
-                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
-            });
-        }
-    })();
-    </script>
+    <?php require __DIR__ . '/darkmode_admin_partial.php'; ?>
     </div>
 </body>
 </html>

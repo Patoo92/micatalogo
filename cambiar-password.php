@@ -52,22 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cambiar Contrase√±a</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
-    <style>
-        .input-wrapper { position: relative; }
-        .password-toggle {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;
-        }
-        .password-toggle:hover { color: #64748b; }
-    </style>
+<?php $page_title = 'Cambiar ContraseÒa'; ?>
+<?php require __DIR__ . '/templates/head.php'; ?>
 </head>
 <body>
 
@@ -165,33 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     });
     </script>
-    <script nonce="<?= $csp_nonce ?>">
-    (function() {
-        var html = document.documentElement;
-        var toggle = document.getElementById('darkModeToggle');
-        var icon = toggle && toggle.querySelector('iconify-icon');
-        var span = toggle && toggle.querySelector('.nav-link-title');
-        if (localStorage.getItem('dark_mode') === '1') {
-            html.setAttribute('data-bs-theme', 'dark');
-            if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
-            if (span) span.textContent = 'Modo claro';
-        }
-        if (toggle) {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                var isDark = html.getAttribute('data-bs-theme') === 'dark';
-                if (isDark) {
-                    html.removeAttribute('data-bs-theme');
-                } else {
-                    html.setAttribute('data-bs-theme', 'dark');
-                }
-                localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
-                if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
-            });
-        }
-    })();
-    </script>
+    <?php require __DIR__ . '/templates/darkmode_admin_partial.php'; ?>
     </div>
 </body>
 </html>

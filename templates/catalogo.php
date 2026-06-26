@@ -336,6 +336,24 @@
         <?php endif; ?>
     </div>
 
+    <?php if ($total_paginas > 1): ?>
+    <nav class="mt-4 d-flex justify-content-center" aria-label="Paginación">
+        <ul class="pagination pagination-sm">
+            <li class="page-item <?php echo $pagina <= 1 ? 'disabled' : ''; ?>">
+                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $pagina - 1; ?>#productos-catalogo" tabindex="-1">Anterior</a>
+            </li>
+            <?php for ($p = max(1, $pagina - 2); $p <= min($total_paginas, $pagina + 2); $p++): ?>
+            <li class="page-item <?php echo $p === $pagina ? 'active' : ''; ?>">
+                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $p; ?>#productos-catalogo"><?php echo $p; ?></a>
+            </li>
+            <?php endfor; ?>
+            <li class="page-item <?php echo $pagina >= $total_paginas ? 'disabled' : ''; ?>">
+                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $pagina + 1; ?>#productos-catalogo">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+    <?php endif; ?>
+
     <div id="searchEmpty" class="text-center py-5">
         <iconify-icon icon="mdi:package-variant-closed" width="48" style="color:#94a3b8;"></iconify-icon>
         <p class="text-muted mt-3">No encontramos productos con ese nombre.</p>

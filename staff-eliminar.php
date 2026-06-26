@@ -53,18 +53,8 @@ if (!$staff) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar Staff</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        iconify-icon { display: inline-flex; vertical-align: -2px; }
-    </style>
+<?php $page_title = 'Eliminar Staff'; ?>
+<?php require __DIR__ . '/templates/head.php'; ?>
 </head>
 <body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
     <div class="card card-md text-center">

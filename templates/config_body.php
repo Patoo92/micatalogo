@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Configuraci√≥n de Tienda</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<?php $page_title = 'ConfiguraciÛn de Tienda'; ?>
+<?php require __DIR__ . '/head.php'; ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .form-label-custom { font-weight: 600; font-size: 0.875rem; color: #374151; margin-bottom: 4px; }
@@ -356,33 +349,7 @@
         });
         </script>
         <?php endif; ?>
-        <script nonce="<?= $csp_nonce ?>">
-        (function() {
-            var html = document.documentElement;
-            var toggle = document.getElementById('darkModeToggle');
-            var icon = toggle && toggle.querySelector('iconify-icon');
-            var span = toggle && toggle.querySelector('.nav-link-title');
-            if (localStorage.getItem('dark_mode') === '1') {
-                html.setAttribute('data-bs-theme', 'dark');
-                if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
-                if (span) span.textContent = 'Modo claro';
-            }
-            if (toggle) {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var isDark = html.getAttribute('data-bs-theme') === 'dark';
-                    if (isDark) {
-                        html.removeAttribute('data-bs-theme');
-                    } else {
-                        html.setAttribute('data-bs-theme', 'dark');
-                    }
-                    localStorage.setItem('dark_mode', html.getAttribute('data-bs-theme') === 'dark' ? '1' : '0');
-                    if (icon) icon.setAttribute('icon', html.getAttribute('data-bs-theme') === 'dark' ? 'mdi:weather-sunny' : 'mdi:weather-night');
-                    if (span) span.textContent = html.getAttribute('data-bs-theme') === 'dark' ? 'Modo claro' : 'Modo oscuro';
-                });
-            }
-        })();
-        </script>
+        <?php require __DIR__ . '/darkmode_admin_partial.php'; ?>
     </div>
     </div>
 </body>
