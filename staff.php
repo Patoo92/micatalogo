@@ -25,9 +25,6 @@ $staff = $stmt->fetchAll();
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .table-custom thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; background: #f8fafc; }
         .badge-perm { font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
         iconify-icon { display: inline-flex; vertical-align: -2px; }
         .btn-action-sm { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; padding: 0; }
@@ -59,24 +56,23 @@ $staff = $stmt->fetchAll();
     </nav>
 
     <div class="container my-4" style="max-width: 900px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
-                <iconify-icon icon="mdi:account-group" width="28"></iconify-icon> Staff
-            </h2>
-            <a href="staff-nuevo.php" class="btn btn-success fw-bold btn-icon">
-                <iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Staff
-            </a>
-        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Staff</h3>
+                <a href="staff-nuevo.php" class="btn btn-success btn-icon">
+                    <iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Staff
+                </a>
+            </div>
+            <div class="card-body">
 
         <?php if (empty($staff)): ?>
-            <div class="card p-5 text-center">
-                <iconify-icon icon="mdi:account-off" width="48" style="color: #94a3b8;"></iconify-icon>
-                <p class="text-muted mt-2 mb-0">No hay miembros de staff. Crea el primero.</p>
-            </div>
+                <div class="empty">
+                    <div class="empty-icon"><iconify-icon icon="mdi:account-off" width="48" style="color: #94a3b8;"></iconify-icon></div>
+                    <p class="empty-title">No hay miembros de staff. Crea el primero.</p>
+                </div>
         <?php else: ?>
-            <div class="card">
                 <div class="table-responsive">
-                    <table class="table table-custom align-middle mb-0">
+                    <table class="table table-vcenter align-middle">
                         <thead>
                             <tr>
                                 <th>Usuario</th>
@@ -92,7 +88,7 @@ $staff = $stmt->fetchAll();
                             ?>
                             <tr>
                                 <td>
-                                    <div class="fw-bold"><?php echo htmlspecialchars($s['usuario']); ?></div>
+                                    <div class="fw-semibold"><?php echo htmlspecialchars($s['usuario']); ?></div>
                                 </td>
                                 <td class="text-muted"><?php echo htmlspecialchars($s['email'] ?? '—'); ?></td>
                                 <td>
@@ -126,8 +122,9 @@ $staff = $stmt->fetchAll();
                         </tbody>
                     </table>
                 </div>
-            </div>
         <?php endif; ?>
+            </div>
+        </div>
     </div>
     <script nonce="<?= $csp_nonce ?>">
     (function() {

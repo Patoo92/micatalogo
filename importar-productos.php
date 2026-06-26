@@ -64,32 +64,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar Productos CSV</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .container { max-width: 600px; }
-    </style>
 </head>
 <body>
     <?php require __DIR__ . '/templates/sidebar_partial.php'; ?>
     <div class="page-wrapper">
     <div class="container my-5">
-        <div class="card p-4">
-            <h4 class="fw-bold mb-3"><iconify-icon icon="mdi:file-upload" width="24"></iconify-icon> Importar Productos CSV</h4>
-            <?php echo $mensaje; ?>
-            <form method="POST" enctype="multipart/form-data">
-                <?php echo csrf_field(); ?>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Archivo CSV</label>
-                    <input type="file" name="csv" class="form-control" accept=".csv" required>
-                    <small class="text-muted">Columnas: nombre, descripcion, precio, stock, stock_minimo, categoria_id, destacado, etiqueta</small>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold">Importar</button>
-            </form>
-            <hr class="my-4">
-            <a href="exportar-productos.php" class="btn btn-outline-success w-100 fw-bold"><iconify-icon icon="mdi:file-download" width="18"></iconify-icon> Descargar CSV de ejemplo</a>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><iconify-icon icon="mdi:file-upload" width="24"></iconify-icon> Importar Productos CSV</h3>
+            </div>
+            <div class="card-body">
+                <?php echo $mensaje; ?>
+                <form method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
+                    <div class="mb-3">
+                        <label class="form-label">Archivo CSV</label>
+                        <input type="file" name="csv" class="form-control" accept=".csv" required>
+                        <small class="text-muted">Columnas: nombre, descripcion, precio, stock, stock_minimo, categoria_id, destacado, etiqueta</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Importar</button>
+                </form>
+                <hr class="my-4">
+                <a href="exportar-productos.php" class="btn btn-outline-success w-100"><iconify-icon icon="mdi:file-download" width="18"></iconify-icon> Descargar CSV de ejemplo</a>
+            </div>
         </div>
     </div>
     <script nonce="<?= $csp_nonce ?>">

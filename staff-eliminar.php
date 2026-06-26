@@ -60,25 +60,27 @@ if (!$staff) {
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
 <body class="d-flex align-items-center justify-content-center" style="min-height:100vh;padding:1rem;">
-    <div class="card p-4 text-center" style="max-width:480px;width:100%;">
-        <iconify-icon icon="mdi:account-remove" width="56" style="color: #dc2626;"></iconify-icon>
-        <h3 class="fw-bold mt-2">¿Eliminar staff?</h3>
-        <p class="text-muted mb-4">Estás a punto de eliminar a <strong><?php echo htmlspecialchars($staff['usuario']); ?></strong></p>
-        <p class="text-danger small mb-4">Esta acción no se puede deshacer.</p>
+    <div class="card card-md text-center">
+        <div class="card-body">
+            <iconify-icon icon="mdi:account-remove" width="56" style="color: #dc2626;"></iconify-icon>
+            <h3 class="mt-2">¿Eliminar staff?</h3>
+            <p class="text-muted mb-4">Estás a punto de eliminar a <strong><?php echo htmlspecialchars($staff['usuario']); ?></strong></p>
+            <p class="text-danger small mb-4">Esta acción no se puede deshacer.</p>
 
-        <form method="POST">
-            <?php echo csrf_field(); ?>
-            <div class="d-flex gap-2">
-                <a href="staff.php" class="btn btn-outline-secondary w-50 fw-bold">← Cancelar</a>
-                <button type="submit" class="btn btn-danger w-50 fw-bold btn-icon">
-                    <iconify-icon icon="mdi:delete" width="18"></iconify-icon> Sí, eliminar
-                </button>
-            </div>
-        </form>
+            <form method="POST">
+                <?php echo csrf_field(); ?>
+                <div class="d-flex gap-2">
+                    <a href="staff.php" class="btn btn-outline-secondary w-50">← Cancelar</a>
+                    <button type="submit" class="btn btn-danger w-50 btn-icon">
+                        <iconify-icon icon="mdi:delete" width="18"></iconify-icon> Sí, eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>

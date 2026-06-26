@@ -116,11 +116,10 @@ $actividades = $stmtAct->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin — Panel de Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        iconify-icon { display: inline-flex; vertical-align: -2px; }
     </style>
 </head>
 <body>
@@ -149,32 +148,44 @@ $actividades = $stmtAct->fetchAll();
 
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="card p-3">
-                    <div class="text-secondary text-uppercase small fw-semibold">Total tiendas</div>
-                    <div class="h2 mb-0"><?php echo $total_tiendas; ?></div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-secondary text-uppercase small fw-semibold">Total tiendas</div>
+                        <div class="h2 mb-0"><?php echo $total_tiendas; ?></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card p-3">
-                    <div class="text-secondary text-uppercase small fw-semibold">Tiendas activas</div>
-                    <div class="h2 mb-0 text-success"><?php echo count($tiendas_activas); ?></div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-secondary text-uppercase small fw-semibold">Tiendas activas</div>
+                        <div class="h2 mb-0 text-success"><?php echo count($tiendas_activas); ?></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card p-3">
-                    <div class="text-secondary text-uppercase small fw-semibold">Bloqueadas</div>
-                    <div class="h2 mb-0 text-danger"><?php echo $total_tiendas - count($tiendas_activas); ?></div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-secondary text-uppercase small fw-semibold">Bloqueadas</div>
+                        <div class="h2 mb-0 text-danger"><?php echo $total_tiendas - count($tiendas_activas); ?></div>
+                    </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card p-3">
-                    <div class="text-secondary text-uppercase small fw-semibold">Total pedidos</div>
-                    <div class="h2 mb-0"><?php echo array_sum(array_column($tiendas, 'total_pedidos')); ?></div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="text-secondary text-uppercase small fw-semibold">Total pedidos</div>
+                        <div class="h2 mb-0"><?php echo array_sum(array_column($tiendas, 'total_pedidos')); ?></div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Tiendas</h3>
+            </div>
+            <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-vcenter card-table">
                     <thead>
@@ -280,12 +291,17 @@ $actividades = $stmtAct->fetchAll();
                 </table>
             </div>
         </div>
+        </div>
 
         <?php endif; ?>
 
         <?php if ($tab === 'historial'): ?>
 
         <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Historial Global</h3>
+            </div>
+            <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-vcenter card-table">
                     <thead>
@@ -324,6 +340,7 @@ $actividades = $stmtAct->fetchAll();
                     </tbody>
                 </table>
             </div>
+        </div>
         </div>
 
         <?php endif; ?>

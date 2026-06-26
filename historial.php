@@ -25,11 +25,7 @@ $actividades = $stmt->fetchAll();
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <style>
-        .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .table-custom thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; border-bottom: 2px solid #e2e8f0; background: #f8fafc; }
         iconify-icon { display: inline-flex; vertical-align: -2px; }
-        .timeline-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -58,23 +54,21 @@ $actividades = $stmt->fetchAll();
     </nav>
 
     <div class="container my-4" style="max-width: 900px;">
-        <div class="d-flex align-items-center gap-2 mb-4">
-            <iconify-icon icon="mdi:history" width="32"></iconify-icon>
-            <div>
-                <h2 class="fw-bold text-dark m-0">Historial de Actividad</h2>
-                <p class="text-muted mb-0">Últimas 100 acciones registradas en tu tienda.</p>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Historial de Actividad</h3>
             </div>
-        </div>
+            <div class="card-body">
 
         <?php if (empty($actividades)): ?>
-            <div class="card p-5 text-center">
-                <iconify-icon icon="mdi:history" width="48" style="color: #94a3b8;"></iconify-icon>
-                <p class="text-muted mt-2 mb-0">Aún no hay actividad registrada.</p>
-            </div>
+                <div class="empty">
+                    <div class="empty-icon"><iconify-icon icon="mdi:history" width="48" style="color: #94a3b8;"></iconify-icon></div>
+                    <p class="empty-title">Aún no hay actividad registrada.</p>
+                </div>
         <?php else: ?>
-            <div class="card">
                 <div class="table-responsive">
-                    <table class="table table-custom align-middle mb-0">
+                    <table class="table table-vcenter align-middle">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -90,7 +84,7 @@ $actividades = $stmt->fetchAll();
                                 <td class="text-muted" style="font-size: 0.85rem; white-space: nowrap;">
                                     <?php echo date('d/m/Y H:i', strtotime($a['created_at'])); ?>
                                 </td>
-                                <td class="fw-bold"><?php echo htmlspecialchars($a['usuario_nombre']); ?></td>
+                                <td class="fw-semibold"><?php echo htmlspecialchars($a['usuario_nombre']); ?></td>
                                 <td>
                                     <?php if ($a['usuario_tipo'] === 'owner'): ?>
                                         <span class="badge bg-primary">Dueño</span>
@@ -109,8 +103,9 @@ $actividades = $stmt->fetchAll();
                         </tbody>
                     </table>
                 </div>
-            </div>
         <?php endif; ?>
+            </div>
+        </div>
     </div>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
