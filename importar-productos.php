@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {
         var html = document.documentElement;
         var toggle = document.getElementById('darkModeToggle');
         var icon = toggle && toggle.querySelector('iconify-icon');
-        var span = toggle && toggle.querySelector('span');
+        var span = toggle && toggle.querySelector('.nav-link-title');
         if (localStorage.getItem('dark_mode') === '1') {
             html.setAttribute('data-bs-theme', 'dark');
             if (icon) icon.setAttribute('icon', 'mdi:weather-sunny');
