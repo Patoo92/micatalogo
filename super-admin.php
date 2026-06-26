@@ -7,6 +7,10 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+$success_msg = $_SESSION['flash_message'] ?? '';
+$error_msg = $_SESSION['flash_error'] ?? '';
+unset($_SESSION['flash_message'], $_SESSION['flash_error']);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         header("Location: super-admin.php");
@@ -71,6 +75,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$nueva_fecha, $tienda_id]);
         header("Location: super-admin.php");
         exit;
+    }
+
+    if (isset($_POST['crear_tienda'])) {
+        $nombre = trim($_POST['nueva_tienda_nombre'] ?? '');
+        $slug = trim($_POST['nueva_tienda_slug'] ?? '');
+        $whatsapp = trim($_POST['nueva_tienda_whatsapp'] ?? '');
+        $usuario = trim($_POST['nueva_tienda_usuario'] ?? '');
+        $password = trim($_POST['nueva_tienda_password'] ?? '');
+        $email = trim($_POST['nueva_tienda_email'] ?? '');
+        $plan = $_POST['nueva_tienda_plan'] ?? 'starter';
+        $moneda = trim($_POST['nueva_tienda_moneda'] ?? '€');
+        $dias_trial = min(365, max(0, (int)($_POST['nueva_tienda_trial'] ?? 0)));
+        $error_msg = '';
+        if (empty($nombre) || empty($slug) || empty($whatsapp) || empty($usuario) || empty($password)) {
+            $error_msg = 'Faltan campos obligatorios.';
+        } elseif (strlen($password) < 10) {
+            $error_msg = 'La contraseña debe tener al menos 10 caracteres.';
+        } else {
+            $stmtCheck = $pdo->prepare("SELECT id FROM tiendas WHERE slug = ? OR usuario = ?");
+            $stmtCheck->execute([$slug, $usuario]);
+            if ($stmtCheck->fetch()) {
+                $error_msg = 'El slug o el nombre de usuario ya están en uso.';
+            } else {
+                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $trial_ends_at = $dias_trial > 0 ? date('Y-m-d', strtotime("+$dias_trial days")) : null;
+                $stmt = $pdo->prepare("INSERT INTO tiendas (nombre_tienda, slug, usuario, password, telefono_whatsapp, email, plan, moneda, trial_ends_at, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+                $stmt->execute([$nombre, $slug, $usuario, $hash, $whatsapp, $email ?: null, $plan, $moneda, $trial_ends_at]);
+                $tienda_id_nueva = $pdo->lastInsertId();
+                registrar_actividad($pdo, $tienda_id_nueva, $_SESSION['admin_usuario'], 'superadmin', 'Creó tienda manualmente: ' . $nombre);
+                $success_msg = "Tienda «$nombre» creada correctamente.";
+                $stmt = $pdo->prepare("INSERT INTO categorias (tienda_id, nombre_categoria) VALUES (?, 'General')");
+                $stmt->execute([$tienda_id_nueva]);
+            }
+        }
     }
 
     if (isset($_POST['crear_factura']) && isset($_POST['id'])) {
@@ -231,10 +269,78 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Tiendas</h3>
+        <?php if (!empty($success_msg)): ?>
+            <div class="alert alert-success d-flex align-items-center gap-2 py-2" style="font-size:0.875rem;">
+                <iconify-icon icon="mdi:check-circle" width="18"></iconify-icon>
+                <?php echo htmlspecialchars($success_msg); ?>
             </div>
+        <?php endif; ?>
+        <?php if (!empty($error_msg)): ?>
+            <div class="alert alert-danger d-flex align-items-center gap-2 py-2" style="font-size:0.875rem;">
+                <iconify-icon icon="mdi:alert-circle" width="18"></iconify-icon>
+                <?php echo htmlspecialchars($error_msg); ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h3 class="card-title mb-0">Tiendas</h3>
+                <button class="btn btn-sm btn-primary" id="btnCrearTienda">+ Crear tienda</button>
+            </div>
+            <div id="formCrearTienda" class="card-body border-bottom d-none">
+                <form method="POST" action="super-admin.php">
+                    <?php echo csrf_field(); ?>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Nombre tienda</label>
+                            <input type="text" name="nueva_tienda_nombre" class="form-control" required placeholder="Mi Tienda">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Slug</label>
+                            <input type="text" name="nueva_tienda_slug" class="form-control" required placeholder="mi-tienda">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">WhatsApp</label>
+                            <input type="text" name="nueva_tienda_whatsapp" class="form-control" required placeholder="+5491122334455">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Usuario</label>
+                            <input type="text" name="nueva_tienda_usuario" class="form-control" required placeholder="owner">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Contraseña</label>
+                            <input type="password" name="nueva_tienda_password" class="form-control" required minlength="10">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" name="nueva_tienda_email" class="form-control" placeholder="tienda@ejemplo.com">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Plan</label>
+                            <select name="nueva_tienda_plan" class="form-select">
+                                <option value="starter">Starter</option>
+                                <option value="pro">Pro</option>
+                                <option value="business">Business</option>
+                                <option value="enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Moneda</label>
+                            <input type="text" name="nueva_tienda_moneda" class="form-control" value="€" maxlength="10">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Trial (días)</label>
+                            <input type="number" name="nueva_tienda_trial" class="form-control" value="0" min="0" max="365">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" name="crear_tienda" class="btn btn-primary w-100 fw-bold">Crear tienda</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-vcenter card-table">
@@ -490,6 +596,13 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
             }
         }
     });
+    var btnCrear = document.getElementById('btnCrearTienda');
+    if (btnCrear) {
+        btnCrear.addEventListener('click', function() {
+            var el = document.getElementById('formCrearTienda');
+            if (el) el.classList.toggle('d-none');
+        });
+    }
     </script>
     <script nonce="<?= $csp_nonce ?>">
     (function() {
