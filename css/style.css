@@ -3,7 +3,6 @@
     --border-radius-btn: 10px;
     --border-radius-badge: 20px;
     --border-radius-sm: 8px;
-    --badge-stock-success: #000000;
 }
 
 html { scroll-behavior: smooth; }
