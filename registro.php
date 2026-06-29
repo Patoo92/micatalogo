@@ -75,11 +75,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
             ");
             $stmt->execute([$nombre_tienda, $slug, $usuario, $hash, $telefono_whatsapp, $email ?: null, $plan, $trial_ends_at]);
+            $nuevo_id = $pdo->lastInsertId();
 
-            $_SESSION['flash_message'] = '¡Tienda creada correctamente! Ya puedes iniciar sesión.';
-            $_SESSION['flash_type'] = 'success';
-            header("Location: login.php");
-            exit;
+            if ($plan === 'starter') {
+                $_SESSION['flash_message'] = '¡Tienda creada correctamente! Ya puedes iniciar sesión.';
+                $_SESSION['flash_type'] = 'success';
+                header("Location: login.php");
+                exit;
+            } else {
+                header("Location: stripe-checkout.php?tienda_id=$nuevo_id&plan=$plan&periodo=mensual");
+                exit;
+            }
         }
     }
     }
