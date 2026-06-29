@@ -5,7 +5,7 @@ require_once 'conexion.php';
 $error = '';
 $exito = '';
 $planes_disponibles = ['starter', 'pro', 'business'];
-$plan_seleccionado = in_array($_GET['plan'] ?? '', $planes_disponibles) ? $_GET['plan'] : 'starter';
+$plan_seleccionado = in_array($_POST['plan'] ?? $_GET['plan'] ?? '', $planes_disponibles) ? ($_POST['plan'] ?? $_GET['plan'] ?? '') : 'starter';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
