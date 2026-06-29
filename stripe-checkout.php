@@ -26,9 +26,9 @@ if (!$tienda) {
     exit;
 }
 
-$base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
-$success_url = rtrim($base_url, '/') . '/stripe-success.php?tienda_id=' . $tienda_id;
-$cancel_url  = rtrim($base_url, '/') . '/registro.php?plan=' . $plan;
+$base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+$success_url = $base_url . '/stripe-success.php?tienda_id=' . $tienda_id . '&session_id={CHECKOUT_SESSION_ID}';
+$cancel_url  = $base_url . '/registro.php?plan=' . $plan;
 
 try {
     $result = stripe_crear_sesion_checkout(
