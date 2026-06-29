@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label class="form-label">URL de tu catálogo *</label>
                     <input type="text" name="slug" id="slug" class="form-control"
                            placeholder="Ej: ropa-sofia" value="<?php echo htmlspecialchars($_POST['slug'] ?? ''); ?>"
-                           pattern="[a-z0-9\-]+" minlength="4" maxlength="60" required>
+                           pattern="[a-z0-9-]+" minlength="4" maxlength="60" required>
                     <div class="text-muted small mt-1">Tu catálogo estará en: tudominio.com/<span class="text-success fw-semibold" id="slug-preview">ropa-sofia</span></div>
                     <small class="text-muted">Minúsculas, números y guiones. 4-60 caracteres.</small>
                 </div>
