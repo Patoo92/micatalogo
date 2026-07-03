@@ -144,9 +144,40 @@
 
 ### Próximos pasos
 1. Subir capturas de pantalla reales a la landing (imagenes/captura-admin.jpg, captura-movil.jpg)
-2. Integrar Stripe/Mercado Pago como pasarela de pago
+2. ~~Integrar Stripe/Mercado Pago como pasarela de pago~~ ✅ Implementado via Stripe Checkout + Customer Portal
 3. Desplegar en hosting real (PHP 8.2+, MySQL, Apache)
 4. Configurar dominio + DNS + HTTPS + SMTP (Brevo) + Cloudflare CDN
+
+### Stripe — Configuración del Webhook
+Para que Stripe notifique eventos (pagos, cancelaciones, renovaciones) al servidor:
+
+1. Ir a Stripe Dashboard → **Developers** → **Webhooks** → **Add endpoint**
+2. URL del endpoint: `https://tudominio.com/micatalogo/webhook-stripe.php`
+3. Eventos a escuchar:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `invoice.paid`
+   - `invoice.payment_failed`
+4. Obtener el **Signing secret** (whsec_xxxx) y agregarlo en `C:\xampp\micatalogo-config\stripe.php`:
+   ```php
+   'webhook_secret' => 'whsec_tu_secreto_aqui',
+   ```
+5. Habilitar **Customer Portal** en Stripe Dashboard → Settings → Customer Portal:
+   - Activar: "Update payment methods", "Cancel subscriptions", "Upgrade/downgrade"
+   - No es necesario el portal si no se usa (el botón "Gestionar suscripción" redirige al portal)
+
+### Stripe — Customer Portal
+El portal permite al usuario gestionar su suscripción (cambiar plan, cancelar, actualizar método de pago) sin salir del sitio. Configurar en Stripe Dashboard:
+- **Settings → Customer Portal** → Customize → habilitar lo necesario
+- Los price IDs deben estar configurados en `C:\xampp\micatalogo-config\stripe.php`:
+  ```php
+  'prices' => [
+      'pro'       => ['mensual' => 'price_xxx'],
+      'business'  => ['mensual' => 'price_xxx'],
+      'enterprise'=> ['mensual' => 'price_xxx'],
+  ],
+  ```
 
 ### Notas técnicas
 - El CSP nonce se genera en `init_session.php` y se pasa como `$csp_nonce` a los templates

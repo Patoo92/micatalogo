@@ -99,3 +99,19 @@ function stripe_crear_sesion_checkout($tienda_id, $plan, $periodo, $success_url,
 function generar_numero_factura() {
     return 'INV-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
 }
+
+/**
+ * Crea un enlace al Customer Portal de Stripe para que el usuario
+ * gestione su suscripción (upgrade, downgrade, cancelar, métodos de pago).
+ *
+ * @param string $stripe_customer_id ID del cliente en Stripe (cus_xxxx)
+ * @param string $return_url         URL de retorno después del portal
+ * @return string                    URL del portal
+ */
+function stripe_crear_portal($stripe_customer_id, $return_url) {
+    $session = stripe_cliente()->billingPortal->sessions->create([
+        'customer'   => $stripe_customer_id,
+        'return_url' => $return_url,
+    ]);
+    return $session->url;
+}

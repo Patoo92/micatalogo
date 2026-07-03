@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Configuraci�n de Tienda'; ?>
+<?php $page_title = 'Configuraci�n de Tienda'; ?>
 <?php require __DIR__ . '/head.php'; ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -274,6 +274,15 @@
             <h5 class="mb-3 d-flex align-items-center gap-2">
                 <iconify-icon icon="mdi:crown" width="24"></iconify-icon>
                 Plan: <?php echo htmlspecialchars(ucfirst($_SESSION['plan'])); ?>
+                <?php if ($stripe_sub_status === 'active'): ?>
+                    <span class="badge bg-success ms-auto">Activo</span>
+                <?php elseif ($stripe_sub_status === 'past_due'): ?>
+                    <span class="badge bg-danger ms-auto">Pago pendiente</span>
+                <?php elseif ($stripe_sub_status === 'canceled' || $stripe_sub_status === 'incomplete_expired'): ?>
+                    <span class="badge bg-secondary ms-auto">Cancelada</span>
+                <?php elseif ($stripe_sub_status === 'trialing'): ?>
+                    <span class="badge bg-info ms-auto">Trial</span>
+                <?php endif; ?>
             </h5>
             <ul class="list-unstyled small mb-0">
                 <li class="mb-1"><iconify-icon icon="mdi:account-group" width="16"></iconify-icon> Staff: <?php echo plan_limite('staff'); ?> miembros</li>
@@ -282,10 +291,41 @@
                 <li class="mb-1"><iconify-icon icon="mdi:palette" width="16"></iconify-icon> Marca blanca: <?php echo plan_limite('marca_blanca') ? 'Sí' : 'No'; ?></li>
                 <li class="mb-1"><iconify-icon icon="mdi:tune" width="16"></iconify-icon> Personalización: <?php echo plan_limite('personalizacion') ? 'Sí' : 'No'; ?></li>
             </ul>
-            <a href="index.html#planes" class="btn btn-sm btn-outline-primary mt-3 btn-icon">
-                <iconify-icon icon="mdi:arrow-up-circle" width="16"></iconify-icon> Ver planes
-            </a>
-            <p class="text-muted small mt-2 mb-0">Los cambios de plan se gestionan manualmente. <a href="https://wa.me/34123456789" target="_blank" rel="noopener">Contactanos por WhatsApp</a> para mejorar tu plan.</p>
+
+            <?php if ($stripe_sub_status && $stripe_sub_status !== 'canceled' && $stripe_sub_status !== 'incomplete_expired'): ?>
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+                    <form method="POST" action="configuracion.php">
+                        <?php echo csrf_field(); ?>
+                        <button type="submit" name="manage_subscription" class="btn btn-sm btn-primary btn-icon">
+                            <iconify-icon icon="mdi:credit-card" width="16"></iconify-icon> Gestionar suscripción
+                        </button>
+                    </form>
+                    <form method="POST" action="configuracion.php" onsubmit="return confirm('¿Cancelar la suscripción? Tras el periodo actual volverás al plan Starter.');">
+                        <?php echo csrf_field(); ?>
+                        <button type="submit" name="cancel_subscription" class="btn btn-sm btn-outline-danger btn-icon">
+                            <iconify-icon icon="mdi:close-circle" width="16"></iconify-icon> Cancelar suscripción
+                        </button>
+                    </form>
+                </div>
+                <?php if ($stripe_current_period_end): ?>
+                    <small class="text-muted d-block mt-2">
+                        Próxima renovación: <?php echo date('d/m/Y', $stripe_current_period_end); ?>
+                    </small>
+                <?php endif; ?>
+            <?php elseif ($_SESSION['plan'] !== 'starter' && !$stripe_subscription_id): ?>
+                <div class="mt-3">
+                    <a href="registro.php?plan=<?php echo $_SESSION['plan']; ?>" class="btn btn-sm btn-primary btn-icon">
+                        <iconify-icon icon="mdi:credit-card" width="16"></iconify-icon> Configurar pago
+                    </a>
+                </div>
+            <?php else: ?>
+                <div class="mt-3">
+                    <a href="index.html#planes" class="btn btn-sm btn-outline-primary btn-icon">
+                        <iconify-icon icon="mdi:arrow-up-circle" width="16"></iconify-icon> Ver planes
+                    </a>
+                </div>
+                <p class="text-muted small mt-2 mb-0">Estás en el plan Starter. Elegí un plan superior para acceder a más funcionalidades.</p>
+            <?php endif; ?>
         </div>
 
         <?php if (plan_limite('marca_blanca')): ?>
