@@ -11,6 +11,7 @@ if (!verificar_permiso('productos_crear')) {
 }
 
 $tienda_id = $_SESSION['tienda_id'];
+$tienda_nombre = $_SESSION['tienda_nombre'];
 $mensaje = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['csv'])) {

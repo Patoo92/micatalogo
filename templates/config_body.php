@@ -348,7 +348,7 @@
                             <form method="POST" action="configuracion.php" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="key_id" value="<?php echo $k['id']; ?>">
-                                <button type="submit" name="revocar_api_key" class="btn btn-sm btn-outline-danger btn-icon" onclick="return confirm('¿Revocar esta API Key? Las integraciones que la usen dejarán de funcionar.');">
+                                <button type="submit" name="revocar_api_key" class="btn btn-sm btn-outline-danger btn-icon">
                                     <iconify-icon icon="mdi:delete" width="14"></iconify-icon> Revocar
                                 </button>
                             </form>

@@ -19,6 +19,13 @@ if (!$config) {
 $payload = @file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
+if (empty($config['webhook_secret'])) {
+    error_log("webhook-stripe.php: webhook_secret no configurado — eventos ignorados");
+    http_response_code(200);
+    echo json_encode(['error' => 'webhook_secret not configured']);
+    exit;
+}
+
 try {
     $event = \Stripe\Webhook::constructEvent(
         $payload, $sig_header, $config['webhook_secret']

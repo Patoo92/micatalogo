@@ -1,6 +1,5 @@
 # Dependencias
 vendor/
-composer.lock
 composer.phar
 
 # Archivos de configuración fuera del webroot

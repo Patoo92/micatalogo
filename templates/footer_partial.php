@@ -38,7 +38,7 @@
                 <small class="text-muted">
                     <a href="privacidad.php" class="text-decoration-none text-muted me-2">Privacidad</a>
                     &middot;
-                    <a href="#" onclick="if(window.__cookiesBanner)window.__cookiesBanner();return false;" class="text-decoration-none text-muted ms-2">Cookies</a>
+                    <a href="#" id="cookiesPrefLink" class="text-decoration-none text-muted ms-2">Cookies</a>
                 </small>
             </div>
         </div>
@@ -61,10 +61,17 @@
 
 <script nonce="<?= $csp_nonce ?>">
 (function() {
-    if (localStorage.getItem('cookies_consent')) return;
     var banner = document.getElementById('cookiesBanner');
-    banner.style.display = 'block';
-    window.__cookiesBanner = function() { banner.style.display = 'block'; };
+    var prefLink = document.getElementById('cookiesPrefLink');
+    if (!localStorage.getItem('cookies_consent')) {
+        banner.style.display = 'block';
+    }
+    if (prefLink) {
+        prefLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            banner.style.display = 'block';
+        });
+    }
     document.getElementById('cookiesAccept').addEventListener('click', function() {
         localStorage.setItem('cookies_consent', 'accepted');
         banner.style.display = 'none';
