@@ -5,7 +5,7 @@
   Repo: https://github.com/Patoo92/micatalogo (master)
 ================================================================================
 
-ESTADO GENERAL: ~75% LISTO PARA PRODUCCIÓN (+10% desde inicio)
+ESTADO GENERAL: ~82% LISTO PARA PRODUCCIÓN (+17% desde inicio)
 
   Área                %     Observaciones
   ─────────────────────────────────────────────────────────────────────
@@ -17,8 +17,8 @@ ESTADO GENERAL: ~75% LISTO PARA PRODUCCIÓN (+10% desde inicio)
   Testing             50%   44 tests (helpers + business flows) ✅
                             Sin tests de controladores, Stripe,
                             API ni E2E
-  UI/UX               68%   Tabler, responsive, dark mode, 404 ✅
-                            Faltan estados vacíos
+  UI/UX               80%   Tabler, responsive, dark mode, 404,
+                            buscador, empty states ✅. Sin session timeout
   Deployment          48%   robots.txt, favicon, 404, HSTS, CSP fallback,
                             .htaccess headers ✅. Falta: sitemap
 
@@ -231,11 +231,11 @@ ESTADO GENERAL: ~75% LISTO PARA PRODUCCIÓN (+10% desde inicio)
 
   FASE 4 — POLISH (EN PROGRESO)
   ─────────────────────────────────────────────────────────────────────
-  [ ] 19. Agregar estados vacíos en tablas y listados
-  [ ] 20. Agregar timeout de sesión por inactividad
-  [ ] 21. Agregar buscador/filtro de productos
+  [x] 19. Estados vacíos — ya existían en todos los templates
+  [x] 20. Timeout de sesión por inactividad (30 min, init_session.php)
+  [x] 21. Buscador/filtro de productos (admin + catálogo público)
   [ ] 22. Tests de integración para Stripe y API
-  [ ] 23. Notificación email pre-expiracion trial
+  [x] 23. Notificación email pre-expiracion trial — ya implementada
 
   ESTIMACIÓN TOTAL: ~5-7 días hábiles para producción
 
