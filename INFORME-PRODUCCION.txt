@@ -5,22 +5,22 @@
   Repo: https://github.com/Patoo92/micatalogo (master)
 ================================================================================
 
-ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
+ESTADO GENERAL: ~75% LISTO PARA PRODUCCIÓN (+10% desde inicio)
 
   Área                %     Observaciones
   ─────────────────────────────────────────────────────────────────────
   Funcionalidad core  85%   Registro, login, productos, catálogo,
                             pedidos, email, staff, dashboard,
                             Stripe checkout ✅
-  Seguridad           75%   CSP nonce, CSRF, rate limiting,
-                            prepared statements ✅. 5 bugs a corregir
+  Seguridad           85%   CSP nonce, CSRF, rate limiting, HSTS,
+                            prepared statements ✅. Bugs restantes: #3
   Testing             50%   44 tests (helpers + business flows) ✅
                             Sin tests de controladores, Stripe,
                             API ni E2E
-  UI/UX               65%   Tabler, responsive, dark mode ✅
-                            Faltan estados vacíos, 404
-  Deployment          30%   .htaccess básico ✅. Faltan: robots.txt,
-                            favicon, sitemap, HSTS, CSP fallback
+  UI/UX               68%   Tabler, responsive, dark mode, 404 ✅
+                            Faltan estados vacíos
+  Deployment          48%   robots.txt, favicon, 404, HSTS, CSP fallback,
+                            .htaccess headers ✅. Falta: sitemap
 
 
 ================================================================================
@@ -63,38 +63,34 @@ ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
     .htaccess en imagenes/ y uploads/ bloquea *.php
   - Configuración sensible fuera del webroot (micatalogo-config/)
 
-  2.2 Bugs de seguridad a corregir (ALTA prioridad)
+  2.2 Bugs de seguridad corregidos (FASE 1)
   ─────────────────────────────────────────────────────────────────────
+  ✅ #1  cambiar-password.php:27 — quitada validación mayúscula+número.
+         Solo se exige min 10 caracteres (consistente con registro).
+  ✅ #2  css_personalizado escapado con htmlspecialchars() en
+         catalogo.php y producto.php. codigo_tracking se deja raw
+         (es intencional: Google Analytics, Meta Pixel, etc.)
 
-  #1  cambiar-password.php:27
-      La validación EXIGE mayúscula [A-Z] y número [0-9], pero
-      registro.php acepta passwords sin esas reglas (solo min 10 chars).
-      Usuarios con password tipo "abcdefghij" no podrán cambiarla.
-
-  #2  templates/catalogo.php:144, producto.php:96,168
-      codigo_tracking y css_personalizado se imprimen con echo RAW
-      (<?= $tienda['codigo_tracking'] ?>).
-      Stored XSS contra visitantes del catálogo público.
+  2.3 Bugs de seguridad pendientes
+  ─────────────────────────────────────────────────────────────────────
 
   #3  init_session.php:10
       Session cookie Secure flag depende de HTTPS detectado.
-      Si el servidor no fuerza HTTPS, la cookie viaja en texto plano.
+      Si el servidor no fuerza HTTPS, la cookie viaje en texto plano.
+      (Se resuelve automáticamente con HTTPS en producción)
+  ✅ #4  logout.php, logout-admin.php — protegidos con token CSRF
+         en la URL, generado al iniciar sesión.
+  ✅ #5  api.php:13 — eliminado CORS "*". Sin Origin header
+         ya no se envía CORS.
 
-  #4  logout.php, logout-admin.php
-      No verifican CSRF. Ataque de Logout CSRF posible (daño bajo).
-
-  #5  api.php:13
-      CORS devuelve "*" cuando no hay Origin header.
-      Permite peticiones cross-origin desde local filesystem.
-
-  2.3 Mejoras de seguridad (MEDIA prioridad)
+  2.4 Mejoras de seguridad (FASE 2 completada)
   ─────────────────────────────────────────────────────────────────────
-  - .htaccess: agregar HSTS (Strict-Transport-Security)
-  - .htaccess: agregar CSP como fallback (si PHP falla antes de
-    conexion.php, no hay CSP)
-  - index.php:71,77 y admin.php:62 usan LIMIT $x OFFSET $y con (int)
-    cast en vez de placeholders PDO
-  - Sin timeout de sesión por inactividad
+  ✅ HSTS en .htaccess (Strict-Transport-Security)
+  ✅ CSP fallback en .htaccess (mínimo, sin nonce)
+  ✅ index.php y admin.php: LIMIT/OFFSET con placeholders PDO
+  ✅ logout.php y logout-admin.php: CSRF token en URL
+  ✅ api.php: eliminado CORS "*"
+  [PENDIENTE] Sin timeout de sesión por inactividad (FASE 4)
 
 
 ================================================================================
@@ -109,17 +105,20 @@ ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
     Options -Indexes, ServerSignature Off, headers de seguridad,
     mod_expires para caching, rewrite rules para URLs amigables
 
-  3.2 Archivos faltantes (BLOQUEANTES para producción)
+  3.2 Archivos faltantes (FASE 1 completada)
   ─────────────────────────────────────────────────────────────────────
-  [ALTA] robots.txt      — No existe. Google indexa /admin.php,
-                           /login.php, /logout.php, etc.
-  [ALTA] favicon.ico     — No existe. Cada carga genera 404.
-  [ALTA] 404.html (o     — No existe. Apache muestra página 404 por
-         .htaccess         defecto (fea, expone versión del server).
-         ErrorDocument)
-  [MEDIA] sitemap.xml    — No existe. Perjudica SEO.
+  ✅ [ALTA] robots.txt      — Creado con Disallow para admin, login,
+                             staff, API, vendor/, etc.
+  ✅ [ALTA] favicon.svg     — Creado + link en head.php y 12
+                             páginas standalone
+  ✅ [ALTA] 404.php         — Creado con Tabler + ErrorDocument en
+                             .htaccess
 
-  3.3 Configuración externa requerida
+  3.3 Archivos aún pendientes
+  ─────────────────────────────────────────────────────────────────────
+  [MEDIA] sitemap.xml    — No existe. Perjudica SEO. (FASE 3)
+
+  3.4 Configuración externa requerida
   ─────────────────────────────────────────────────────────────────────
   Tres archivos fuera del webroot (NO incluidos en el repo):
 
@@ -131,12 +130,12 @@ ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
 
   Riesgo: si no existen en el servidor de producción, la app falla.
 
-  3.4 Error handling
+  3.5 Error handling
   ─────────────────────────────────────────────────────────────────────
   ✅ display_errors=0 en init_session.php
   ✅ Error logging a logs/error.log
-  ✅ try/catch en: conexion.php, pedidos, Stripe, email
-  ❌ NO hay try/catch en guardar-configuracion.php
+  ✅ try/catch en: conexion.php, pedidos, Stripe, email,
+     guardar-configuracion.php (FASE 1)
   ✅ mostrar_error() en toda la app (mensajes genéricos)
 
 
@@ -177,7 +176,6 @@ ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
   4.2 Pendiente (IMPORTANTE)
   ─────────────────────────────────────────────────────────────────────
   - Buscador/filtro de productos (admin y público)
-  - Página 404 personalizada
   - Timeout de sesión por inactividad
   - Webhook Stripe (requiere dominio público)
   - Notificación email pre-expiracion trial
@@ -204,22 +202,22 @@ ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
   6. PLAN DE ACCIÓN PARA PRODUCCIÓN
 ================================================================================
 
-  FASE 1 — BLOQUEANTES (estima: 1 día)
+  FASE 1 — BLOQUEANTES (COMPLETADA ✅)
   ─────────────────────────────────────────────────────────────────────
-  [ ] 1. Crear robots.txt
-  [ ] 2. Crear favicon.ico (16x16 o 32x32 PNG/ICO)
-  [ ] 3. Crear página 404 (404.html + ErrorDocument en .htaccess)
-  [ ] 4. Corregir cambiar-password.php — quitar validación mayúscula/número
-  [ ] 5. Agregar try/catch en guardar-configuracion.php
-  [ ] 6. Sanitizar codigo_tracking y css_personalizado (o documentar riesgo)
+  [x] 1. Crear robots.txt
+  [x] 2. Crear favicon.svg + links en 13 páginas
+  [x] 3. Crear 404.php + ErrorDocument en .htaccess
+  [x] 4. Corregir cambiar-password.php — quitar validación mayúscula/número
+  [x] 5. Agregar try/catch en guardar-configuracion.php
+  [x] 6. Sanitizar css_personalizado con htmlspecialchars()
 
-  FASE 2 — SEGURIDAD (estima: 1 día)
+  FASE 2 — SEGURIDAD (COMPLETADA ✅)
   ─────────────────────────────────────────────────────────────────────
-  [ ] 7. Agregar HSTS en .htaccess
-  [ ] 8. Agregar CSP fallback en .htaccess
-  [ ] 9. Migrar LIMIT/OFFSET a placeholders PDO
-  [ ] 10. Agregar CSRF en logout
-  [ ] 11. Revisar CORS en api.php
+  [x] 7. Agregar HSTS en .htaccess
+  [x] 8. Agregar CSP fallback en .htaccess
+  [x] 9. Migrar LIMIT/OFFSET a placeholders PDO
+  [x] 10. Agregar CSRF en logout (token en URL)
+  [x] 11. Revisar CORS en api.php (eliminado "*")
 
   FASE 3 — DEPLOYMENT (estima: 2-3 días)
   ─────────────────────────────────────────────────────────────────────

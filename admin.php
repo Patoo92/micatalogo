@@ -59,9 +59,9 @@ $stmt = $pdo->prepare("
     LEFT JOIN categorias c ON p.categoria_id = c.id 
     WHERE p.tienda_id = ?
     ORDER BY p.id DESC
-    LIMIT $por_pagina OFFSET $offset
+    LIMIT ? OFFSET ?
 ");
-$stmt->execute([$tienda_id]);
+$stmt->execute([$tienda_id, $por_pagina, $offset]);
 $productos = $stmt->fetchAll();
 
 $stock_critico = array_filter($productos, fn($p) => $p['stock'] <= $p['stock_minimo']);

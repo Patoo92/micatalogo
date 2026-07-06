@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Gestión de Staff'; ?>
+<?php $page_title = 'Gestiï¿½n de Staff'; ?>
 <?php require __DIR__ . '/head.php'; ?>
 </head>
 <body>
@@ -21,8 +21,8 @@
                 <div class="d-flex gap-2 flex-wrap justify-content-end">
                     <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
                     <a href="pedidos.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Pedidos</a>
-                    <a href="configuracion.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuración</a>
-                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                    <a href="configuracion.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:cog" width="16"></iconify-icon> Configuraciï¿½n</a>
+                    <a href="logout.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@
                                 <td>
                                     <div class="fw-semibold"><?php echo htmlspecialchars($s['usuario']); ?></div>
                                 </td>
-                                <td class="text-muted"><?php echo htmlspecialchars($s['email'] ?? '—'); ?></td>
+                                <td class="text-muted"><?php echo htmlspecialchars($s['email'] ?? 'ï¿½'); ?></td>
                                 <td>
                                     <?php if ($permisos): ?>
                                         <?php foreach (['productos_crear', 'productos_editar', 'productos_eliminar', 'pedidos_gestionar', 'configuracion_editar'] as $p): ?>

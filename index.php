@@ -68,14 +68,14 @@ try {
         $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND categoria_id = ?");
         $stmtCount->execute([$tienda_id, $categoria_filtrada]);
         $total_productos = (int)$stmtCount->fetchColumn();
-        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? AND categoria_id = ? ORDER BY id DESC LIMIT $por_pagina OFFSET $offset");
-        $stmtProd->execute([$tienda_id, $categoria_filtrada]);
+        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? AND categoria_id = ? ORDER BY id DESC LIMIT ? OFFSET ?");
+        $stmtProd->execute([$tienda_id, $categoria_filtrada, $por_pagina, $offset]);
     } else {
         $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
         $stmtCount->execute([$tienda_id]);
         $total_productos = (int)$stmtCount->fetchColumn();
-        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? ORDER BY id DESC LIMIT $por_pagina OFFSET $offset");
-        $stmtProd->execute([$tienda_id]);
+        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? ORDER BY id DESC LIMIT ? OFFSET ?");
+        $stmtProd->execute([$tienda_id, $por_pagina, $offset]);
     }
     $productos = $stmtProd->fetchAll();
     $total_paginas = max(1, (int)ceil($total_productos / $por_pagina));

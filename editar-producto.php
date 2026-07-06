@@ -125,7 +125,7 @@ $categorias = $stmtCat->fetchAll();
             <div class="collapse navbar-collapse" id="editarNav">
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:arrow-left" width="16"></iconify-icon> Volver</a>
-                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                    <a href="logout.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
                 </div>
             </div>
         </div>

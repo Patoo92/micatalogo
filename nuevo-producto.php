@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Añadir Nuevo Producto'; ?>
+<?php $page_title = 'Aï¿½adir Nuevo Producto'; ?>
 <?php require __DIR__ . '/templates/head.php'; ?>
 </head>
 <body>
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="collapse navbar-collapse" id="nuevoNav">
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:arrow-left" width="16"></iconify-icon> Volver</a>
-                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                    <a href="logout.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
                 </div>
             </div>
         </div>

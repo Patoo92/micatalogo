@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($admin && password_verify($password, $admin['password'])) {
                 limpiar_intentos_login($pdo, 'admin');
                 session_regenerate_id(true);
+                $_SESSION['_logout_token'] = bin2hex(random_bytes(32));
                 $_SESSION['admin_id']      = $admin['id'];
                 $_SESSION['admin_usuario'] = $admin['usuario'];
                 header("Location: super-admin.php");

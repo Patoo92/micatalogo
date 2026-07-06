@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     limpiar_intentos_login($pdo, 'login');
                     session_regenerate_id(true);
+                    $_SESSION['_logout_token'] = bin2hex(random_bytes(32));
                     $_SESSION['tienda_id']     = $tienda['id'];
                     $_SESSION['tienda_nombre'] = $tienda['nombre_tienda'];
                     $_SESSION['tienda_slug']   = $tienda['slug'];
@@ -86,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         limpiar_intentos_login($pdo, 'login');
                         session_regenerate_id(true);
+                        $_SESSION['_logout_token'] = bin2hex(random_bytes(32));
                         $_SESSION['tienda_id']      = $staff['tienda_id'];
                         $_SESSION['tienda_nombre']  = $staff['nombre_tienda'];
                         $_SESSION['tienda_slug']    = $staff['slug'];

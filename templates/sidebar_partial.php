@@ -70,7 +70,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-danger" href="logout.php">
+                    <a class="nav-link text-danger" href="logout.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>">
                         <span class="nav-link-icon"><iconify-icon icon="mdi:logout" width="18"></iconify-icon></span>
                         <span class="nav-link-title">Salir</span>
                     </a>

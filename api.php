@@ -9,9 +9,8 @@ if ($requestHost) {
 if ($origin && in_array($origin, $allowedOrigins)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Vary: Origin');
-} elseif (!$origin) {
-    header('Access-Control-Allow-Origin: *');
 }
+// Sin Origin header → petición same-origin o no-navegador: no se envía CORS
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 

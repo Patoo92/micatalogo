@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Gestión de Pedidos - ' . htmlspecialchars($tienda_nombre); ?>
+<?php $page_title = 'Gestiï¿½n de Pedidos - ' . htmlspecialchars($tienda_nombre); ?>
 <?php require __DIR__ . '/head.php'; ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -34,7 +34,7 @@
                 <div class="d-flex gap-2 flex-wrap justify-content-end">
                     <a href="admin.php" class="btn btn-sm btn-light btn-icon"><iconify-icon icon="mdi:package-variant-closed" width="16"></iconify-icon> Productos</a>
                     <a href="pedidos.php" class="btn btn-sm btn-primary btn-icon"><iconify-icon icon="mdi:format-list-bulleted" width="16"></iconify-icon> Ver Pedidos</a>
-                    <a href="logout.php" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
+                    <a href="logout.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>" class="btn btn-sm btn-danger btn-icon"><iconify-icon icon="mdi:logout" width="16"></iconify-icon> Salir</a>
                 </div>
             </div>
         </div>
