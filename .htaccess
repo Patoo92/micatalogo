@@ -35,6 +35,9 @@ Options -Indexes
 # Ocultar versión del servidor
 ServerSignature Off
 
+# Página 404 personalizada
+ErrorDocument 404 /404.php
+
 <IfModule mod_headers.c>
     Header always set X-Frame-Options "DENY"
     Header always set X-Content-Type-Options "nosniff"

@@ -67,6 +67,7 @@ $prod_precio = number_format($producto['precio'], 2);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo $prod_nombre; ?> - <?php echo htmlspecialchars($tienda['nombre_tienda']); ?></title>
     <meta name="description" content="<?php echo $prod_descripcion ?: $prod_nombre . ' — ' . $prod_precio . ' ' . ($tienda['moneda'] ?? '€'); ?>">
@@ -165,7 +166,7 @@ $prod_precio = number_format($producto['precio'], 2);
         body.public-dark-mode .breadcrumb-item.active { color: #94a3b8 !important; }
     </style>
     <?php if ($cat_pers && !empty($tienda['css_personalizado'])): ?>
-    <style><?php echo $tienda['css_personalizado']; ?></style>
+    <style><?php echo htmlspecialchars($tienda['css_personalizado']); ?></style>
     <?php endif; ?>
 </head>
 <body>

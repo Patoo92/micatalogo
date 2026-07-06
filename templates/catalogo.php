@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?php echo htmlspecialchars($tienda['nombre_tienda']); ?> - Tienda Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -144,7 +145,7 @@
     <?php echo $tienda['codigo_tracking']; ?>
 <?php endif; ?>
 <?php if ($cat_pers && !empty($tienda['css_personalizado'])): ?>
-<style><?php echo $tienda['css_personalizado']; ?></style>
+    <style><?php echo htmlspecialchars($tienda['css_personalizado']); ?></style>
 <?php endif; ?>
 </head>
 <body>

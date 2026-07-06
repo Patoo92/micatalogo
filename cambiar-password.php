@@ -24,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($actual) || empty($nueva) || empty($confirmar)) {
         $error = "Todos los campos son obligatorios.";
-    } elseif (strlen($nueva) < 10 || !preg_match('/[A-Z]/', $nueva) || !preg_match('/[0-9]/', $nueva)) {
-        $error = "La nueva contraseña debe tener al menos 10 caracteres, una mayúscula y un número.";
+    } elseif (strlen($nueva) < 10) {
+        $error = "La nueva contraseña debe tener al menos 10 caracteres.";
     } elseif ($nueva !== $confirmar) {
         $error = "Las contraseñas nuevas no coinciden.";
     } else {
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Cambiar Contrase�a'; ?>
+<?php $page_title = 'Cambiar Contrase�a'; ?>
 <?php require __DIR__ . '/templates/head.php'; ?>
 </head>
 <body>
@@ -108,12 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label class="form-label">Nueva contraseña</label>
                     <div class="input-wrapper">
-                        <input type="password" name="password_nueva" class="form-control" minlength="8" required>
+                        <input type="password" name="password_nueva" class="form-control" minlength="10" required>
                         <button type="button" class="password-toggle" data-toggle-pass="nueva">
                             <iconify-icon icon="mdi:eye-outline" width="18"></iconify-icon>
                         </button>
                     </div>
-                    <div class="form-text">Mínimo 8 caracteres.</div>
+                    <div class="form-text">Mínimo 10 caracteres.</div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Confirmar nueva contraseña</label>

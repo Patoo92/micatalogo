@@ -173,25 +173,31 @@ $sql = "UPDATE tiendas SET
             dominio            = ?
         WHERE id = ?";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    $nombre_tienda, $email,
-    $instagram, $facebook, $tiktok, $twitter,
-    $color, $moneda, $whatsapp, $mensaje_wp,
-    $descripcion, $direccion, $horario,
-    $logo_url, $banner_url,
-    $marca_blanca, $notif_pedido, $notif_stock,
-    $meta_desc, $meta_palabras, $codigo_tracking, $css_personalizado,
-    $hero_title, $hero_subtitle,
-    $dominio ?: null,
-    $tienda_id
-]);
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $nombre_tienda, $email,
+        $instagram, $facebook, $tiktok, $twitter,
+        $color, $moneda, $whatsapp, $mensaje_wp,
+        $descripcion, $direccion, $horario,
+        $logo_url, $banner_url,
+        $marca_blanca, $notif_pedido, $notif_stock,
+        $meta_desc, $meta_palabras, $codigo_tracking, $css_personalizado,
+        $hero_title, $hero_subtitle,
+        $dominio ?: null,
+        $tienda_id
+    ]);
 
-$_SESSION['tienda_nombre'] = $nombre_tienda;
-$_SESSION['marca_blanca'] = $marca_blanca;
+    $_SESSION['tienda_nombre'] = $nombre_tienda;
+    $_SESSION['marca_blanca'] = $marca_blanca;
 
-$u = obtener_usuario_actual();
-registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la configuración de la tienda');
+    $u = obtener_usuario_actual();
+    registrar_actividad($pdo, $tienda_id, $u['nombre'], $u['tipo'], 'Actualizó la configuración de la tienda');
 
-header("Location: configuracion.php?success=1");
-exit;
+    header("Location: configuracion.php?success=1");
+    exit;
+} catch (\Exception $e) {
+    error_log("Error al guardar configuración: " . $e->getMessage());
+    header("Location: configuracion.php?error=general");
+    exit;
+}

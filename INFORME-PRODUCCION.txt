@@ -1,0 +1,247 @@
+================================================================================
+  INFORME DE PRODUCCIÓN — mi_catalogo
+  Fecha: 06/07/2026
+  Proyecto: C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo
+  Repo: https://github.com/Patoo92/micatalogo (master)
+================================================================================
+
+ESTADO GENERAL: ~65% LISTO PARA PRODUCCIÓN
+
+  Área                %     Observaciones
+  ─────────────────────────────────────────────────────────────────────
+  Funcionalidad core  85%   Registro, login, productos, catálogo,
+                            pedidos, email, staff, dashboard,
+                            Stripe checkout ✅
+  Seguridad           75%   CSP nonce, CSRF, rate limiting,
+                            prepared statements ✅. 5 bugs a corregir
+  Testing             50%   44 tests (helpers + business flows) ✅
+                            Sin tests de controladores, Stripe,
+                            API ni E2E
+  UI/UX               65%   Tabler, responsive, dark mode ✅
+                            Faltan estados vacíos, 404
+  Deployment          30%   .htaccess básico ✅. Faltan: robots.txt,
+                            favicon, sitemap, HSTS, CSP fallback
+
+
+================================================================================
+  1. TESTS
+================================================================================
+
+  PHPUnit: OK (44 tests, 68 assertions)
+  - tests/HelpersTest.php:     23 tests (helpers, escaping, rate limit, CSRF)
+  - tests/BusinessFlowsTest.php: 21 tests (permisos, roles, plan_limite)
+
+  Smoke test (smoke_test.ps1): 7 verificaciones
+  - Catálogo público (200), 404 tienda inexistente, Login admin (200),
+    Login público (200), Recuperar admin/pass, Header CSP
+
+  Pendiente:
+  - Tests de controladores (productos, pedidos, staff, config)
+  - Tests de integración Stripe
+  - Tests de API endpoints
+  - Tests E2E
+  - Cobertura de código (phpunit.xml no tiene coverage config)
+
+
+================================================================================
+  2. SEGURIDAD
+================================================================================
+
+  2.1 Implementado ✅
+  ─────────────────────────────────────────────────────────────────────
+  - CSP nonce en scripts (generado en init_session.php)
+  - CSRF tokens en todos los formularios POST
+  - Rate limiting: login (5/15min), registro (3/15min), slug lookup
+    (30/15min), API (60/min)
+  - Password hashing con PASSWORD_BCRYPT
+  - Regeneración de session ID tras login
+  - Session cookie: httponly=true, samesite=Strict
+  - Prepared statements en TODAS las consultas SQL
+  - Headers: X-Frame-Options (DENY), X-Content-Type-Options (nosniff),
+    Referrer-Policy
+  - Uploads: validación MIME real con finfo, tamaño máximo 2MB,
+    .htaccess en imagenes/ y uploads/ bloquea *.php
+  - Configuración sensible fuera del webroot (micatalogo-config/)
+
+  2.2 Bugs de seguridad a corregir (ALTA prioridad)
+  ─────────────────────────────────────────────────────────────────────
+
+  #1  cambiar-password.php:27
+      La validación EXIGE mayúscula [A-Z] y número [0-9], pero
+      registro.php acepta passwords sin esas reglas (solo min 10 chars).
+      Usuarios con password tipo "abcdefghij" no podrán cambiarla.
+
+  #2  templates/catalogo.php:144, producto.php:96,168
+      codigo_tracking y css_personalizado se imprimen con echo RAW
+      (<?= $tienda['codigo_tracking'] ?>).
+      Stored XSS contra visitantes del catálogo público.
+
+  #3  init_session.php:10
+      Session cookie Secure flag depende de HTTPS detectado.
+      Si el servidor no fuerza HTTPS, la cookie viaja en texto plano.
+
+  #4  logout.php, logout-admin.php
+      No verifican CSRF. Ataque de Logout CSRF posible (daño bajo).
+
+  #5  api.php:13
+      CORS devuelve "*" cuando no hay Origin header.
+      Permite peticiones cross-origin desde local filesystem.
+
+  2.3 Mejoras de seguridad (MEDIA prioridad)
+  ─────────────────────────────────────────────────────────────────────
+  - .htaccess: agregar HSTS (Strict-Transport-Security)
+  - .htaccess: agregar CSP como fallback (si PHP falla antes de
+    conexion.php, no hay CSP)
+  - index.php:71,77 y admin.php:62 usan LIMIT $x OFFSET $y con (int)
+    cast en vez de placeholders PDO
+  - Sin timeout de sesión por inactividad
+
+
+================================================================================
+  3. DEPLOYMENT
+================================================================================
+
+  3.1 Archivos existentes ✅
+  ─────────────────────────────────────────────────────────────────────
+  - .htaccess presente con: bloqueo de archivos sensibles (*.sql, *.md,
+    *.log, *.env, conexion.php, helpers.php, email_helper.php, composer.*),
+    bloqueo de directorios (templates/, logs/, vendor/, tests/),
+    Options -Indexes, ServerSignature Off, headers de seguridad,
+    mod_expires para caching, rewrite rules para URLs amigables
+
+  3.2 Archivos faltantes (BLOQUEANTES para producción)
+  ─────────────────────────────────────────────────────────────────────
+  [ALTA] robots.txt      — No existe. Google indexa /admin.php,
+                           /login.php, /logout.php, etc.
+  [ALTA] favicon.ico     — No existe. Cada carga genera 404.
+  [ALTA] 404.html (o     — No existe. Apache muestra página 404 por
+         .htaccess         defecto (fea, expone versión del server).
+         ErrorDocument)
+  [MEDIA] sitemap.xml    — No existe. Perjudica SEO.
+
+  3.3 Configuración externa requerida
+  ─────────────────────────────────────────────────────────────────────
+  Tres archivos fuera del webroot (NO incluidos en el repo):
+
+  Archivo                    Ruta local (XAMPP)         Ruta relativa
+  ─────────────────────────────────────────────────────────────────────
+  micatalogo-config/db.php   C:\xampp\...\db.php        ../../micatalogo-config/db.php
+  micatalogo-config/email.php C:\xampp\...\email.php    ../../micatalogo-config/email.php
+  micatalogo-config/stripe.php C:\xampp\...\stripe.php  ../../micatalogo-config/stripe.php
+
+  Riesgo: si no existen en el servidor de producción, la app falla.
+
+  3.4 Error handling
+  ─────────────────────────────────────────────────────────────────────
+  ✅ display_errors=0 en init_session.php
+  ✅ Error logging a logs/error.log
+  ✅ try/catch en: conexion.php, pedidos, Stripe, email
+  ❌ NO hay try/catch en guardar-configuracion.php
+  ✅ mostrar_error() en toda la app (mensajes genéricos)
+
+
+================================================================================
+  4. FUNCIONALIDAD CORE
+================================================================================
+
+  4.1 Implementado ✅
+  ─────────────────────────────────────────────────────────────────────
+  - Registro con selección de plan (Starter/Pro/Business)
+  - Trial 3 días (Pro/Business), downgrade automático al vencer
+  - Login con verificación de tienda activa
+  - Staff con permisos granulares
+  - API keys + API REST (api.php, api-productos.php) con rate limiting
+  - Productos: CRUD, stock, stock mínimo, alerta email, thumbnails,
+    WebP con fallback, destacado, etiqueta (Nuevo/Oferta/Sin stock)
+  - Catálogo público con: carrito, lightbox, compartir WhatsApp,
+    meta tags OG/Twitter, hero personalizable, CSS custom, tracking,
+    dark mode, parallax (Pro+), layout grid/lista (Pro+), paginación
+  - Producto individual con meta tags, tracking, CSS custom
+  - Pedidos agrupados por cliente+fecha, expandibles, completar,
+    cancelar con restauración de stock, email confirmación al cliente
+  - Dashboard con Chart.js (pedidos/7 días, productos por categoría)
+  - Super-admin: gestión tiendas, actividad, cambiar plan, trial,
+    facturas, backup
+  - Configuración: nombre, email, moneda, RRSS, descripción,
+    dirección, horario, banner, hero, meta tags, tracking,
+    CSS personalizado, notificaciones, dominio (Business+)
+  - Stripe Checkout + Customer Portal + cancelación desde admin
+  - Migraciones SQL (7 migraciones aplicadas)
+  - Exportar/Importar productos CSV
+  - Backup SQL
+  - Privacidad, cookies consent banner
+  - Tabler UI con sidebar, dark mode admin, 5 temas visuales
+  - Modo oscuro público con persistencia localStorage
+  - Marca blanca (Business+)
+
+  4.2 Pendiente (IMPORTANTE)
+  ─────────────────────────────────────────────────────────────────────
+  - Buscador/filtro de productos (admin y público)
+  - Página 404 personalizada
+  - Timeout de sesión por inactividad
+  - Webhook Stripe (requiere dominio público)
+  - Notificación email pre-expiracion trial
+
+
+================================================================================
+  5. COMPOSER / DEPENDENCIAS
+================================================================================
+
+  Producción:
+    phpmailer/phpmailer ^6.9    ✅
+    stripe/stripe-php    ^20.3  ✅
+
+  Desarrollo:
+    phpunit/phpunit      ^11.0  ✅
+
+  No declaradas (instaladas en servidor pero no explicitadas):
+    ext-pdo, ext-gd, ext-json, ext-ctype, ext-mbstring
+
+  43 archivos PHP en raíz — TODOS sin errores de sintaxis.
+
+
+================================================================================
+  6. PLAN DE ACCIÓN PARA PRODUCCIÓN
+================================================================================
+
+  FASE 1 — BLOQUEANTES (estima: 1 día)
+  ─────────────────────────────────────────────────────────────────────
+  [ ] 1. Crear robots.txt
+  [ ] 2. Crear favicon.ico (16x16 o 32x32 PNG/ICO)
+  [ ] 3. Crear página 404 (404.html + ErrorDocument en .htaccess)
+  [ ] 4. Corregir cambiar-password.php — quitar validación mayúscula/número
+  [ ] 5. Agregar try/catch en guardar-configuracion.php
+  [ ] 6. Sanitizar codigo_tracking y css_personalizado (o documentar riesgo)
+
+  FASE 2 — SEGURIDAD (estima: 1 día)
+  ─────────────────────────────────────────────────────────────────────
+  [ ] 7. Agregar HSTS en .htaccess
+  [ ] 8. Agregar CSP fallback en .htaccess
+  [ ] 9. Migrar LIMIT/OFFSET a placeholders PDO
+  [ ] 10. Agregar CSRF en logout
+  [ ] 11. Revisar CORS en api.php
+
+  FASE 3 — DEPLOYMENT (estima: 2-3 días)
+  ─────────────────────────────────────────────────────────────────────
+  [ ] 12. Configurar hosting (PHP 8.2+, MySQL, Apache)
+  [ ] 13. Configurar dominio + DNS + HTTPS
+  [ ] 14. Subir archivos (excepto config externa)
+  [ ] 15. Crear micatalogo-config/ con db.php, email.php, stripe.php
+  [ ] 16. Ejecutar migraciones SQL
+  [ ] 17. Configurar webhook Stripe (requiere dominio HTTPS)
+  [ ] 18. Crear sitemap.xml
+
+  FASE 4 — POLISH (estima: 1-2 días)
+  ─────────────────────────────────────────────────────────────────────
+  [ ] 19. Agregar estados vacíos en tablas y listados
+  [ ] 20. Agregar timeout de sesión por inactividad
+  [ ] 21. Agregar buscador/filtro de productos
+  [ ] 22. Tests de integración para Stripe y API
+  [ ] 23. Notificación email pre-expiracion trial
+
+  ESTIMACIÓN TOTAL: ~5-7 días hábiles para producción
+
+
+================================================================================
+  FIN DEL INFORME
+================================================================================
