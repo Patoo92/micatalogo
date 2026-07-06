@@ -7,15 +7,15 @@
 
 ## Estado actual del proyecto
 
-### Planes y monetización (sin pasarela de pago)
+### Planes y monetización (Stripe integrado)
 - **Starter** (gratis, siempre): 1 staff, 1 tienda, 0 API keys, sin marca blanca, sin personalización
 - **Pro** (12€/mes): 3 staff, 1 tienda, 1 API key, personalización completa (SEO, hero, RRSS, CSS, tracking, notificaciones), sin marca blanca
 - **Business** (19€/mes): 10 staff, 3 tiendas, 5 API keys, marca blanca, dominio personalizado, todo lo de Pro
 - **Enterprise** (39€/mes): staff/tiendas/API keys ilimitados, personalización total, soporte dedicado
-- Trial: 3 días solo para Pro/Business; al vencer → downgrade automático a Starter (login.php)
-- Upgrades: gestión manual desde super-admin (sin pasarela de pago aún)
+- Trial: 3 días solo para Pro/Business; al vencer → downgrade automático a Starter (login.php) + email notificación
+- Stripe Checkout para nuevas suscripciones; Customer Portal para gestionar/cancelar
 
-### Nuevas implementaciones (25 junio 2026)
+### Nuevas implementaciones (25–27 junio 2026)
 - **Dashboard stats**: admin.php ahora muestra cards con total productos, pedidos totales, pendientes, stock bajo/agotados, pedidos hoy y esta semana
 - **Dominio personalizado**: columna `dominio` en tiendas, campo en config (Business+), routing automático en index.php y producto.php — si el HTTP_HOST coincide con un dominio registrado, carga esa tienda sin necesidad de `?tienda=`
 - **Dashboard.php con gráficos**: nueva página dedicada con Chart.js (pedidos/7 días, productos por categoría). Stats movidas de admin.php a dashboard.php como tab independiente
@@ -48,6 +48,13 @@
 - Configuración de tienda: nombre, email, moneda, redes sociales (Facebook, TikTok, Twitter/X), descripción, dirección, horario, mensaje WhatsApp, banner, hero title/subtitle, meta tags, tracking, CSS personalizado, notificaciones
 - Footer genérico con dirección/horario, cookies consent banner, página de privacidad
 - Exportar/Importar productos CSV
+
+### FASE 4 — Polish (27 junio 2026)
+- **Timeout de sesión**: `init_session.php` verifica inactividad >30 min y destruye sesión + redirige a login
+- **Buscador server-side (admin)**: filtro `?q=` en admin.php busca por nombre de producto via SQL LIKE
+- **Buscador server-side (catálogo público)**: formulario GET en catalogo.php mantiene `?tienda=` y `?q=` en URL, compatible con paginación
+- **Login trial email**: notificación automática al owner cuando el trial vence en ≤3 días (implementado desde junio)
+- **Sidebar, dark mode, CSP nonce, Parallax, List view, Tema admin**: implementado en F3
 
 ### Sidebar lateral (navegación moderna)
 - Creado `templates/sidebar_partial.php`: sidebar fijo (240px) en escritorio con gradiente oscuro
@@ -87,7 +94,7 @@
 - **editar-producto.php**: movida la consulta `SELECT` del producto antes del bloque `POST`. Ya no se usa `$producto` antes de ser definida; al editar sin cambiar imagen ya no se pierde el thumbnail.
 - **login.php**: añadido alias `t.activo AS tienda_activo` al SELECT de staff. El segundo `elseif` ahora compara `$staff['tienda_activo']` en vez de duplicar la condición de `activo`. Staff de tienda suspendida ya no puede iniciar sesión.
 
-### Cambios recientes (junio 2026)
+### Cambios recientes (27 junio 2026)
 
 #### helpers.php
 - `generar_thumbnail()`: verifica `function_exists('imagecreatefromwebp')` antes de usarlo

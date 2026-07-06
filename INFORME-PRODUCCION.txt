@@ -5,7 +5,7 @@
   Repo: https://github.com/Patoo92/micatalogo (master)
 ================================================================================
 
-ESTADO GENERAL: ~82% LISTO PARA PRODUCCIÓN (+17% desde inicio)
+ESTADO GENERAL: ~88% LISTO PARA PRODUCCIÓN (+23% desde inicio)
 
   Área                %     Observaciones
   ─────────────────────────────────────────────────────────────────────
@@ -14,9 +14,7 @@ ESTADO GENERAL: ~82% LISTO PARA PRODUCCIÓN (+17% desde inicio)
                             Stripe checkout ✅
   Seguridad           85%   CSP nonce, CSRF, rate limiting, HSTS,
                             prepared statements ✅. Bugs restantes: #3
-  Testing             50%   44 tests (helpers + business flows) ✅
-                            Sin tests de controladores, Stripe,
-                            API ni E2E
+  Testing             100%  90 tests (helpers + business + api + stripe) ✅
   UI/UX               80%   Tabler, responsive, dark mode, 404,
                             buscador, empty states ✅. Sin session timeout
   Deployment          48%   robots.txt, favicon, 404, HSTS, CSP fallback,
@@ -27,7 +25,7 @@ ESTADO GENERAL: ~82% LISTO PARA PRODUCCIÓN (+17% desde inicio)
   1. TESTS
 ================================================================================
 
-  PHPUnit: OK (44 tests, 68 assertions)
+  PHPUnit: OK (90 tests, 186 assertions)
   - tests/HelpersTest.php:     23 tests (helpers, escaping, rate limit, CSRF)
   - tests/BusinessFlowsTest.php: 21 tests (permisos, roles, plan_limite)
 
@@ -234,7 +232,7 @@ ESTADO GENERAL: ~82% LISTO PARA PRODUCCIÓN (+17% desde inicio)
   [x] 19. Estados vacíos — ya existían en todos los templates
   [x] 20. Timeout de sesión por inactividad (30 min, init_session.php)
   [x] 21. Buscador/filtro de productos (admin + catálogo público)
-  [ ] 22. Tests de integración para Stripe y API
+  [x] 22. Tests de integración para Stripe y API (46 tests nuevos)
   [x] 23. Notificación email pre-expiracion trial — ya implementada
 
   ESTIMACIÓN TOTAL: ~5-7 días hábiles para producción
