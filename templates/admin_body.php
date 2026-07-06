@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<?php $page_title = 'Panel de Administraci�n - ' . htmlspecialchars($tienda_nombre); ?>
+<?php $page_title = 'Panel de Administraci�n - ' . htmlspecialchars($tienda_nombre); ?>
 <?php require __DIR__ . '/head.php'; ?>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -88,11 +88,25 @@
             </div>
         </div>
 
+        <form method="GET" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Buscar productos…" value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>">
+                <button type="submit" class="btn btn-outline-secondary"><iconify-icon icon="mdi:magnify" width="18"></iconify-icon></button>
+                <?php if (!empty($_GET['q'])): ?>
+                    <a href="admin.php" class="btn btn-outline-danger"><iconify-icon icon="mdi:close" width="18"></iconify-icon></a>
+                <?php endif; ?>
+            </div>
+        </form>
+
         <?php if (count($productos) === 0): ?>
         <div class="text-center py-5 empty-state">
             <iconify-icon icon="mdi:package-variant-closed" width="48"></iconify-icon>
-            <p>No hay productos todavía. ¡Creá el primero!</p>
-            <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon mt-2"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
+            <?php if (!empty($_GET['q'])): ?>
+                <p>No se encontraron productos para "<strong><?php echo htmlspecialchars($_GET['q']); ?></strong>".</p>
+            <?php else: ?>
+                <p>No hay productos todavía. ¡Creá el primero!</p>
+                <a href="nuevo-producto.php" class="btn btn-success fw-bold btn-icon mt-2"><iconify-icon icon="mdi:plus" width="18"></iconify-icon> Nuevo Producto</a>
+            <?php endif; ?>
         </div>
         <?php else: ?>
 

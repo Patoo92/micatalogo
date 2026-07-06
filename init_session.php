@@ -14,12 +14,24 @@ session_set_cookie_params([
 
 session_start();
 
-if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
-    header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
-}
-if (isset($_SESSION['tienda_id']) || isset($_SESSION['admin_id'])) {
+// Timeout de sesión por inactividad (30 min)
+$SESSION_TIMEOUT = 1800;
+$is_admin = isset($_SESSION['admin_id']);
+if (isset($_SESSION['tienda_id']) || $is_admin) {
+    $last = $_SESSION['_last_activity'] ?? 0;
+    if ($last > 0 && (time() - $last) > $SESSION_TIMEOUT) {
+        $_SESSION = [];
+        session_destroy();
+        header("Location: " . ($is_admin ? 'login-admin.php' : 'login.php'));
+        exit;
+    }
+    $_SESSION['_last_activity'] = time();
     header('Cache-Control: no-store, no-cache, must-revalidate, private');
     header('Pragma: no-cache');
+}
+
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
 }
 
 $csp_nonce = bin2hex(random_bytes(16));

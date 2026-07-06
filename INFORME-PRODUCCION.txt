@@ -229,7 +229,7 @@ ESTADO GENERAL: ~75% LISTO PARA PRODUCCIÓN (+10% desde inicio)
   [ ] 17. Configurar webhook Stripe (requiere dominio HTTPS)
   [ ] 18. Crear sitemap.xml
 
-  FASE 4 — POLISH (estima: 1-2 días)
+  FASE 4 — POLISH (EN PROGRESO)
   ─────────────────────────────────────────────────────────────────────
   [ ] 19. Agregar estados vacíos en tablas y listados
   [ ] 20. Agregar timeout de sesión por inactividad

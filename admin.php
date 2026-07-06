@@ -47,21 +47,40 @@ $stats_pedidos_hoy = (int)$stmtHoy->fetchColumn();
 $pagina = max(1, (int)($_GET['p'] ?? 1));
 $por_pagina = 20;
 $offset = ($pagina - 1) * $por_pagina;
+$q = trim($_GET['q'] ?? '');
 
-$stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
-$stmtCount->execute([$tienda_id]);
-$total_productos = (int)$stmtCount->fetchColumn();
-$total_paginas = max(1, (int)ceil($total_productos / $por_pagina));
+if ($q !== '') {
+    $like = '%' . $q . '%';
+    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND (nombre LIKE ? OR descripcion LIKE ?)");
+    $stmtCount->execute([$tienda_id, $like, $like]);
+    $total_productos = (int)$stmtCount->fetchColumn();
+    $total_paginas = max(1, (int)ceil($total_productos / $por_pagina));
 
-$stmt = $pdo->prepare("
-    SELECT p.*, c.nombre_categoria 
-    FROM productos p 
-    LEFT JOIN categorias c ON p.categoria_id = c.id 
-    WHERE p.tienda_id = ?
-    ORDER BY p.id DESC
-    LIMIT ? OFFSET ?
-");
-$stmt->execute([$tienda_id, $por_pagina, $offset]);
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.nombre_categoria 
+        FROM productos p 
+        LEFT JOIN categorias c ON p.categoria_id = c.id 
+        WHERE p.tienda_id = ? AND (p.nombre LIKE ? OR p.descripcion LIKE ?)
+        ORDER BY p.id DESC
+        LIMIT ? OFFSET ?
+    ");
+    $stmt->execute([$tienda_id, $like, $like, $por_pagina, $offset]);
+} else {
+    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
+    $stmtCount->execute([$tienda_id]);
+    $total_productos = (int)$stmtCount->fetchColumn();
+    $total_paginas = max(1, (int)ceil($total_productos / $por_pagina));
+
+    $stmt = $pdo->prepare("
+        SELECT p.*, c.nombre_categoria 
+        FROM productos p 
+        LEFT JOIN categorias c ON p.categoria_id = c.id 
+        WHERE p.tienda_id = ?
+        ORDER BY p.id DESC
+        LIMIT ? OFFSET ?
+    ");
+    $stmt->execute([$tienda_id, $por_pagina, $offset]);
+}
 $productos = $stmt->fetchAll();
 
 $stock_critico = array_filter($productos, fn($p) => $p['stock'] <= $p['stock_minimo']);

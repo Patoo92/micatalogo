@@ -263,10 +263,16 @@
     </div>
 
     <div class="d-flex gap-2 align-items-center mb-4">
-        <div class="search-wrapper">
-            <iconify-icon icon="mdi:magnify" class="search-icon" width="18"></iconify-icon>
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar productos…" autocomplete="off">
-        </div>
+        <form method="GET" class="flex-grow-1" action="index.php">
+            <div class="search-wrapper">
+                <iconify-icon icon="mdi:magnify" class="search-icon" width="18"></iconify-icon>
+                <input type="hidden" name="tienda" value="<?php echo htmlspecialchars($tienda['slug']); ?>">
+                <input type="text" name="q" id="searchInput" class="form-control" placeholder="Buscar productos…" autocomplete="off" value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>">
+                <?php if (!empty($_GET['q'])): ?>
+                    <a href="index.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2"><iconify-icon icon="mdi:close" width="16"></iconify-icon></a>
+                <?php endif; ?>
+            </div>
+        </form>
         <?php if ($cat_pers): ?>
         <div class="d-flex gap-1 flex-shrink-0">
             <button id="layoutGrid" class="btn-layout active" title="Cuadrícula"><iconify-icon icon="mdi:grid" width="16"></iconify-icon></button>
@@ -332,24 +338,33 @@
             <?php endforeach; ?>
         <?php else: ?>
             <div class="col-12 text-center py-5">
-                <p class="text-muted">No hay productos disponibles en este momento.</p>
+                <?php if (!empty($_GET['q'])): ?>
+                    <p class="text-muted">No se encontraron productos para "<strong><?php echo htmlspecialchars($_GET['q']); ?></strong>".</p>
+                <?php else: ?>
+                    <p class="text-muted">No hay productos disponibles en este momento.</p>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
 
+    <?php
+    $url_base = '?tienda=' . urlencode($tienda['slug']);
+    if ($categoria_filtrada) $url_base .= '&categoria=' . $categoria_filtrada;
+    if (!empty($_GET['q'])) $url_base .= '&q=' . urlencode($_GET['q']);
+    ?>
     <?php if ($total_paginas > 1): ?>
     <nav class="mt-4 d-flex justify-content-center" aria-label="Paginación">
         <ul class="pagination pagination-sm">
             <li class="page-item <?php echo $pagina <= 1 ? 'disabled' : ''; ?>">
-                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $pagina - 1; ?>#productos-catalogo" tabindex="-1">Anterior</a>
+                <a class="page-link" href="<?php echo $url_base; ?>&pagina=<?php echo $pagina - 1; ?>#productos-catalogo" tabindex="-1">Anterior</a>
             </li>
             <?php for ($p = max(1, $pagina - 2); $p <= min($total_paginas, $pagina + 2); $p++): ?>
             <li class="page-item <?php echo $p === $pagina ? 'active' : ''; ?>">
-                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $p; ?>#productos-catalogo"><?php echo $p; ?></a>
+                <a class="page-link" href="<?php echo $url_base; ?>&pagina=<?php echo $p; ?>#productos-catalogo"><?php echo $p; ?></a>
             </li>
             <?php endfor; ?>
             <li class="page-item <?php echo $pagina >= $total_paginas ? 'disabled' : ''; ?>">
-                <a class="page-link" href="?tienda=<?php echo htmlspecialchars($tienda['slug']); ?><?php echo $categoria_filtrada ? '&categoria=' . $categoria_filtrada : ''; ?>&pagina=<?php echo $pagina + 1; ?>#productos-catalogo">Siguiente</a>
+                <a class="page-link" href="<?php echo $url_base; ?>&pagina=<?php echo $pagina + 1; ?>#productos-catalogo">Siguiente</a>
             </li>
         </ul>
     </nav>
@@ -568,9 +583,9 @@ function enviarWhatsApp() {
         });
 }
 
-/* --- buscador en vivo --- */
+/* --- buscador en vivo (solo si no hay búsqueda servidor) --- */
 var searchInput = document.getElementById('searchInput');
-if (searchInput) {
+if (searchInput && !window.location.search.match(/[?&]q=/)) {
     searchInput.addEventListener('input', function() {
         var term = this.value.toLowerCase().trim();
         var items = document.querySelectorAll('.product-item');

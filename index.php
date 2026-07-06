@@ -60,25 +60,34 @@ try {
     $destacados = $stmtDest->fetchAll();
 
     $categoria_filtrada = isset($_GET['categoria']) ? (int)$_GET['categoria'] : null;
+    $q = trim($_GET['q'] ?? '');
     $pagina = max(1, (int)($_GET['pagina'] ?? 1));
     $por_pagina = 20;
     $offset = ($pagina - 1) * $por_pagina;
 
+    $where = "tienda_id = ?";
+    $params = [$tienda_id];
+
     if ($categoria_filtrada) {
-        $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ? AND categoria_id = ?");
-        $stmtCount->execute([$tienda_id, $categoria_filtrada]);
-        $total_productos = (int)$stmtCount->fetchColumn();
-        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? AND categoria_id = ? ORDER BY id DESC LIMIT ? OFFSET ?");
-        $stmtProd->execute([$tienda_id, $categoria_filtrada, $por_pagina, $offset]);
-    } else {
-        $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE tienda_id = ?");
-        $stmtCount->execute([$tienda_id]);
-        $total_productos = (int)$stmtCount->fetchColumn();
-        $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE tienda_id = ? ORDER BY id DESC LIMIT ? OFFSET ?");
-        $stmtProd->execute([$tienda_id, $por_pagina, $offset]);
+        $where .= " AND categoria_id = ?";
+        $params[] = $categoria_filtrada;
     }
-    $productos = $stmtProd->fetchAll();
+
+    if ($q !== '') {
+        $like = '%' . $q . '%';
+        $where .= " AND (nombre LIKE ? OR descripcion LIKE ?)";
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM productos WHERE $where");
+    $stmtCount->execute($params);
+    $total_productos = (int)$stmtCount->fetchColumn();
     $total_paginas = max(1, (int)ceil($total_productos / $por_pagina));
+
+    $stmtProd = $pdo->prepare("SELECT * FROM productos WHERE $where ORDER BY id DESC LIMIT ? OFFSET ?");
+    $stmtProd->execute([...$params, $por_pagina, $offset]);
+    $productos = $stmtProd->fetchAll();
 
 } catch (PDOException $e) {
     mostrar_error("Error del servidor", "No se pudo cargar la tienda. Intenta de nuevo más tarde.");
