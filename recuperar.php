@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mensaje = '<div class="alert alert-success"><strong>Correo enviado.</strong> Revisá tu bandeja de entrada (y la carpeta de spam).</div>';
             } else {
                 $mensaje = '<div class="alert alert-warning">
-                    <strong>No se pudo enviar el email.</strong> Configurá SMTP en <code>micatalogo-config/email.php</code>.<br>
+                    <strong>No se pudo enviar el email.</strong> Configurá las variables de entorno <code>SMTP_USER</code> / <code>SMTP_PASS</code>.<br>
                     Pedí un nuevo enlace cuando tengas SMTP funcionando.
                 </div>';
             }

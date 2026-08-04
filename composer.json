@@ -11,10 +11,7 @@
         "phpunit/phpunit": "^11.0"
     },
     "autoload": {
-        "files": [
-            "helpers.php",
-            "email_helper.php"
-        ]
+        "files": []
     },
     "scripts": {
         "test": "phpunit"

@@ -11,6 +11,8 @@
 --   5. Eliminados índices duplicados en login_attempts (idx_ip_tipo = idx_login_ip)
 --   6. FK actividad→tiendas cambiada a ON DELETE SET NULL (evita perder historial al borrar tienda)
 --   7. Añadida tabla 'suscripciones' preparada para integración Stripe/MP
+--   8. Añadidas columnas de facturación de la migración 007 (precio_mensual,
+--      precio_anual, stripe_customer_id, stripe_subscription_id) + tabla 'facturas'
 -- =============================================================================
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -55,6 +57,11 @@ CREATE TABLE `tiendas` (
   `codigo_tracking`     TEXT          DEFAULT NULL,
   -- Configuración operativa
   `moneda`              VARCHAR(10)   DEFAULT '€',
+  -- Facturación Stripe (migración 007)
+  `precio_mensual`      DECIMAL(10,2) DEFAULT NULL,
+  `precio_anual`        DECIMAL(10,2) DEFAULT NULL,
+  `stripe_customer_id`  VARCHAR(100)  DEFAULT NULL,                       -- cus_xxxxx
+  `stripe_subscription_id` VARCHAR(100) DEFAULT NULL,                     -- sub_xxxxx
   `notif_nuevo_pedido`  TINYINT(1)    DEFAULT 1,
   `notif_stock_bajo`    TINYINT(1)    DEFAULT 1,
   -- Plan y estado
@@ -305,6 +312,38 @@ CREATE TABLE `suscripciones` (
   KEY `idx_suscripciones_renovacion` (`fecha_renovacion`),
   KEY `idx_proveedor_sub_id`       (`proveedor_sub_id`),
   CONSTRAINT `suscripciones_ibfk_1`
+    FOREIGN KEY (`tienda_id`) REFERENCES `tiendas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- =============================================================================
+-- TABLA: facturas  [migración 007 — integración Stripe]
+-- Facturas emitidas por pagos Stripe o creadas manualmente por el superadmin.
+-- El webhook (webhook-stripe.php) y stripe-success.php insertan aquí.
+-- =============================================================================
+CREATE TABLE `facturas` (
+  `id`                INT(11)       NOT NULL AUTO_INCREMENT,
+  `tienda_id`         INT(11)       NOT NULL,
+  `numero_factura`    VARCHAR(50)   NOT NULL,
+  `plan`              VARCHAR(20)   NOT NULL,
+  `periodo`           ENUM('mensual','anual') NOT NULL DEFAULT 'mensual',
+  `monto`             DECIMAL(10,2) NOT NULL,
+  `moneda`            VARCHAR(3)    DEFAULT 'EUR',
+  `estado`            ENUM('pendiente','pagada','cancelada','vencida') NOT NULL DEFAULT 'pendiente',
+  `metodo_pago`       VARCHAR(50)   DEFAULT NULL,
+  `fecha_emision`     DATE          NOT NULL,
+  `fecha_pago`        DATE          DEFAULT NULL,
+  `fecha_vencimiento` DATE          DEFAULT NULL,
+  `notas`             TEXT          DEFAULT NULL,
+  `created_at`        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_factura_numero` (`numero_factura`),
+  KEY `idx_facturas_tienda`   (`tienda_id`),
+  KEY `idx_facturas_estado`   (`estado`),
+  KEY `idx_facturas_fecha_vencimiento` (`fecha_vencimiento`),
+  CONSTRAINT `facturas_ibfk_1`
     FOREIGN KEY (`tienda_id`) REFERENCES `tiendas` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

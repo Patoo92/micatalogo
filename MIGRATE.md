@@ -17,14 +17,15 @@ uploads/    →  4 archivos
 ```
 Copiarlos al mismo lugar en el destino.
 
-### 3. Configuración fuera del webroot
-Del **origen** (`C:\xampp\micatalogo-config\`):
+### 3. Configuración (variables de entorno)
+En el **origen**, copiar el `.env` local (`C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo\.env`) que contiene:
 ```
-db.php          → credenciales BD
-email.php       → SMTP Brevo
-stripe.php      → API keys Stripe + price IDs
+DB_*        → credenciales BD
+SMTP_*      → SMTP Brevo
+STRIPE_*    → API keys Stripe + price IDs
+MYSQLDUMP_PATH → ruta al mysqldump local
 ```
-Crear la carpeta `C:\xampp\micatalogo-config\` en el destino y copiar los 3 archivos.
+En el **destino**: copiar el `.env` (o reconstruirlo desde `.env.example`) a la raíz del proyecto. Si se usa un servidor real, definir estas variables en el entorno del hosting en vez del `.env`. **No** se necesitan archivos de configuración fuera del webroot.
 
 ### 4. Base de datos
 En el **origen**, exportar:
@@ -56,7 +57,7 @@ composer install
 |------|--------|---------|
 | Código | `mi_catalogo/` (git) | `git clone` |
 | Imágenes | `imagenes/`, `uploads/` | Copiar carpetas |
-| Config | `C:\xampp\micatalogo-config\` | Copiar carpeta |
+| Config | `.env` (gitignored) | Copiar `.env` o definir variables de entorno |
 | BD | Exportar con mysqldump | Importar + crear DB |
 | GD | `extension=gd` en php.ini | Descomentar igual |
 | Dependencias | `vendor/` | `composer install` |

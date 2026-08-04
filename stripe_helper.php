@@ -4,21 +4,36 @@ define('STRIPE_HELPER_LOADED', true);
 
 require_once __DIR__ . '/helpers.php';
 
+// Autoloader de Composer: sin él las clases \Stripe\* no existen.
+$autoload = __DIR__ . '/vendor/autoload.php';
+if (file_exists($autoload)) {
+    require_once $autoload;
+} else {
+    error_log("stripe_helper.php: vendor/autoload.php no encontrado — Stripe no disponible");
+}
+
 /**
- * Carga la config de Stripe y retorna el array.
+ * Carga la config de Stripe desde variables de entorno y retorna el array.
  */
 function stripe_config() {
-    $paths = [
-        __DIR__ . '/../../micatalogo-config/stripe.php',
-        'C:\\xampp\\micatalogo-config\\stripe.php',
-    ];
-    foreach ($paths as $p) {
-        if (file_exists($p)) {
-            return require $p;
+    $prices = [];
+    foreach (['pro', 'business', 'enterprise'] as $plan) {
+        foreach (['mensual', 'anual'] as $periodo) {
+            $clave = 'STRIPE_PRICE_' . strtoupper($plan) . '_' . strtoupper($periodo);
+            $valor = _getenv($clave);
+            if ($valor !== '') {
+                $prices[$plan][$periodo] = $valor;
+            }
         }
     }
-    error_log("stripe_helper.php: No se encontró stripe.php en las rutas de config");
-    return null;
+
+    return [
+        'secret_key'      => getenv('STRIPE_SECRET_KEY') ?: '',
+        'publishable_key' => getenv('STRIPE_PUBLISHABLE_KEY') ?: '',
+        'prices'          => $prices,
+        'webhook_secret'  => getenv('STRIPE_WEBHOOK_SECRET') ?: '',
+        'test_mode'       => in_array(strtolower(_getenv('STRIPE_TEST_MODE', 'true')), ['1', 'true', 'on', 'yes']),
+    ];
 }
 
 /**

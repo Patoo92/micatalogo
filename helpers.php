@@ -2,6 +2,8 @@
 if (defined('HELPERS_LOADED')) return;
 define('HELPERS_LOADED', true);
 
+require_once __DIR__ . '/env.php';
+
 function ruta_imagen($tienda_id) {
     $dir = "imagenes/{$tienda_id}";
     if (!is_dir($dir)) mkdir($dir, 0755, true);

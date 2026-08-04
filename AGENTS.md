@@ -146,8 +146,9 @@
 - `/micatalogo/Css/style.css`: estilos
 - `/micatalogo/migrations/`: SQL de migraciones
 - `/micatalogo/logs/error.log`: log de errores PHP
-- `C:\xampp\micatalogo-config\db.php`: config DB
-- `C:\xampp\micatalogo-config\email.php`: config SMTP Brevo
+- `/.env`: variables de entorno (gitignored, copiar desde `.env.example`)
+- `/env.php`: cargador de `.env` (sin dependencias; el entorno real gana sobre el .env)
+- `DB_*`, `SMTP_*`, `STRIPE_*`, `MYSQLDUMP_PATH`, `CDN_URL`: variables leídas por conexion.php, email_helper.php, stripe_helper.php y backup.php
 
 ### Próximos pasos
 1. Subir capturas de pantalla reales a la landing (imagenes/captura-admin.jpg, captura-movil.jpg)
@@ -166,10 +167,7 @@ Para que Stripe notifique eventos (pagos, cancelaciones, renovaciones) al servid
    - `customer.subscription.deleted`
    - `invoice.paid`
    - `invoice.payment_failed`
-4. Obtener el **Signing secret** (whsec_xxxx) y agregarlo en `C:\xampp\micatalogo-config\stripe.php`:
-   ```php
-   'webhook_secret' => 'whsec_tu_secreto_aqui',
-   ```
+4. Obtener el **Signing secret** (whsec_xxxx) y configurarlo como variable de entorno `STRIPE_WEBHOOK_SECRET` (en el entorno real o en `.env`).
 5. Habilitar **Customer Portal** en Stripe Dashboard → Settings → Customer Portal:
    - Activar: "Update payment methods", "Cancel subscriptions", "Upgrade/downgrade"
    - No es necesario el portal si no se usa (el botón "Gestionar suscripción" redirige al portal)
@@ -177,19 +175,13 @@ Para que Stripe notifique eventos (pagos, cancelaciones, renovaciones) al servid
 ### Stripe — Customer Portal
 El portal permite al usuario gestionar su suscripción (cambiar plan, cancelar, actualizar método de pago) sin salir del sitio. Configurar en Stripe Dashboard:
 - **Settings → Customer Portal** → Customize → habilitar lo necesario
-- Los price IDs deben estar configurados en `C:\xampp\micatalogo-config\stripe.php`:
-  ```php
-  'prices' => [
-      'pro'       => ['mensual' => 'price_xxx'],
-      'business'  => ['mensual' => 'price_xxx'],
-      'enterprise'=> ['mensual' => 'price_xxx'],
-  ],
-  ```
+- Los price IDs deben estar configurados como variables de entorno: `STRIPE_PRICE_PRO_MENSUAL`, `STRIPE_PRICE_PRO_ANUAL`, `STRIPE_PRICE_BUSINESS_MENSUAL`, `STRIPE_PRICE_BUSINESS_ANUAL`, `STRIPE_PRICE_ENTERPRISE_MENSUAL`, `STRIPE_PRICE_ENTERPRISE_ANUAL`
 
 ### Notas técnicas
 - El CSP nonce se genera en `init_session.php` y se pasa como `$csp_nonce` a los templates
 - `conexion.php` incluye `helpers.php` con `require_once`; `init_session.php` no incluye helpers
 - El toast usa `mostrarToast()` definido en `templates/toast_partial.php`
-- Las rutas de configuración tienen fallback a `C:\xampp\micatalogo-config\` si la ruta relativa no existe
+- La configuración se lee por variables de entorno (`env.php` carga `.env`; getenv real tiene prioridad). No hay rutas locales hardcodeadas
+- `email_helper.php`, `helpers.php` y `stripe_helper.php` tienen guard de doble inclusión y NO están en `autoload.files` de Composer — incluirlos SIEMPRE con `require_once`
 - El dark mode se persiste en `localStorage` con clave `dark_mode` ('1' = activo)
 - Para agregar dark mode a una página nueva: (1) sidebar ya tiene el toggle, (2) copiar el script bloque justo antes de `</body>`

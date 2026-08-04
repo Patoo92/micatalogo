@@ -13,21 +13,18 @@ if (isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$configPath = __DIR__ . '/../../micatalogo-config/db.php';
-if (!file_exists($configPath)) {
-    $configPath = 'C:\xampp\micatalogo-config\db.php';
-}
-$config = require $configPath;
+$config = [
+    'host' => _getenv('DB_HOST', 'localhost'),
+    'db'   => _getenv('DB_NAME', 'catalogo_whatsapp'),
+    'user' => _getenv('DB_USER', 'root'),
+    'pass' => getenv('DB_PASS') ?: '',
+];
 
 if ($es_admin) {
     $filename = 'backup_' . $config['db'] . '_' . date('Ymd_His') . '.sql';
     header('Content-Disposition: attachment; filename="' . $filename . '"');
 
-    $mysqldump = 'mysqldump';
-    $paths = ['C:\\xampp\\mysql\\bin\\mysqldump', 'C:\\xampp\\mysql\\bin\\mysqldump.exe', 'mysqldump'];
-    foreach ($paths as $p) {
-        if (file_exists($p) || strpos($p, '\\') === false) { $mysqldump = $p; break; }
-    }
+    $mysqldump = _getenv('MYSQLDUMP_PATH', 'mysqldump');
 
     putenv("MYSQL_PWD={$config['pass']}");
     $cmd = sprintf(

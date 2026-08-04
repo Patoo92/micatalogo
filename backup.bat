@@ -1,9 +1,9 @@
 @echo off
-REM Backup CLI seguro - requiere .my.cnf en el directorio de configuracion
+REM Backup CLI - respalda la base completa local
 REM Uso: backup.bat
 
-set "MYSQL_CONFIG=C:\xampp\micatalogo-config\.my.cnf"
-set "OUTPUT_DIR=C:\xampp\htdocs\micatalogo\backups"
+set "MYSQL_CONFIG=C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo\.my.cnf"
+set "OUTPUT_DIR=C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo\backups"
 
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 

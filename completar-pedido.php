@@ -1,6 +1,7 @@
 <?php
 require_once 'init_session.php';
 require_once 'conexion.php';
+require_once 'email_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['tienda_id']) || !isset($_POST['id'])) {
     header("Location: login.php");

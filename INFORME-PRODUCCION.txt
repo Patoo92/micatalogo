@@ -59,7 +59,8 @@ ESTADO GENERAL: ~88% LISTO PARA PRODUCCIÓN (+23% desde inicio)
     Referrer-Policy
   - Uploads: validación MIME real con finfo, tamaño máximo 2MB,
     .htaccess en imagenes/ y uploads/ bloquea *.php
-  - Configuración sensible fuera del webroot (micatalogo-config/)
+  - Configuración por variables de entorno (.env gitignored + bloqueado
+    por .htaccess; env real del servidor tiene prioridad)
 
   2.2 Bugs de seguridad corregidos (FASE 1)
   ─────────────────────────────────────────────────────────────────────
@@ -116,17 +117,23 @@ ESTADO GENERAL: ~88% LISTO PARA PRODUCCIÓN (+23% desde inicio)
   ─────────────────────────────────────────────────────────────────────
   [MEDIA] sitemap.xml    — No existe. Perjudica SEO. (FASE 3)
 
-  3.4 Configuración externa requerida
+  3.4 Configuración — variables de entorno (env.php)
   ─────────────────────────────────────────────────────────────────────
-  Tres archivos fuera del webroot (NO incluidos en el repo):
+  Ya NO se usan archivos fuera del webroot. La app lee variables de
+  entorno cargadas por env.php desde .env (o del entorno real, que
+  tiene prioridad). Lista completa en .env.example.
 
-  Archivo                    Ruta local (XAMPP)         Ruta relativa
-  ─────────────────────────────────────────────────────────────────────
-  micatalogo-config/db.php   C:\xampp\...\db.php        ../../micatalogo-config/db.php
-  micatalogo-config/email.php C:\xampp\...\email.php    ../../micatalogo-config/email.php
-  micatalogo-config/stripe.php C:\xampp\...\stripe.php  ../../micatalogo-config/stripe.php
+  Variables: DB_HOST, DB_NAME, DB_USER, DB_PASS, DB_CHARSET,
+             SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM,
+             STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY,
+             STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_* (12 price IDs),
+             MYSQLDUMP_PATH, CDN_URL
 
-  Riesgo: si no existen en el servidor de producción, la app falla.
+  En producción: definir en el panel del hosting / systemd / Docker,
+  o copiar .env.example → .env (protegido por .htaccess).
+
+  Riesgo ELIMINADO: ya no existen rutas locales hardcodeadas
+  (C:\xampp\...) ni dependencia de archivos fuera del repo.
 
   3.5 Error handling
   ─────────────────────────────────────────────────────────────────────
@@ -221,8 +228,9 @@ ESTADO GENERAL: ~88% LISTO PARA PRODUCCIÓN (+23% desde inicio)
   ─────────────────────────────────────────────────────────────────────
   [ ] 12. Configurar hosting (PHP 8.2+, MySQL, Apache)
   [ ] 13. Configurar dominio + DNS + HTTPS
-  [ ] 14. Subir archivos (excepto config externa)
-  [ ] 15. Crear micatalogo-config/ con db.php, email.php, stripe.php
+  [ ] 14. Subir archivos (excepto .env y vendor/)
+  [ ] 15. Configurar variables de entorno (DB_*, SMTP_*, STRIPE_*)
+          en el hosting o copiar .env.example → .env
   [ ] 16. Ejecutar migraciones SQL
   [ ] 17. Configurar webhook Stripe (requiere dominio HTTPS)
   [ ] 18. Crear sitemap.xml

@@ -14,17 +14,14 @@ if (!is_dir($logDir)) mkdir($logDir, 0755, true);
 ini_set('log_errors', 1);
 ini_set('error_log', $logDir . '/error.log');
 
-$configPath = __DIR__ . '/../../micatalogo-config/db.php';
-if (!file_exists($configPath)) {
-    $configPath = 'C:\xampp\micatalogo-config\db.php';
-}
-$config = require $configPath;
+// helpers.php carga .env (variables de entorno) — real env gana sobre .env
+require_once __DIR__ . '/helpers.php';
 
-$host    = $config['host'];
-$db      = $config['db'];
-$user    = $config['user'];
-$pass    = $config['pass'];
-$charset = $config['charset'];
+$host    = _getenv('DB_HOST', 'localhost');
+$db      = _getenv('DB_NAME', 'catalogo_whatsapp');
+$user    = _getenv('DB_USER', 'root');
+$pass    = getenv('DB_PASS') ?: '';
+$charset = _getenv('DB_CHARSET', 'utf8mb4');
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 

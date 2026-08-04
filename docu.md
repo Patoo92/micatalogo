@@ -16,41 +16,58 @@ SaaS multi-tenant para catálogos de productos con pedidos por WhatsApp.
 
 ### 2.1 Estructura de directorios
 ```
-C:\xampp\htdocs\micatalogo\          → webroot (app)
-C:\xampp\micatalogo-config\          → credenciales (fuera del webroot)
+C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo\   → proyecto (app)
+└── .env                                        → credenciales (gitignored)
 ```
+La configuración se lee por **variables de entorno** (ver `.env.example`). El cargador está en `env.php`: si existe `.env` en la raíz del proyecto lo carga, pero las variables reales del entorno (`getenv`) tienen prioridad. No hay credenciales hardcodeadas en el código.
 
 ### 2.2 Base de datos
 - Crear BD: `catalogo_whatsapp` (charset `utf8mb4_general_ci`)
-- Ejecutar migraciones:
+- Importar el schema completo (incluye facturas y suscripciones):
+```
+mysql -u root catalogo_whatsapp < schema.sql
+```
+- O ejecutar las migraciones en orden (001 → 007):
 ```
 mysql -u root catalogo_whatsapp < migrations/001_indices.sql
 mysql -u root catalogo_whatsapp < migrations/002_email_cliente.sql
+mysql -u root catalogo_whatsapp < migrations/003_marca_blanca_api.sql
+mysql -u root catalogo_whatsapp < migrations/004_planes.sql
+mysql -u root catalogo_whatsapp < migrations/005_trial.sql
+mysql -u root catalogo_whatsapp < migrations/006_dominio.sql
+mysql -u root catalogo_whatsapp < migrations/007_facturas.sql
 ```
 
-### 2.3 Configuración
-`C:\xampp\micatalogo-config\db.php`:
-```php
-<?php
-return [
-    'host'    => 'localhost',
-    'db'      => 'catalogo_whatsapp',
-    'user'    => 'root',
-    'pass'    => '',
-    'charset' => 'utf8mb4',
-];
-```
+### 2.3 Configuración (variables de entorno)
 
-`C:\xampp\micatalogo-config\email.php`:
-```php
-<?php
-define('SMTP_HOST', 'smtp-relay.brevo.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'tu_usuario_smtp');
-define('SMTP_PASS', 'tu_password_smtp');
-define('SMTP_FROM', 'tutienda@tudominio.com');
-define('SMTP_FROM_NAME', 'micatalogo');
+Copiar `.env.example` a `.env` y completar:
 ```
+DB_HOST=localhost
+DB_NAME=catalogo_whatsapp
+DB_USER=root
+DB_PASS=
+
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
+
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_TEST_MODE=true
+STRIPE_PRICE_PRO_MENSUAL=
+STRIPE_PRICE_PRO_ANUAL=
+STRIPE_PRICE_BUSINESS_MENSUAL=
+STRIPE_PRICE_BUSINESS_ANUAL=
+STRIPE_PRICE_ENTERPRISE_MENSUAL=
+STRIPE_PRICE_ENTERPRISE_ANUAL=
+
+MYSQLDUMP_PATH=
+CDN_URL=
+```
+`.env` NO se sube al repositorio (está en `.gitignore`) y el `.htaccess` bloquea su acceso por web. En producción, definir estas variables en el entorno real del servidor (panel del hosting, systemd, Docker) es preferible al `.env`.
 
 ### 2.4 Dependencias
 ```
@@ -92,14 +109,16 @@ Requisitos del hosting:
 
 ### 3.3 Preparar archivos para subir
 
-**Archivos a subir** (todo el contenido de `C:\xampp\htdocs\micatalogo`):
+**Archivos a subir** (todo el contenido del proyecto, excepto `.env`, `vendor/`, `logs/`):
 ```
 /var/www/html/micatalogo/
 ├── .htaccess
+├── .env.example      (luego copiar a .env)
 ├── index.php
 ├── init_session.php
 ├── conexion.php
 ├── helpers.php
+├── env.php
 ├── email_helper.php
 ├── *.php             (todos los .php)
 ├── templates/
@@ -109,12 +128,7 @@ Requisitos del hosting:
 └── uploads/          (crear con permisos 755)
 ```
 
-**Config fuera del webroot**:
-```
-/var/www/micatalogo-config/   (UN nivel arriba de html)
-├── db.php
-└── email.php
-```
+**Configuración**: no hay archivos fuera del webroot. En producción se definen las variables de entorno (`DB_*`, `SMTP_*`, `STRIPE_*`) en el panel del hosting, en `systemd` o en Docker. Si se usa `.env`, copiar `.env.example` → `.env` y completarlo (está protegido por `.htaccess`).
 
 ### 3.4 Subir archivos vía FTP
 
@@ -126,9 +140,9 @@ Contraseña: (la del hosting)
 Puerto: 21
 ```
 
-1. Subir todo `micatalogo/` a `public_html/` o `htdocs/`
-2. Crear `micatalogo-config/` FUERA del webroot
-3. Configurar `db.php` y `email.php`
+1. Subir todo el proyecto a `public_html/` o `htdocs/` (excepto `.env` local)
+2. Crear `.env` desde `.env.example` (o definir variables en el panel del hosting)
+3. Configurar `DB_*`, `SMTP_*`, `STRIPE_*`
 
 ### 3.5 Base de datos
 
@@ -167,15 +181,13 @@ Si el hosting no tiene SSH, subir `vendor/` desde local (se generó con `compose
 3. En **Senders** → verificar el remitente (tu dominio)
 4. Si el hosting tiene IP fija, agregarla en **Authorized IPs**
 
-Configurar `/var/www/micatalogo-config/email.php`:
-```php
-<?php
-define('SMTP_HOST', 'smtp-relay.brevo.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'la_clave_que_te_dio_brevo');
-define('SMTP_PASS', 'xsmtpsib-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-define('SMTP_FROM', 'tutienda@tudominio.com');
-define('SMTP_FROM_NAME', 'micatalogo');
+Configurar las variables SMTP en `.env` (o entorno del servidor):
+```
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=la_clave_que_te_dio_brevo
+SMTP_PASS=xsmtpsib-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+SMTP_FROM=tutienda@tudominio.com
 ```
 
 ### 3.8 HTTPS (Let's Encrypt)
@@ -205,14 +217,27 @@ Esto genera certificados y configura el redirect 80→443 automáticamente.
 
 **Sin Cloudflare**: solo configurar `CDN_URL` si tienes un subdominio dedicado para assets.
 
-### 3.10 Variables de entorno (Apache)
+### 3.10 Variables de entorno
 
-En el `.htaccess` del hosting o `httpd.conf`:
+Todas las credenciales y config se leen por entorno (`.env` local o variables reales del servidor). La app lee: `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_*`, `MYSQLDUMP_PATH`, `CDN_URL`.
+
+En Apache se pueden fijar así:
 ```apache
+SetEnv DB_HOST localhost
+SetEnv DB_NAME catalogo_whatsapp
+SetEnv DB_USER usuario
+SetEnv DB_PASS clave
+SetEnv SMTP_HOST smtp-relay.brevo.com
+SetEnv SMTP_PORT 587
+SetEnv SMTP_USER clave_brevo
+SetEnv SMTP_PASS xsmtpsib-xxxx
+SetEnv STRIPE_SECRET_KEY sk_live_xxxx
+SetEnv STRIPE_PUBLISHABLE_KEY pk_live_xxxx
+SetEnv STRIPE_WEBHOOK_SECRET whsec_xxxx
 SetEnv CDN_URL https://cdn.tudominio.com
 ```
 
-O en el panel del hosting (si lo soporta).
+En cPanel, hostinger, etc. suelen tener una sección de **Variables de entorno**; también se pueden definir por `systemd` (Servicios) o Docker (`environment:`).
 
 ### 3.11 Checklist final
 
@@ -250,7 +275,7 @@ https://tudominio.com/micatalogo/backup.php?token=CLAVE_SECRETA
 |----------|-------|----------|
 | Página en blanco | PHP error | Revisar `logs/error.log` |
 | 500 Internal Server | Error PHP o .htaccess | Revisar logs de Apache (/var/log/apache2/) |
-| No envía emails | SMTP mal configurado | Verificar credenciales en `email.php` |
+| No envía emails | SMTP mal configurado | Verificar `SMTP_USER`/`SMTP_PASS` en `.env` |
 | Imágenes no se ven | Ruta incorrecta | Verificar que `uploads/` y `imagenes/` tengan permisos 755 |
 | Session no funciona | PHP session.save_path incorrecto | Configurar en php.ini del hosting |
 | .htaccess no funciona | Apache AllowOverride None | Pedir al hosting que active mod_rewrite |
@@ -274,7 +299,7 @@ https://tudominio.com/micatalogo/recuperar.php           → Recuperar contrase�
 
 ### 4.1 Patrón
 - Separación lógica/template: cada `.php` carga datos y hace `require` a `templates/`
-- Seguridad: credenciales fuera del webroot, `.htaccess` restrictivo
+- Seguridad: credenciales por variables de entorno (`.env` gitignored + `.htaccess` que bloquea `\.env$`), `.htaccess` restrictivo
 - Estado: sesiones PHP, CSRF tokens, rate limiting por IP
 
 ### 4.2 Flujo de archivos
@@ -322,7 +347,7 @@ init_session.php ← configura sesión ANTES de conexion.php
 
 ## 6. Seguridad
 
-- Credenciales fuera del webroot (`micatalogo-config/`)
+- Credenciales por variables de entorno (`.env` gitignored, bloqueado por `.htaccess`)
 - `.htaccess`: deniega `.sql`, `.md`, `.log`, `conexion.php`, `helpers.php`, `templates/`, `logs/`, `vendor/`
 - CSRF tokens en todos los POST (rotación post-uso)
 - Rate limiting (5 intentos / 15 min) en login
@@ -369,7 +394,7 @@ init_session.php ← configura sesión ANTES de conexion.php
 2. **SMTP & API** → generar SMTP key
 3. Agregar IP del servidor en **Authorized IPs** (si aplica)
 4. Verificar remitente en **Senders**
-5. Configurar en `micatalogo-config/email.php`
+5. Configurar `SMTP_USER`/`SMTP_PASS` en `.env` (o entorno del servidor)
 
 ---
 
@@ -390,6 +415,6 @@ init_session.php ← configura sesión ANTES de conexion.php
 ## 10. Tests
 
 ```bash
-php phpunit.phar
+php vendor/bin/phpunit --configuration phpunit.xml
 ```
-PHPUnit 10.5 — 4 tests (helpers: ruta_imagen, imagen_defecto, rate_limit, thumbnail)
+PHPUnit 11 — 90 tests, 186 assertions (helpers, controladores, Stripe, suscripciones, facturas, migraciones).
