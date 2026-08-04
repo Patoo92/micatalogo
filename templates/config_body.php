@@ -314,7 +314,7 @@
                 <?php endif; ?>
             <?php elseif ($_SESSION['plan'] !== 'starter' && !$stripe_subscription_id): ?>
                 <div class="mt-3">
-                    <a href="registro.php?plan=<?php echo $_SESSION['plan']; ?>" class="btn btn-sm btn-primary btn-icon">
+                    <a href="registro.php?plan=<?php echo htmlspecialchars($_SESSION['plan']); ?>" class="btn btn-sm btn-primary btn-icon">
                         <iconify-icon icon="mdi:credit-card" width="16"></iconify-icon> Configurar pago
                     </a>
                 </div>
@@ -389,6 +389,7 @@
         });
         </script>
         <?php endif; ?>
+        <?php require __DIR__ . '/session_warning_partial.php'; ?>
         <?php require __DIR__ . '/darkmode_admin_partial.php'; ?>
     </div>
     </div>

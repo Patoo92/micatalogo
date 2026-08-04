@@ -23,7 +23,7 @@ La configuración se lee por **variables de entorno** (ver `.env.example`). El c
 
 ### 2.2 Base de datos
 - Crear BD: `catalogo_whatsapp` (charset `utf8mb4_general_ci`)
-- Importar el schema completo (incluye facturas y suscripciones):
+- Importar el schema completo (incluye facturas; la tabla suscripciones se eliminó en la migración 008):
 ```
 mysql -u root catalogo_whatsapp < schema.sql
 ```

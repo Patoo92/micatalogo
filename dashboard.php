@@ -190,5 +190,6 @@ try {
     })();
     </script>
 </div>
+    <?php require __DIR__ . '/templates/session_warning_partial.php'; ?>
 </body>
 </html>

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($flash_message): ?>
                 <div class="alert alert-<?php echo htmlspecialchars($flash_type ?? 'info'); ?> d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
                     <iconify-icon icon="mdi:<?php echo $flash_type === 'success' ? 'check-circle' : 'info'; ?>" width="18"></iconify-icon>
-                    <?php echo $flash_message; ?>
+                    <?php echo htmlspecialchars($flash_message); ?>
                 </div>
             <?php endif; ?>
 

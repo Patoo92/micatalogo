@@ -151,6 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     });
     </script>
+    <?php require __DIR__ . '/templates/session_warning_partial.php'; ?>
     <?php require __DIR__ . '/templates/darkmode_admin_partial.php'; ?>
     </div>
 </body>

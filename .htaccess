@@ -4,6 +4,9 @@ RewriteEngine On
 RewriteRule ^registro$ registro.php [L,QSA]
 RewriteRule ^recuperar-admin$ recuperar-admin.php [L,QSA]
 
+# Sitemap dinámico (generado por sitemap.php)
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
 # Catálogo de tienda
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

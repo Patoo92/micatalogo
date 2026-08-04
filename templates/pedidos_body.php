@@ -191,6 +191,7 @@
         });
     });
     </script>
+    <?php require __DIR__ . '/session_warning_partial.php'; ?>
     <?php require __DIR__ . '/darkmode_admin_partial.php'; ?>
     </div>
 </body>

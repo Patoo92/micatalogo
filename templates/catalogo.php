@@ -406,8 +406,8 @@
 let carrito = JSON.parse(localStorage.getItem('carrito_' + <?php echo $tienda_id; ?>)) || [];
 let carritoData = [];
 const whatsappNum = '<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>';
-const moneda = '<?php echo htmlspecialchars($tienda['moneda'] ?? '€'); ?>';
-const tiendaSlug = '<?php echo htmlspecialchars($tienda['slug']); ?>';
+const moneda = <?php echo js_escape($tienda['moneda'] ?? '€'); ?>;
+const tiendaSlug = <?php echo js_escape($tienda['slug']); ?>;
 const csrfToken = '<?php echo csrf_token(); ?>';
 
 function guardarCarrito() {
@@ -559,7 +559,8 @@ function enviarWhatsApp() {
                 btn.innerHTML = '<iconify-icon icon="mdi:whatsapp" width="18"></iconify-icon> Enviar Pedido por WhatsApp';
                 return;
             }
-            let msg = '<?php echo htmlspecialchars($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>'.replace(/\\n/g, '\n') + '\n';
+            let msg = <?php echo js_escape($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>;
+            msg = msg.replace(/\\n/g, '\n') + '\n';
             let total = 0;
             carrito.forEach(item => {
                 const prod = carritoData.find(p => p.id === item.id);

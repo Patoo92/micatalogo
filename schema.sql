@@ -10,9 +10,10 @@
 --   4. Eliminados índices duplicados en tiendas (slug×2, usuario×2)
 --   5. Eliminados índices duplicados en login_attempts (idx_ip_tipo = idx_login_ip)
 --   6. FK actividad→tiendas cambiada a ON DELETE SET NULL (evita perder historial al borrar tienda)
---   7. Añadida tabla 'suscripciones' preparada para integración Stripe/MP
---   8. Añadidas columnas de facturación de la migración 007 (precio_mensual,
+--   7. Añadidas columnas de facturación de la migración 007 (precio_mensual,
 --      precio_anual, stripe_customer_id, stripe_subscription_id) + tabla 'facturas'
+--   8. Eliminada tabla 'suscripciones' (en desuso, nunca usada por el código PHP;
+--      la facturación real usa tiendas.* + facturas). Ver migrations/008_eliminar_suscripciones.sql
 -- =============================================================================
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -281,38 +282,6 @@ CREATE TABLE `actividad` (
   KEY `idx_actividad_created` (`created_at`),
   CONSTRAINT `actividad_ibfk_1`
     FOREIGN KEY (`tienda_id`) REFERENCES `tiendas` (`id`) ON DELETE SET NULL  -- FIX: era CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
--- =============================================================================
--- TABLA: suscripciones  [NUEVA — preparada para Stripe/Mercado Pago]
--- No implementada en el código PHP actual. Schema listo para conectar
--- la pasarela de pago cuando se integre.
--- =============================================================================
-CREATE TABLE `suscripciones` (
-  `id`                    INT(11)       NOT NULL AUTO_INCREMENT,
-  `tienda_id`             INT(11)       NOT NULL,
-  `proveedor`             VARCHAR(20)   NOT NULL DEFAULT 'stripe',       -- stripe|mercadopago
-  `proveedor_customer_id` VARCHAR(100)  DEFAULT NULL,                    -- ej: cus_xxxxx en Stripe
-  `proveedor_sub_id`      VARCHAR(100)  DEFAULT NULL,                    -- ej: sub_xxxxx en Stripe
-  `plan`                  VARCHAR(20)   NOT NULL,                        -- starter|pro|business|enterprise
-  `periodo`               ENUM('mensual','anual') NOT NULL DEFAULT 'mensual',
-  `estado`                ENUM('activa','cancelada','vencida','trial') NOT NULL DEFAULT 'trial',
-  `monto`                 DECIMAL(10,2) DEFAULT NULL,
-  `moneda_pago`           VARCHAR(3)    DEFAULT 'EUR',                   -- ISO 4217
-  `fecha_inicio`          DATE          NOT NULL,
-  `fecha_renovacion`      DATE          DEFAULT NULL,
-  `fecha_cancelacion`     DATE          DEFAULT NULL,
-  `created_at`            TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at`            TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  PRIMARY KEY (`id`),
-  KEY `idx_suscripciones_tienda`   (`tienda_id`),
-  KEY `idx_suscripciones_estado`   (`estado`),
-  KEY `idx_suscripciones_renovacion` (`fecha_renovacion`),
-  KEY `idx_proveedor_sub_id`       (`proveedor_sub_id`),
-  CONSTRAINT `suscripciones_ibfk_1`
-    FOREIGN KEY (`tienda_id`) REFERENCES `tiendas` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 

@@ -520,9 +520,9 @@ document.addEventListener('keydown', function(e) {
 /* --- compartir --- */
 document.getElementById('btnShareProduct').addEventListener('click', function() {
     const url = '<?php echo htmlspecialchars($prod_url, ENT_QUOTES, 'UTF-8'); ?>';
-    const text = '<?php echo $prod_nombre; ?> - <?php echo $prod_precio; ?> ' + moneda;
+    const text = <?php echo js_escape($producto['nombre'] . ' - ' . number_format($producto['precio'], 2)); ?> + ' ' + moneda;
     if (navigator.share) {
-        navigator.share({ title: '<?php echo $prod_nombre; ?>', text: text, url: url }).catch(function(){});
+        navigator.share({ title: <?php echo js_escape($producto['nombre']); ?>, text: text, url: url }).catch(function(){});
     } else {
         const waUrl = 'https://wa.me/' + whatsappNum + '?text=' + encodeURIComponent(text + ' - ' + url);
         window.open(waUrl, '_blank');

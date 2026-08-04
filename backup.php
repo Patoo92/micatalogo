@@ -47,7 +47,7 @@ if ($es_admin) {
 } else {
     $tienda_id = $_SESSION['tienda_id'];
     $tienda_nombre = $_SESSION['tienda_nombre'];
-    $filename = 'backup_' . str_replace(' ', '_', $tienda_nombre) . '_' . date('Ymd_His') . '.sql';
+    $filename = 'backup_' . preg_replace('/[^\w\-.]/', '_', str_replace(' ', '_', $tienda_nombre)) . '_' . date('Ymd_His') . '.sql';
     header('Content-Disposition: attachment; filename="' . $filename . '"');
 
     echo "-- Respaldo de tienda: $tienda_nombre (ID: $tienda_id)\n";

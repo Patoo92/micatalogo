@@ -76,5 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['confirmar'] ?? '') === 'si
             </div>
         </form>
     </div>
+    <?php require __DIR__ . '/templates/session_warning_partial.php'; ?>
 </body>
 </html>

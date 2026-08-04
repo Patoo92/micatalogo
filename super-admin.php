@@ -362,7 +362,7 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
                                 <td style="color: #475569;">#<?php echo $tienda['id']; ?></td>
                                 <td>
                                     <div style="color: #f1f5f9; font-weight: 600;"><?php echo htmlspecialchars($tienda['nombre_tienda']); ?></div>
-                                    <a href="index.php?tienda=<?php echo $tienda['slug']; ?>" target="_blank" class="text-info small font-monospace text-decoration-none">/<?php echo $tienda['slug']; ?></a>
+                                    <a href="index.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>" target="_blank" class="text-info small font-monospace text-decoration-none">/<?php echo htmlspecialchars($tienda['slug']); ?></a>
                                 </td>
                                 <td><?php echo htmlspecialchars($tienda['usuario']); ?></td>
                                 <td style="font-size:0.8rem;color:#94a3b8;"><?php echo htmlspecialchars($tienda['email'] ?? '—'); ?></td>
@@ -424,7 +424,7 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
                                         </form>
                                         <form method="POST" action="super-admin.php?tab=facturas" class="d-inline" title="Crear factura">
                                             <input type="hidden" name="id" value="<?php echo $tienda['id']; ?>">
-                                            <input type="hidden" name="plan" value="<?php echo $tienda['plan'] ?? 'starter'; ?>">
+                                            <input type="hidden" name="plan" value="<?php echo htmlspecialchars($tienda['plan'] ?? 'starter'); ?>">
                                             <input type="hidden" name="periodo" value="mensual">
                                             <input type="hidden" name="monto" value="0">
                                             <input type="hidden" name="estado" value="pendiente">
@@ -602,5 +602,6 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
         }
     })();
     </script>
+    <?php require __DIR__ . '/templates/session_warning_partial.php'; ?>
 </body>
 </html>

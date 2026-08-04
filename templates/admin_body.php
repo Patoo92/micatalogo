@@ -207,6 +207,7 @@
         <?php endif; ?>
     </div>
 </div>
+    <?php require __DIR__ . '/session_warning_partial.php'; ?>
     <?php require __DIR__ . '/darkmode_admin_partial.php'; ?>
 </body>
 </html>
