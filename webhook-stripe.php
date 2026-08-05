@@ -6,6 +6,12 @@
  *   https://tudominio.com/micatalogo/webhook-stripe.php
  *   Eventos: checkout.session.completed, customer.subscription.updated,
  *            customer.subscription.deleted, invoice.paid, invoice.payment_failed
+ *            (si hay pagos online de productos: checkout.session.async_payment_failed)
+ *
+ * checkout.session.completed actúa según mode:
+ *   - mode=subscription  → alta/cambio de plan de la plataforma
+ *   - mode=payment       → pago del carrito de una tienda (confirma pedido
+ *                          y descuenta stock; ver confirmar_pago_producto)
  */
 require_once __DIR__ . '/stripe_helper.php';
 
@@ -21,7 +27,12 @@ $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
 if (empty($config['webhook_secret'])) {
     error_log("webhook-stripe.php: webhook_secret no configurado — eventos ignorados");
-    http_response_code(200);
+    // FIX: antes respondía 200, que le indica a Stripe "evento procesado
+    // correctamente" y por lo tanto NO reintenta el envío — un evento de pago
+    // real se perdería en silencio si esta variable de entorno faltara en el
+    // deploy. Con 500, Stripe reintenta automáticamente y además marca el
+    // evento como fallido en su Dashboard de Webhooks, visible de inmediato.
+    http_response_code(500);
     echo json_encode(['error' => 'webhook_secret not configured']);
     exit;
 }
@@ -45,6 +56,22 @@ $data = $event->data->object;
 
 switch ($event_type) {
     case 'checkout.session.completed':
+        // mode=payment → pago de productos del catálogo (carrito)
+        if (($data->mode ?? '') === 'payment') {
+            $codigo_pedido = $data->metadata->codigo_pedido ?? '';
+            $payment_status = $data->payment_status ?? '';
+            $payment_intent = $data->payment_intent ?? '';
+
+            if ($codigo_pedido !== '' && $payment_status === 'paid') {
+                $res = confirmar_pago_producto($pdo, $codigo_pedido, $payment_intent ?: $data->id);
+                if ($res['fallos'] > 0) {
+                    error_log("webhook-stripe: pedido $codigo_pedido pagado con {$res['fallos']} línea(s) sin stock suficiente — revisar manualmente.");
+                }
+            }
+            break;
+        }
+
+        // mode=subscription → alta de plan (flujo existente)
         $tienda_id = (int)($data->metadata->tienda_id ?? 0);
         $plan = $data->metadata->plan ?? 'starter';
         $periodo = $data->metadata->periodo ?? 'mensual';
@@ -144,6 +171,15 @@ switch ($event_type) {
                 $stmtF = $pdo->prepare("INSERT INTO facturas (tienda_id, numero_factura, plan, periodo, monto, moneda, estado, notas) VALUES (?, ?, (SELECT plan FROM tiendas WHERE id = ?), 'mensual', 0, 'EUR', 'vencida', ?)");
                 $stmtF->execute([$tienda['id'], generar_numero_factura(), $tienda['id'], "Pago fallido (intento $attempts)"]);
             }
+        }
+        break;
+
+    case 'checkout.session.async_payment_failed':
+        // Pago de productos rechazado por el banco. El stock NO se descontó
+        // (se descuenta solo al confirmar), así que solo se marca el pedido.
+        $codigo_pedido = $data->metadata->codigo_pedido ?? '';
+        if ($codigo_pedido !== '' && ($data->mode ?? '') === 'payment') {
+            marcar_pago_fallido($pdo, $codigo_pedido);
         }
         break;
 }

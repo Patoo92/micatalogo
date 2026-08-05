@@ -58,6 +58,7 @@ CREATE TABLE `tiendas` (
   `codigo_tracking`     TEXT          DEFAULT NULL,
   -- Configuración operativa
   `moneda`              VARCHAR(10)   DEFAULT '€',
+  `moneda_iso`          VARCHAR(3)    NOT NULL DEFAULT 'EUR',           -- código ISO para la pasarela (migración 009)
   -- Facturación Stripe (migración 007)
   `precio_mensual`      DECIMAL(10,2) DEFAULT NULL,
   `precio_anual`        DECIMAL(10,2) DEFAULT NULL,
@@ -158,12 +159,21 @@ CREATE TABLE `pedidos` (
   `email_cliente`  VARCHAR(255) DEFAULT NULL,
   `estado`         VARCHAR(20)  DEFAULT 'Pendiente',                    -- Pendiente|Vendido|Cancelado
   `fecha_pedido`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  -- Pagos online (migración 009)
+  `codigo_pedido`   VARCHAR(20)   DEFAULT NULL,                         -- agrupa las líneas de un carrito
+  `metodo_pago`     VARCHAR(20)   NOT NULL DEFAULT 'whatsapp',          -- whatsapp|stripe
+  `pago_estado`     VARCHAR(20)   NOT NULL DEFAULT 'pendiente',         -- pendiente|pagado|fallido|cancelado
+  `pago_referencia` VARCHAR(100)  DEFAULT NULL,                         -- id sesión checkout / payment intent
+  `monto_total`     DECIMAL(10,2) DEFAULT NULL,
+  `moneda_pago`     VARCHAR(3)    DEFAULT NULL,
 
   PRIMARY KEY (`id`),
   KEY `idx_pedidos_tienda`   (`tienda_id`),
   KEY `idx_pedidos_estado`   (`estado`),
   KEY `idx_pedidos_producto` (`producto_id`),
   KEY `idx_pedidos_fecha`    (`tienda_id`, `fecha_pedido`),
+  KEY `idx_pedidos_codigo`   (`codigo_pedido`),
+  KEY `idx_pedidos_pago`     (`pago_estado`),
   CONSTRAINT `pedidos_ibfk_1`
     FOREIGN KEY (`tienda_id`)   REFERENCES `tiendas`   (`id`) ON DELETE CASCADE,
   CONSTRAINT `pedidos_ibfk_2`

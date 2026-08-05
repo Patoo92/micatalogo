@@ -109,6 +109,84 @@ function stripe_crear_sesion_checkout($tienda_id, $plan, $periodo, $success_url,
 }
 
 /**
+ * Crea una sesión de Stripe Checkout para cobrar productos de un carrito
+ * (mode=payment, precios dinámicos). NO descuenta stock: eso lo hace el
+ * webhook cuando Stripe confirma el pago (checkout.session.completed).
+ *
+ * @param int    $tienda_id       ID de la tienda en la BD
+ * @param string $codigo_pedido   Código que agrupa las líneas del pedido
+ * @param array  $line_items      Items en formato: [['name'=>..., 'unit_amount'=>centavos,
+ *                                'currency'=>'eur', 'quantity'=>int, 'images'=>[]], ...]
+ * @param string $success_url     URL de retorno OK (incluir {CHECKOUT_SESSION_ID})
+ * @param string $cancel_url      URL de retorno cancelación
+ * @param string $customer_email  Email para prefijar en Checkout
+ * @return array                  ['id' => session_id, 'url' => checkout_url]
+ */
+function stripe_crear_sesion_pago($tienda_id, $codigo_pedido, $line_items, $success_url, $cancel_url, $customer_email = '') {
+    $config = stripe_config();
+    if (!$config || empty($config['secret_key'])) {
+        throw new \RuntimeException("Stripe no configurado: falta secret_key");
+    }
+
+    $stripe_line_items = [];
+    foreach ($line_items as $item) {
+        $entry = [
+            'quantity'   => max(1, (int)$item['quantity']),
+            'price_data' => [
+                'currency'     => strtolower($item['currency']),
+                'unit_amount'  => max(1, (int)$item['unit_amount']),
+                'product_data' => [
+                    'name' => (string)$item['name'],
+                ],
+            ],
+        ];
+        if (!empty($item['images'])) {
+            $entry['price_data']['product_data']['images'] = array_slice((array)$item['images'], 0, 8);
+        }
+        $stripe_line_items[] = $entry;
+    }
+
+    $params = [
+        'mode'                => 'payment',
+        'line_items'          => $stripe_line_items,
+        'success_url'         => $success_url,
+        'cancel_url'          => $cancel_url,
+        'metadata'            => [
+            'tienda_id'     => (string)$tienda_id,
+            'codigo_pedido' => $codigo_pedido,
+        ],
+        'client_reference_id' => $codigo_pedido,
+    ];
+
+    if ($customer_email) {
+        $params['customer_email'] = $customer_email;
+    }
+
+    $session = stripe_cliente()->checkout->sessions->create($params);
+
+    return [
+        'id'  => $session->id,
+        'url' => $session->url,
+    ];
+}
+
+/**
+ * Recupera una sesión de Checkout desde Stripe (para verificar el estado del
+ * pago en pago-exito.php). Devuelve null si no existe o falla la llamada.
+ */
+function stripe_obtener_sesion_checkout($session_id) {
+    if (!$session_id || empty(stripe_config()['secret_key'])) {
+        return null;
+    }
+    try {
+        return stripe_cliente()->checkout->sessions->retrieve($session_id);
+    } catch (\Exception $e) {
+        error_log("stripe_obtener_sesion_checkout: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
  * Genera un número de factura único.
  */
 function generar_numero_factura() {

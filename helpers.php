@@ -119,6 +119,18 @@ function _env_path($key, $default = '') {
     return $val !== false && $val !== '' ? rtrim($val, '\\/') . '/' : $default;
 }
 
+/**
+ * Indica si una tienda puede cobrar online (pasarela) en el catálogo público.
+ * Requiere plan Business/Enterprise Y clave de Stripe configurada.
+ * @param array|null $tienda Fila de la tabla tiendas
+ */
+function pagos_online_habilitados($tienda) {
+    if (empty($tienda) || !in_array($tienda['plan'] ?? '', ['business', 'enterprise'], true)) {
+        return false;
+    }
+    return _getenv('STRIPE_SECRET_KEY') !== '';
+}
+
 function plan_limite($caracteristica) {
     $planes = [
         'starter'   => ['staff' => 1, 'tiendas' => 1, 'api_keys' => 0,  'marca_blanca' => false, 'personalizacion' => false],
@@ -137,6 +149,53 @@ function verificar_limite_plan($caracteristica, $actual, $titulo = 'Límite del 
         $mensaje = "Tu plan $plan permite hasta $maximo " . htmlspecialchars($caracteristica) . ". Actualizá tu plan para ampliarlo.";
         mostrar_error($titulo, $mensaje, 'configuracion.php', 'Ver planes');
     }
+}
+
+/**
+ * Confirma el pago de un pedido online (Stripe mode=payment) y descuenta el
+ * stock de forma condicional (WHERE stock >= 1) para evitar sobreventa.
+ *
+ * Es idempotente: solo aplica cuando el pedido sigue en pago_estado='pendiente',
+ * así un webhook reentregado o la página de éxito no descuentan dos veces.
+ *
+ * @param PDO    $pdo            Conexión activa
+ * @param string $codigo_pedido  Código que agrupa las líneas del pedido
+ * @param string $referencia     id del Payment Intent / sesión de Checkout
+ * @return array ['aplicado' => bool, 'lineas' => int, 'fallos' => int]
+ */
+function confirmar_pago_producto($pdo, $codigo_pedido, $referencia) {
+    $stmt = $pdo->prepare("SELECT id, producto_id, tienda_id FROM pedidos WHERE codigo_pedido = ? AND pago_estado = 'pendiente'");
+    $stmt->execute([$codigo_pedido]);
+    $lineas = $stmt->fetchAll();
+
+    if (!$lineas) {
+        return ['aplicado' => false, 'lineas' => 0, 'fallos' => 0];
+    }
+
+    $pdo->beginTransaction();
+    $stmtStock = $pdo->prepare("UPDATE productos SET stock = stock - 1 WHERE id = ? AND tienda_id = ? AND stock >= 1");
+    $fallos = 0;
+    foreach ($lineas as $linea) {
+        if (!empty($linea['producto_id'])) {
+            $stmtStock->execute([$linea['producto_id'], $linea['tienda_id']]);
+            if ($stmtStock->rowCount() === 0) $fallos++;
+        }
+    }
+    $stmtPagado = $pdo->prepare("UPDATE pedidos SET pago_estado = 'pagado', pago_referencia = COALESCE(?, pago_referencia) WHERE codigo_pedido = ?");
+    $stmtPagado->execute([$referencia ?: null, $codigo_pedido]);
+    $pdo->commit();
+
+    return ['aplicado' => true, 'lineas' => count($lineas), 'fallos' => $fallos];
+}
+
+/**
+ * Marca el pago de un pedido como fallido (sin tocar stock, que aún no se
+ * descontó). Idempotente: solo afecta pedidos en 'pendiente'.
+ */
+function marcar_pago_fallido($pdo, $codigo_pedido) {
+    $stmt = $pdo->prepare("UPDATE pedidos SET pago_estado = 'fallido' WHERE codigo_pedido = ? AND pago_estado = 'pendiente'");
+    $stmt->execute([$codigo_pedido]);
+    return $stmt->rowCount() > 0;
 }
 
 // Página de error amigable

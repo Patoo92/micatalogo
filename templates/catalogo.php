@@ -397,6 +397,13 @@
             <button id="btnWhatsAppCart" class="btn btn-success w-100 py-2 fw-bold btn-icon">
                 <iconify-icon icon="mdi:whatsapp" width="18"></iconify-icon> Enviar Pedido por WhatsApp
             </button>
+            <?php if (pagos_online_habilitados($tienda)): ?>
+                <div class="text-center my-1 small text-muted">— o pagá online —</div>
+                <button id="btnPagarOnline" class="btn btn-primary w-100 py-2 fw-bold btn-icon">
+                    <iconify-icon icon="mdi:credit-card-check-outline" width="18"></iconify-icon> Pagar ahora (tarjeta)
+                </button>
+                <p class="small text-muted text-center mb-0 mt-1">Pago seguro procesado por Stripe.</p>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -584,6 +591,53 @@ function enviarWhatsApp() {
         });
 }
 
+function pagarOnline() {
+    const nombre = document.getElementById('cartNombre').value.trim();
+    const email = document.getElementById('cartEmail').value.trim();
+
+    if (!nombre) {
+        document.getElementById('cartNombre').classList.add('is-invalid');
+        return;
+    }
+    document.getElementById('cartNombre').classList.remove('is-invalid');
+
+    if (!carrito || carrito.length === 0) {
+        alert('Tu carrito está vacío.');
+        return;
+    }
+
+    const btn = document.getElementById('btnPagarOnline');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Redirigiendo a pago seguro...';
+
+    // Se arma un <form> real y se envía con submit(), no con fetch(),
+    // porque crear-checkout.php responde con una redirección HTTP hacia
+    // Stripe Checkout (o una página de error HTML), no con JSON.
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'crear-checkout.php';
+    form.style.display = 'none';
+
+    const campos = {
+        '_csrf': csrfToken,
+        'nombre_cliente': nombre,
+        'email_cliente': email,
+        'slug': tiendaSlug,
+        'items': JSON.stringify(carrito),
+    };
+
+    for (const [nombreCampo, valor] of Object.entries(campos)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = nombreCampo;
+        input.value = valor;
+        form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
 /* --- buscador en vivo (solo si no hay búsqueda servidor) --- */
 var searchInput = document.getElementById('searchInput');
 if (searchInput && !window.location.search.match(/[?&]q=/)) {
@@ -673,6 +727,7 @@ document.querySelectorAll('.btn-add-cart').forEach(function(btn) {
 });
 document.getElementById('btnToggleCart').addEventListener('click', toggleCart);
 document.getElementById('btnWhatsAppCart').addEventListener('click', enviarWhatsApp);
+document.getElementById('btnPagarOnline')?.addEventListener('click', pagarOnline);
 
 actualizarBadge();
 
