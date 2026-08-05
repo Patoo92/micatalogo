@@ -19,7 +19,7 @@ $tienda_id = $_SESSION['tienda_id'];
 try {
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("SELECT producto_id, estado FROM pedidos WHERE id = ? AND tienda_id = ? FOR UPDATE");
+    $stmt = $pdo->prepare("SELECT producto_id, estado, metodo_pago, pago_estado FROM pedidos WHERE id = ? AND tienda_id = ? FOR UPDATE");
     $stmt->execute([$pedido_id, $tienda_id]);
     $pedido = $stmt->fetch();
 
@@ -33,12 +33,17 @@ try {
         mostrar_error("El pedido ya fue procesado", "Solo se pueden cancelar pedidos Pendientes.", "pedidos.php", "Volver a pedidos");
     }
 
-    $stmtUpd = $pdo->prepare("UPDATE pedidos SET estado = 'Cancelado' WHERE id = ?");
+    $stmtUpd = $pdo->prepare("UPDATE pedidos SET estado = 'Cancelado', pago_estado = IF(metodo_pago = 'stripe', 'cancelado', pago_estado) WHERE id = ?");
     $stmtUpd->execute([$pedido_id]);
 
-    if ($pedido['producto_id'] !== null) {
-        $stmtStock = $pdo->prepare("UPDATE productos SET stock = stock + 1 WHERE id = ?");
-        $stmtStock->execute([$pedido['producto_id']]);
+    // A2: restituir SOLO si el stock se descontó antes:
+    //  - whatsapp: se descontó al crear el pedido
+    //  - stripe: se descontó al confirmarse el pago (pago_estado='pagado')
+    // Un pedido stripe pendiente de pago nunca descontó stock → no restituir.
+    $descontado = $pedido['metodo_pago'] === 'whatsapp' || $pedido['pago_estado'] === 'pagado';
+    if ($pedido['producto_id'] !== null && $descontado) {
+        $stmtStock = $pdo->prepare("UPDATE productos SET stock = stock + 1 WHERE id = ? AND tienda_id = ?");
+        $stmtStock->execute([$pedido['producto_id'], $tienda_id]);
     }
 
     $pdo->commit();

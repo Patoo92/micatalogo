@@ -17,10 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($tienda) {
             $token = bin2hex(random_bytes(32));
-            $stmt = $pdo->prepare("UPDATE password_resets SET usado = 1 WHERE email = ? AND usado = 0");
-            $stmt->execute([$email]);
-            $stmt = $pdo->prepare("INSERT INTO password_resets (email, token) VALUES (?, ?)");
-            $stmt->execute([$email, $token]);
+            $stmt = $pdo->prepare("UPDATE password_resets SET usado = 1 WHERE tienda_id = ? AND email = ? AND usado = 0");
+            $stmt->execute([$tienda['id'], $email]);
+            $stmt = $pdo->prepare("INSERT INTO password_resets (tienda_id, email, token) VALUES (?, ?, ?)");
+            $stmt->execute([$tienda['id'], $email, $token]);
 
             $host = $_SERVER['HTTP_HOST'] ?? '';
             if (!preg_match('/^[a-z0-9\.\-:]+$/i', $host)) { $host = 'localhost'; }

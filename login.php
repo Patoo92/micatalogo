@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = trim($_POST['password']);
 
         if (!empty($usuario) && !empty($password)) {
-            $stmt = $pdo->prepare("SELECT id, nombre_tienda, slug, password, activo, marca_blanca, plan, trial_ends_at, tema_admin FROM tiendas WHERE usuario = ?");
+            $stmt = $pdo->prepare("SELECT id, nombre_tienda, slug, password, activo, marca_blanca, plan, trial_ends_at, tema_admin, email, stripe_subscription_id FROM tiendas WHERE usuario = ?");
             $stmt->execute([$usuario]);
             $tienda = $stmt->fetch();
 
@@ -31,12 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = "Tu cuenta está suspendida. Contacta con soporte para reactivarla.";
                 } else {
                     $plan_actual = $tienda['plan'] ?? 'starter';
-                    if ($plan_actual !== 'starter' && !empty($tienda['trial_ends_at']) && $tienda['trial_ends_at'] < date('Y-m-d')) {
+                    // A4a: solo degradar si NO hay suscripción activa (un cliente que
+                    // paga no puede ser degradado aunque el trial haya vencido).
+                    if ($plan_actual !== 'starter' && empty($tienda['stripe_subscription_id'])
+                        && !empty($tienda['trial_ends_at']) && $tienda['trial_ends_at'] <= date('Y-m-d')) {
                         $pdo->prepare("UPDATE tiendas SET plan = 'starter', marca_blanca = 0 WHERE id = ?")->execute([$tienda['id']]);
                         $plan_actual = 'starter';
+                        $tienda['marca_blanca'] = 0;
                         $_SESSION['flash_message'] = 'Tu período de prueba ha finalizado. Has sido cambiado al plan Starter.';
                         $_SESSION['flash_type'] = 'warning';
-                    } elseif ($plan_actual !== 'starter' && !empty($tienda['trial_ends_at'])) {
+                    } elseif ($plan_actual !== 'starter' && empty($tienda['stripe_subscription_id']) && !empty($tienda['trial_ends_at'])) {
                         $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
                         $dias_restantes = (strtotime($tienda['trial_ends_at']) - time()) / 86400;
                         if ($dias_restantes <= 3 && $dias_restantes > 0 && empty($_SESSION['_trial_notified'])) {

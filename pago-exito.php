@@ -36,7 +36,15 @@ if (!empty($codigo)) {
             $monto  = $pedido['monto_total'];
         } elseif (!empty($session_id)) {
             $session = stripe_obtener_sesion_checkout($session_id);
-            if ($session && ($session->payment_status ?? '') === 'paid') {
+            $moneda_coincide = empty($pedido['moneda_pago'])
+                || strtolower($session->currency ?? '') === strtolower($pedido['moneda_pago']);
+            $pago_valido = $session
+                && ($session->payment_status ?? '') === 'paid'
+                && ($session->metadata['codigo_pedido'] ?? '') === $codigo
+                && (int)$session->amount_total === (int)round((float)$pedido['monto_total'] * 100)
+                && $moneda_coincide;
+
+            if ($pago_valido) {
                 $res = confirmar_pago_producto($pdo, $codigo, $session->id);
                 $pagado = true;
                 $monto  = $pedido['monto_total'];

@@ -55,7 +55,7 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Nueva contraseña <span class="text-muted">(dejar vacío para mantener)</span></label>
-                    <input type="password" name="password" class="form-control" minlength="8">
+                    <input type="password" name="password" class="form-control" minlength="10">
                 </div>
 
                 <h6 class="fw-bold mb-2">Permisos</h6>

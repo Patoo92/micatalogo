@@ -13,6 +13,12 @@ $staff_id = (int)$_GET['id'];
 $error = '';
 $exito = '';
 
+if (isset($_SESSION['staff_id'])) {
+    http_response_code(403);
+    mostrar_error("Acceso denegado", "Solo el dueño puede gestionar el staff.", "admin.php", "Volver");
+    exit;
+}
+
 $stmt = $pdo->prepare("SELECT * FROM store_staff WHERE id = ? AND tienda_id = ?");
 $stmt->execute([$staff_id, $tienda_id]);
 $staff = $stmt->fetch();
@@ -42,10 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         if (!empty($password)) {
-            if (strlen($password) < 8) {
-                $error = "La contraseña debe tener al menos 8 caracteres.";
+            if (strlen($password) < 10) {
+                $error = "La contraseña debe tener al menos 10 caracteres.";
             } else {
-                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
                 $stmt = $pdo->prepare("UPDATE store_staff SET email = ?, password = ?, permisos = ? WHERE id = ? AND tienda_id = ?");
                 $stmt->execute([$email ?: null, $hash, json_encode($nuevos_permisos), $staff_id, $tienda_id]);
             }

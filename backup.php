@@ -6,6 +6,10 @@ header('Content-Type: text/plain; charset=utf-8');
 
 if (isset($_SESSION['admin_id'])) {
     $es_admin = true;
+} elseif (isset($_SESSION['tienda_id']) && isset($_SESSION['staff_id'])) {
+    http_response_code(403);
+    mostrar_error("Acceso denegado", "Solo el dueño puede descargar el respaldo.", "admin.php", "Volver");
+    exit;
 } elseif (isset($_SESSION['tienda_id'])) {
     $es_admin = false;
 } else {
@@ -52,7 +56,7 @@ if ($es_admin) {
 
     echo "-- Respaldo de tienda: $tienda_nombre (ID: $tienda_id)\n";
     echo "-- Fecha: " . date('Y-m-d H:i:s') . "\n";
-    echo "-- ATENCIÓN: Este respaldo incluye datos de staff (usuarios, contraseñas hasheadas, permisos).\n";
+    echo "-- ATENCIÓN: Este respaldo incluye datos de staff (usuarios, permisos) SIN contraseñas hasheadas.\n";
     echo "-- Comparte este archivo solo con personas de confianza.\n\n";
 
     echo "SET NAMES utf8mb4;\n\n";
@@ -64,7 +68,7 @@ if ($es_admin) {
     echo "# Datos de tienda\n";
     echo "UPDATE tiendas SET nombre_tienda = " . $pdo->quote($tienda['nombre_tienda']) . " WHERE id = $tienda_id;\n\n";
 
-    foreach (['categorias', 'productos', 'pedidos', 'store_staff', 'actividad'] as $tabla) {
+    foreach (['categorias', 'productos', 'pedidos', 'actividad'] as $tabla) {
         $stmt = $pdo->prepare("SELECT * FROM $tabla WHERE tienda_id = ?");
         $stmt->execute([$tienda_id]);
         $rows = $stmt->fetchAll();
@@ -77,6 +81,22 @@ if ($es_admin) {
                 return $v === null ? 'NULL' : $pdo->quote($v);
             }, array_values($row));
             echo "INSERT INTO $tabla (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $vals) . ");\n";
+        }
+        echo "\n";
+    }
+
+    // Staff SIN contraseñas: se respaldan usuario/email/permisos, nunca el hash.
+    $stmt = $pdo->prepare("SELECT id, tienda_id, usuario, email, activo, permisos, created_at FROM store_staff WHERE tienda_id = ?");
+    $stmt->execute([$tienda_id]);
+    $rows = $stmt->fetchAll();
+    if (count($rows) > 0) {
+        echo "# Tabla: store_staff (" . count($rows) . " registros, sin contraseñas)\n";
+        foreach ($rows as $row) {
+            $cols = array_keys($row);
+            $vals = array_map(function($v) use ($pdo) {
+                return $v === null ? 'NULL' : $pdo->quote($v);
+            }, array_values($row));
+            echo "INSERT INTO store_staff (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $vals) . ");\n";
         }
         echo "\n";
     }

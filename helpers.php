@@ -164,7 +164,7 @@ function verificar_limite_plan($caracteristica, $actual, $titulo = 'Límite del 
  * @return array ['aplicado' => bool, 'lineas' => int, 'fallos' => int]
  */
 function confirmar_pago_producto($pdo, $codigo_pedido, $referencia) {
-    $stmt = $pdo->prepare("SELECT id, producto_id, tienda_id FROM pedidos WHERE codigo_pedido = ? AND pago_estado = 'pendiente'");
+    $stmt = $pdo->prepare("SELECT id, producto_id, tienda_id FROM pedidos WHERE codigo_pedido = ? AND pago_estado = 'pendiente' AND estado = 'Pendiente'");
     $stmt->execute([$codigo_pedido]);
     $lineas = $stmt->fetchAll();
 

@@ -31,23 +31,29 @@ $filas = $stmt->fetchAll();
 
 $pedidos = [];
 foreach ($filas as $f) {
-    $clave = $f['nombre_cliente'] . '|' . date('Y-m-d H:i', strtotime($f['fecha_pedido']));
+    $codigo = !empty($f['codigo_pedido']) ? $f['codigo_pedido'] : null;
+    $clave  = $codigo ?: ($f['nombre_cliente'] . '|' . date('Y-m-d H:i', strtotime($f['fecha_pedido'])));
     if (!isset($pedidos[$clave])) {
         $pedidos[$clave] = [
             'nombre_cliente'  => $f['nombre_cliente'],
             'email_cliente'   => $f['email_cliente'],
             'fecha_pedido'    => $f['fecha_pedido'],
             'fecha_agrupada'  => $clave,
+            'codigo_pedido'   => $codigo,
             'items'           => [],
             'total'           => 0,
             'pendientes'      => 0,
             'ids_estados'     => [],
+            'pagos'           => [],
         ];
     }
     $pedidos[$clave]['items'][] = $f;
     $pedidos[$clave]['total'] += (float)($f['precio'] ?? 0);
     if ($f['estado'] === 'Pendiente') $pedidos[$clave]['pendientes']++;
     $pedidos[$clave]['ids_estados'][$f['id']] = $f['estado'];
+    $metodo = $f['metodo_pago'] ?? 'whatsapp';
+    $pagoe  = $f['pago_estado'] ?? 'pendiente';
+    $pedidos[$clave]['pagos'][$metodo] = $pedidos[$clave]['pagos'][$metodo] ?? $pagoe;
 }
 $pedidos = array_values($pedidos);
 ?>

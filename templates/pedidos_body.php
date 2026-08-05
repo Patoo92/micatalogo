@@ -73,6 +73,21 @@
                             <?php endif; ?>
                         </div>
                         <span class="badge bg-secondary badge-status"><?php echo $items_count; ?> producto<?php echo $items_count !== 1 ? 's' : ''; ?></span>
+                        <?php
+                            $badge_pago = '';
+                            foreach ($grupo['pagos'] as $metodo => $pagoe) {
+                                if ($metodo === 'stripe') {
+                                    if ($pagoe === 'pagado') {
+                                        $badge_pago = '<span class="badge bg-primary badge-status"><iconify-icon icon="mdi:credit-card-check" width="14"></iconify-icon> Pagado online</span>';
+                                    } elseif ($pagoe === 'cancelado') {
+                                        $badge_pago = '<span class="badge bg-danger badge-status"><iconify-icon icon="mdi:credit-card-remove" width="14"></iconify-icon> Pago cancelado</span>';
+                                    } else {
+                                        $badge_pago = '<span class="badge bg-warning text-dark badge-status"><iconify-icon icon="mdi:credit-card-clock" width="14"></iconify-icon> Pago pendiente</span>';
+                                    }
+                                }
+                            }
+                            echo $badge_pago;
+                        ?>
                         <?php if ($todos_vendidos): ?>
                             <span class="badge bg-success badge-status"><iconify-icon icon="mdi:check-circle" width="14"></iconify-icon> Vendido</span>
                         <?php elseif ($todos_cancelados): ?>

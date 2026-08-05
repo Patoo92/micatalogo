@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($check->fetch()) {
             $error = "Ese usuario ya existe en tu tienda.";
         } else {
-            $hash = password_hash($password, PASSWORD_BCRYPT);
+            $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
             $stmt = $pdo->prepare("INSERT INTO store_staff (tienda_id, usuario, password, email, permisos) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$tienda_id, $usuario, $hash, $email ?: null, json_encode($permisos)]);
 

@@ -20,7 +20,7 @@ $tienda_id = $_SESSION['tienda_id'];
 try {
     $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("SELECT producto_id, estado, nombre_cliente, email_cliente FROM pedidos WHERE id = ? AND tienda_id = ? FOR UPDATE");
+    $stmt = $pdo->prepare("SELECT producto_id, estado, metodo_pago, pago_estado, nombre_cliente, email_cliente FROM pedidos WHERE id = ? AND tienda_id = ? FOR UPDATE");
     $stmt->execute([$pedido_id, $tienda_id]);
     $pedido = $stmt->fetch();
 
@@ -29,11 +29,18 @@ try {
         $nombre_cliente = $pedido['nombre_cliente'];
         $email_cliente_pedido = $pedido['email_cliente'];
 
-        $stmtUpdatePedido = $pdo->prepare("UPDATE pedidos SET estado = 'Vendido' WHERE id = ?");
+        $stmtUpdatePedido = $pdo->prepare("UPDATE pedidos SET estado = 'Vendido', pago_estado = IF(metodo_pago = 'stripe', 'pagado', pago_estado) WHERE id = ?");
         $stmtUpdatePedido->execute([$pedido_id]);
 
-        $stmtUpdateStock = $pdo->prepare("UPDATE productos SET stock = stock - 1 WHERE id = ? AND stock > 0");
-        $stmtUpdateStock->execute([$producto_id]);
+        // A2: no descontar dos veces. El stock ya se descontó:
+        //  - whatsapp: al crear el pedido (hacer-pedido/guardar-pedido)
+        //  - stripe: al confirmarse el pago (webhook/pago-exito)
+        // Solo si es stripe y aún no se pagó se descuenta aquí (venta manual).
+        $descontar = $pedido['metodo_pago'] === 'stripe' && $pedido['pago_estado'] !== 'pagado';
+        if ($producto_id !== null && $descontar) {
+            $stmtUpdateStock = $pdo->prepare("UPDATE productos SET stock = GREATEST(stock - 1, 0) WHERE id = ? AND tienda_id = ?");
+            $stmtUpdateStock->execute([$producto_id, $tienda_id]);
+        }
     }
 
     $pdo->commit();

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmtCheck->fetch()) {
             $error = "El nombre de URL o el usuario ya están en uso. Elige otros.";
         } else {
-            $hash = password_hash($password, PASSWORD_BCRYPT);
+            $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
             $stmt = $pdo->prepare("
                 INSERT INTO tiendas (nombre_tienda, slug, usuario, password, telefono_whatsapp, email, activo, plan, trial_ends_at)

@@ -28,6 +28,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "La nueva contraseña debe tener al menos 10 caracteres.";
     } elseif ($nueva !== $confirmar) {
         $error = "Las contraseñas nuevas no coinciden.";
+    } elseif (isset($_SESSION['staff_id'])) {
+        $stmt = $pdo->prepare("SELECT password FROM store_staff WHERE id = ? AND tienda_id = ?");
+        $stmt->execute([$_SESSION['staff_id'], $tienda_id]);
+        $staff = $stmt->fetch();
+
+        if (!$staff || !password_verify($actual, $staff['password'])) {
+            $error = "La contraseña actual no es correcta.";
+            registrar_intento_login($pdo, 'cambio_password');
+        } else {
+            $hash = password_hash($nueva, PASSWORD_BCRYPT, ['cost' => 12]);
+            $stmt = $pdo->prepare("UPDATE store_staff SET password = ? WHERE id = ? AND tienda_id = ?");
+            $stmt->execute([$hash, $_SESSION['staff_id'], $tienda_id]);
+
+            $usuario = obtener_usuario_actual();
+            registrar_actividad($pdo, $tienda_id, $usuario['nombre'], $usuario['tipo'], 'Cambió su contraseña');
+
+            $exito = "Contraseña actualizada correctamente.";
+        }
     } else {
         $stmt = $pdo->prepare("SELECT password FROM tiendas WHERE id = ?");
         $stmt->execute([$tienda_id]);
@@ -37,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "La contraseña actual no es correcta.";
             registrar_intento_login($pdo, 'cambio_password');
         } else {
-            $hash = password_hash($nueva, PASSWORD_BCRYPT);
+            $hash = password_hash($nueva, PASSWORD_BCRYPT, ['cost' => 12]);
             $stmt = $pdo->prepare("UPDATE tiendas SET password = ? WHERE id = ?");
             $stmt->execute([$hash, $tienda_id]);
 

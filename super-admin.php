@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmtCheck->fetch()) {
                 $error_msg = 'El slug o el nombre de usuario ya están en uso.';
             } else {
-                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
                 $trial_ends_at = $dias_trial > 0 ? date('Y-m-d', strtotime("+$dias_trial days")) : null;
                 $stmt = $pdo->prepare("INSERT INTO tiendas (nombre_tienda, slug, usuario, password, telefono_whatsapp, email, plan, moneda, trial_ends_at, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
                 $stmt->execute([$nombre, $slug, $usuario, $hash, $whatsapp, $email ?: null, $plan, $moneda, $trial_ends_at]);

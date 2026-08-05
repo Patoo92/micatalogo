@@ -12,7 +12,7 @@ if (empty($token)) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND usado = 0 AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+$stmt = $pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND usado = 0 AND tienda_id IS NOT NULL AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
 $stmt->execute([$token]);
 $reset = $stmt->fetch();
 
@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reset) {
         } elseif ($password !== $confirm) {
             $error = "Las contraseñas no coinciden.";
         } else {
-            $hash = password_hash($password, PASSWORD_BCRYPT);
+            $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
             $pdo->beginTransaction();
             try {
-                $stmt = $pdo->prepare("UPDATE tiendas SET password = ? WHERE email = ?");
-                $stmt->execute([$hash, $reset['email']]);
+                $stmt = $pdo->prepare("UPDATE tiendas SET password = ? WHERE id = ?");
+                $stmt->execute([$hash, $reset['tienda_id']]);
                 $stmt = $pdo->prepare("UPDATE password_resets SET usado = 1 WHERE id = ?");
                 $stmt->execute([$reset['id']]);
                 $pdo->commit();
