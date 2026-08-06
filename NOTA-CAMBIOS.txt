@@ -1,0 +1,30 @@
+NOTA DE CAMBIOS - Sesión de verificación y correcciones
+
+1) FRONTEND PÚBLICO (index.php?tienda=tienda-test)
+   - .htaccess: eliminado el header CSP de fallback que se sumaba al CSP
+     con nonce de conexion.php y bloqueaba TODO el JavaScript (iconos
+     iconify rotos, modo oscuro, cambio cuadrícula/lista, botones
+     "Agregar"). Ahora la tienda funciona correctamente.
+   - helpers.php: imagen por defecto cambiada a placeholder de comida
+     (antes era una foto de moda).
+   - index.html (landing): agregado plan Enterprise, corregida la
+     descripción, eliminado el toggle anual (solo mensual).
+
+2) DATABASE (corregido doble-encoding / mojibake)
+   - character_set_server=latin1 + tablas utf8mb4 causaban textos
+     tipo "Hamburguesa ClÃ¡sica" y moneda "â‚¬". Reescritos en UTF-8:
+     productos, categorías, tiendas y moneda (€ correcta).
+   - Producto 22 (Empanada de Carne) actualizado con nueva imagen.
+
+3) PASARELA DE PAGO (plan business, verificado)
+   - Con la tienda en business el botón "Pagar ahora (tarjeta)" aparece.
+   - Flujo completo probado: crear-checkout.php -> Stripe Checkout (modo
+     pago) -> pedido queda "Pendiente/stripe", stock NO se descuenta
+     hasta confirmar el pago. Pedidos de prueba eliminados.
+   - Tienda devuelta a plan pro (como estaba antes de la prueba).
+
+4) TESTS
+   - PHPUnit: 100 tests, 202 assertions, OK.
+   - php -l en archivos modificados: sin errores.
+
+NOTAS 4 subido como excepción solicitada.

@@ -1,0 +1,282 @@
+================================================================================
+NOTAS 4 — CHECKLIST DE PRODUCCIÓN + PENDIENTES mi_catalogo (2026-08-05)
+================================================================================
+Proyecto: C:\Users\Usuario\Desktop\PROPIAS\mi_catalogo
+Stack: PHP 8.2+ vanilla, MySQL/MariaDB, Apache, Bootstrap 5.3, PHPMailer (Brevo), Stripe.
+Repositorio git: rama master, último commit 83bf886 "F5: Pagos online Stripe".
+OJO: el working tree TIENE CAMBIOS SIN COMMITEAR (parches C1,C2,C3,A1,A2,A4,A5,A6,A7
+aplicados hoy). PRIMERA ACCIÓN OBLIGATORIA: commitearlos antes de tocar otra cosa.
+
+================================================================================
+0) ACCIÓN INMEDIATA (hacer antes de cualquier deploy)
+================================================================================
+[ ] 1. Commitear los cambios actuales (parches de auditoría aplicados hoy):
+      git add -A
+      git commit -m "F5.1: parches auditoria C1-C3 y A1,A2,A4,A5,A6,A7 + migracion 010"
+      git push origin master
+      Archivos modificados hoy (15): backup.php, cambiar-password.php,
+      cancelar-pedido.php, completar-pedido.php, helpers.php, login.php,
+      pago-exito.php, pedidos.php, recuperar-admin.php, recuperar.php, registro.php,
+      reset-password.php, staff-editar.php, staff-nuevo.php, super-admin.php,
+      templates/pedidos_body.php, templates/staff_editar_body.php.
+      Nuevos: migrations/010_reset_cross_tenant.sql, templates/_form_cambiar_pass_admin.php.
+[ ] 2. Ojo: NOTAS 2.TXT, NOTAS 3.TXT y NOTAS.TXT están SIN trackear en el repo.
+      Decidir si subirlos o moverlos fuera (contienen hallazgos de seguridad:
+      NO conviene commitearlos en un repo público).
+
+================================================================================
+1) PENDIENTES DE CÓDIGO (orden de remediación recomendado)
+================================================================================
+
+=== A3 — stripe-success.php: activar plan desde metadata + idempotencia (ALTO) ===
+Archivo: stripe-success.php (59 líneas). Problemas actuales:
+  - NO actualiza tiendas.plan (el plan lo setea el webhook, pero la página de
+    retorno debería activarlo YA, no esperar al webhook).
+  - $tienda_id cae a GET (línea 11: ?tienda_id=) si falta metadata: IDOR. Validar
+    contra $_SESSION['tienda_id'] cuando exista sesión.
+  - INSERT de factura sin idempotencia: una recarga doble duplica facturas.
+Solución (de NOTAS 3):
+  $plan = in_array($session->metadata->plan ?? '', ['starter','pro','business','enterprise'])
+            ? $session->metadata->plan : 'pro';
+  $stmt = $pdo->prepare("UPDATE tiendas SET stripe_customer_id = ?, stripe_subscription_id = ?,
+                         plan = ?, trial_ends_at = NULL WHERE id = ?");
+  // factura idempotente: columna stripe_referencia VARCHAR(100) UNIQUE
+  INSERT INTO facturas (...) SELECT ... WHERE NOT EXISTS
+  (SELECT 1 FROM facturas WHERE stripe_referencia = ?)
+  Migración SQL necesaria (migrations/011_stripe_referencia.sql):
+  ALTER TABLE facturas ADD COLUMN stripe_referencia VARCHAR(100) NULL
+    AFTER metodo_pago, ADD UNIQUE KEY uq_stripe_ref (stripe_referencia);
+  Probar también: cuando el usuario ya está logueado, usar el tienda_id de sesión.
+
+=== C4 — MFA / TOTP (CRÍTICO deuda, sprint dedicado) ============================
+  - Añadir columna totp_secret VARCHAR(100) NULL en admins y en tiendas.
+  - En login-admin.php y login.php: si totp_secret != NULL, tras verificar password
+    guardar $_SESSION['mfa_pending_*'] y pedir código de 6 dígitos en un 2º paso.
+  - RFC 6238: base32_decode + hash_hmac('sha1', ...) truncado, ventana +/-1.
+  - Recomendado para el master (admins) al menos; opcional por tienda.
+
+=== M1 — API key en texto plano (MEDIA) ========================================
+  configuracion.php:41-42 guarda la API key tal cual en tiendas.api_key.
+  - Opción simple: mostrarla 1 sola vez al generarla y luego ocultarla (ej: solo
+    últimos 4 chars + botón "regenerar" que invalida la anterior).
+  - A futuro: hash HMAC o cifrado con clave de entorno.
+
+=== M2 — stripe-checkout.php: sesión para tienda_id arbitrario (MEDIA) ==========
+  stripe-checkout.php:16 usa tienda_id de GET/POST sin validar sesión.
+  - Si no hay sesión de tienda logueada, redirigir a login o validar pertenencia.
+
+=== M4 — stripe-success.php:7-8 tienda_id desde GET (MEDIA) =====================
+  Ya cubierto en A3: validar contra $_SESSION['tienda_id'].
+
+=== M6 — super-admin.php:87 $plan sin whitelist (MEDIA) =========================
+  super-admin.php cambia plan con valor libre.
+  - Validar: $plan = in_array($plan, ['starter','pro','business','enterprise']) ? $plan : 'starter';
+
+=== M7 — api.php:6 poca rate limiting + clave en GET (MEDIA) ====================
+  - La API key viajando en query string se loguea en los access logs.
+  - Aceptar la clave en header 'X-API-Key' (y mantener GET por compatibilidad).
+  - Subir rate limit de api_productos o revisar que 60/1min baste.
+
+=== M8 — schema.sql login_attempts.tipo ENUM incompleto (MEDIA) =================
+  schema.sql:244 tiene ENUM('login','owner','staff','admin','registro','guardar_pedido')
+  pero el código usa además 'cambio_password', 'api_productos' y 'slug_lookup'
+  (helpers.php verificar_rate_limit). Con EMULATE_PREPARES=false un INSERT con
+  tipo fuera del ENUM lanza error en MySQL (en la BD viva es varchar, funciona).
+  Migración SQL (migrations/012_login_attempts_tipo.sql):
+  ALTER TABLE login_attempts MODIFY tipo VARCHAR(50) NOT NULL DEFAULT 'login';
+  (o ampliar el ENUM). Alinear schema.sql al final.
+
+=== M5 — cancelar-pedido restitución (MEDIA) ====================================
+  CERRADO con A2 (ya aplicado hoy): ahora restituye solo si el stock se descontó
+  antes (whatsapp o stripe ya pagado) y marca pago_estado='cancelado'.
+  PENDIENTE dentro de M5: reembolso Stripe real al cancelar un pago 'pagado'
+  (TODO en cancelar-pedido.php: añadir refund via Stripe).
+
+=== M3 — producto.php sin "Pagar ahora" (MEDIA) =================================
+  La página individual de producto no ofrece pago online directo (solo carrito).
+  - Decisión de producto: agregar botón "Pagar ahora" (crear-checkout con 1 item)
+    o documentar como fuera de alcance.
+
+=== M9 — dev/productivo mismo repo (MEDIA) ======================================
+  Se resuelve con el deploy: usar .env distinto en producción y NO subir la BD
+  de desarrollo. Ver sección 3.
+
+=== M10 — toggle de pagos online por tienda (MEDIA) =============================
+  Hoy solo hay gate por plan (business/enterprise). Agregar switch en
+  configuración "Aceptar pagos online" por tienda si se desea deshabilitar por
+  tienda sin bajar de plan.
+
+=== Bajos (B10-B17) =============================================================
+  B10 sitemap.php:19-23 — Host header poisoning: usar SITE_URL (env) en vez de
+    confiar en HTTP_HOST para la URL base del sitemap.
+  B11 reset-password.php:43,77 — link de éxito pasa por htmlspecialchars y se
+    rompe; usar flash + href sin escapar el href completo.
+  B12 pedidos_body.php:6,19 — estado/stock consultados por producto en cada
+    render; no urgente.
+  B13 pedidos.php:50 — email_cliente sin escapar (si se exportara a CSV);
+    agregar htmlspecialchars o fputcsv.
+  B14 email_helper.php:12 — SMTP_PASS via getenv(); en producción definir en el
+    entorno real (no .env) para evitar leak si .env se sirve por error.
+  B17 admin.php:16 — $row['moneda'] sin validar $row; agregar guard.
+  B15/B16 — requieren verificación (pendientes del informe previo).
+
+================================================================================
+2) OPERATIVO / PROCESO (A8 y A9 de la auditoría)
+================================================================================
+
+=== A8 — Backups operativos (ALTO) ==============================================
+[ ] mysqldump diario CIFRADO (gpg/openssl) + copia FUERA del servidor
+    (S3 compatible / Google Drive / otro proveedor).
+[ ] Definir RPO (pérdida máxima aceptable) y RTO (tiempo de restauración).
+[ ] Script de restauración PROBADO (no sirve un backup que no se puede volcar).
+    Modelo de cron en Ubuntu:
+    0 3 * * * mysqldump --single-transaction -u $DB_USER -p$DB_PASS $DB_NAME
+      | gzip | openssl enc -aes-256-cbc -pbkdf2 -pass pass:... > /backups/db.$(date +%F).sql.gz.enc
+[ ] Backup de la carpeta del proyecto (código + imágenes subidas) aparte.
+
+=== A9 — CI básico (.github/workflows/ci.yml) (PROCESO) =========================
+  on: [push, pull_request]
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: shivammathur/setup-php@v2
+          with: { php-version: 8.2, tools: composer }
+        - run: composer install
+        - run: find . -name '*.php' -not -path './vendor/*' -exec php -l {} \;
+        - run: vendor/bin/phpunit
+  NOTA: los tests usan una BD (tests/bootstrap.php). Configurar MySQL service en
+  CI o apuntar los tests a SQLite/BD de pruebas, y setear las variables de entorno
+  que exige conexion.php.
+
+================================================================================
+3) PASOS PARA SUBIR A PRODUCCIÓN (checklist en orden)
+================================================================================
+
+[ ] 1. Commitear y pushear los cambios actuales (sección 0).
+[ ] 2. Aplicar el parche A3 (es el único de código que bloquea salida real,
+       porque sin él la activación de plan depende del webhook y hay riesgo de
+       facturas duplicadas). Después commit.
+[ ] 3. Crear la BD de producción LIMPIA en el hosting y correr las migraciones
+       EN ORDEN: migrations/001_indices.sql ... 010_reset_cross_tenant.sql
+       (y 011/012 si aplicaste A3/M8).
+       NO usar la BD de desarrollo (tienda-test, plan pro, pedidos=0).
+[ ] 4. Si quieres una tienda inicial real, insertarla directamente o usar
+       registro.php en producción (definir precio real de los planes).
+[ ] 5. Configurar el .env de PRODUCCIÓN (o variables de entorno reales):
+       DB_HOST / DB_NAME / DB_USER / DB_PASS
+       SMTP_HOST=smtp-relay.brevo.com SMTP_PORT=587 SMTP_USER SMTP_PASS
+       SMTP_FROM (email remitente verificado en Brevo) SMTP_FROM_NAME
+       STRIPE_SECRET_KEY=sk_live_...  STRIPE_PUBLISHABLE_KEY=pk_live_...
+       STRIPE_TEST_MODE=false
+       STRIPE_PRICE_PRO_MENSUAL / _ANUAL, STRIPE_PRICE_BUSINESS_* / _ANUAL,
+       STRIPE_PRICE_ENTERPRISE_MENSUAL / _ANUAL   (IDs de PRODUCCIÓN)
+       MYSQLDUMP_PATH (ruta real del binario en el server)
+       SITE_URL=https://tudominio.com   CDN_URL (opcional, si usas CDN)
+       Confirmar que .env NO es accesible por web (.htaccess ya lo bloquea;
+       verificar en el hosting).
+[ ] 6. Stripe Dashboard (MODO LIVE):
+       - Products/Prices reales; copiar price IDs al .env.
+       - Developers → Webhooks → Add endpoint:
+         URL: https://tudominio.com/micatalogo/webhook-stripe.php
+         Eventos: checkout.session.completed, customer.subscription.updated,
+                  customer.subscription.deleted, invoice.paid,
+                  invoice.payment_failed, checkout.session.async_payment_failed
+       - Copiar el Signing secret (whsec_...) a STRIPE_WEBHOOK_SECRET.
+       - Customer Portal habilitado (Settings → Customer Portal).
+[ ] 7. Dominio + DNS + HTTPS:
+       - A record del dominio (y www) apuntando al server del hosting.
+       - Si tu plan lo requiere, registrar el dominio en tiendas.dominio.
+       - SSL/HTTPS obligatorio: el código asume cookies secure y HSTS.
+[ ] 8. Permisos de escritura: carpetas de subida de imágenes (uploads/),
+       logs/ deben ser escribibles por PHP (y NO ejecutables por web).
+[ ] 9. Smoke test en producción:
+       - Crear tienda de prueba con plan Pro (trial) y simular:
+         pedido WhatsApp (descuento stock OK), completar/cancelar,
+         login owner + staff, backup (dueño) 403 staff, reset password por email,
+         reset master (403 anónimo), cambiar password staff, recuperar-admin.
+       - Stripe test: comprar un plan con tarjeta de prueba 4242..., verificar
+         webhook recibido (Stripe Dashboard → Webhooks → ver eventos), factura
+         única, downgrade por trial, upgrade.
+       - Correr PHPUnit en CI o local contra la BD de producción? NO — los tests
+         deben correr contra BD de pruebas. Ver sección 2 (A9).
+[ ] 10. Monitorización: logs de PHP en logs/error.log, alerta de stock bajo ya
+       usa email. Opcional: UptimeRobot (gratis) para chequear el sitio.
+
+================================================================================
+4) QUÉ HOSTING ES IDEAL PARA ESTE PROYECTO (2026)
+================================================================================
+
+REQUISITOS MÍNIMOS DEL PROYECTO:
+- PHP 8.2+ (ideal 8.3) con extensiones: pdo_mysql, gd (con WebP para
+  thumbnails), mbstring, curl, openssl, fileinfo, intl (opcional).
+- MySQL 8 / MariaDB 10.6+.
+- Apache con mod_rewrite (o Nginx con rewrite equivalente) y soporte .htaccess.
+- Variables de entorno reales (el código las prefiere sobre .env).
+- Cron (para el backup A8). WHM/cPanel o acceso SSH.
+- HTTPS/SSL gratis (Let's Encrypt) y posibilidad de registrar dominios extra
+  (plan Business ofrece dominio personalizado).
+- SMTP saliente 587 (Brevo).
+
+RECOMENDACIÓN SEGÚN TU PERFIL:
+
+A) VPS (recomendado para este proyecto por ser SaaS multi-tenant con Stripe
+   webhook, cron y dominios personalizados):
+   - HETZNER CLOUD CX22 (2 vCPU / 4 GB RAM / 40 GB NVMe) ~4,5-5 €/mes:
+     MEJOR RELACIÓN PRECIO/RENDIMIENTO en Europa. Ubuntu 24.04 + Apache +
+     PHP 8.3-FPM + MariaDB + Certbot. Total control: cron, .env real, SSL,
+     múltiples dominios. Requiere saber administrar Linux.
+   - DIGITALOCEAN Droplet Premium ($7-12/mes, 1-2 vCPU, 1-2 GB RAM, NVMe):
+     ecosistema y documentación excelentes, facturación por segundo (2026),
+     sin data centers en LATAM.
+   - VULTR High Frequency (~$6/mes): red de data centers enorme, incluye
+     São Paulo y Santiago (mejor latencia para LATAM).
+   - IONOS / OVHcloud / Contabo: alternativas económicas europeas.
+
+B) Hosting COMPARTIDO gestionado (si NO quieres administrar un servidor):
+   - HOSTINGER (plans Premium/Cloud desde ~$3-4/mes): PHP 8.3, MySQL, hPanel
+     con SSH y cron, datacenter en São Paulo. El más fácil para no técnicos.
+     OJO: precios promocionales y renovación 3-5x; compromiso de 24-48 meses.
+   - CLOUDWAYS (desde ~$11/mes): capa administrada sobre DigitalOcean/Vultr.
+     Buen punto medio: te evitas el mantenimiento del SO sin perder control.
+
+C) PARA EVITAR: hosting compartido ultra-económico sin cron ni SSH (bloquea
+   webhooks de Stripe, backups A8 y .env reales). No sirve para este proyecto.
+
+RECOMENDACIÓN CONCRETA (si pudiera elegir yo):
+  → HETZNER CLOUD CX22 (Ubuntu 24.04) + Apache/PHP-FPM 8.3 + MariaDB + Certbot
+    + cron de backup cifrado (A8). Costo ~5 €/mes.
+  → SI PREFIERES NO ADMINISTRAR SERVIDOR: Hostinger Cloud o Cloudways, con la
+    misma stack.
+  → Data center: elegir el más cercano a TU audiencia (Europa o São Paulo).
+
+COMANDOS DE REFERENCIA PARA UN VPS UBUNTU 24.04 (Hetzner/DO/Vultr):
+  apt update && apt install -y apache2 mariadb-server php8.3 php8.3-fpm \
+    php8.3-mysql php8.3-gd php8.3-mbstring php8.3-curl php8.3-intl \
+    php8.3-xml php8.3-zip composer certbot python3-certbot-apache
+  a2enmod rewrite ssl headers expires
+  # subir el código a /var/www/micatalogo (git clone o rsync)
+  # crear BD + usuario MySQL, correr migraciones 001..010
+  # setear .env o variables de entorno (systemd/panel)
+  # certbot --apache -d tudominio.com -d www.tudominio.com
+  # cron: backup diario cifrado (A8)
+
+================================================================================
+5) RESUMEN: ¿QUÉ FALTA PARA PRODUCCIÓN?
+================================================================================
+CÓDIGO (bloqueante): A3 (stripe-success) — 1 hora.
+CÓDIGO (no bloqueante, agenda): C4 MFA, M1, M2, M6, M7, M8 (migración 011/012),
+  M5 refund, B10, B11, B17.
+OPS (necesario en prod): A8 backups, .env real, Stripe live + webhook, HTTPS/DNS.
+PROCESO: A9 CI (recomendado antes de tocar producción).
+INMEDIATO: commitear los parches de hoy (sección 0).
+
+Estimación realista para salir a producción con lo mínimo sólido:
+  1) commit parches (15 min)
+  2) A3 + migración 011 (1 h)
+  3) crear BD prod + migraciones (1 h)
+  4) .env + Stripe live + webhook + dominios + HTTPS (2-3 h)
+  5) smoke tests (1-2 h)
+  → ~1 día de trabajo. A8 (backup) se debe activar ANTES de producir (30 min).
+================================================================================

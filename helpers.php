@@ -11,7 +11,7 @@ function ruta_imagen($tienda_id) {
 }
 
 function imagen_defecto() {
-    return "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500";
+    return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80";
 }
 
 function imagen_url($path) {

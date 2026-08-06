@@ -157,7 +157,7 @@
             </p>
             <p class="mb-5" style="font-size: 1.1rem;">
                 <iconify-icon icon="mdi:rocket-launch" width="20" style="color:#10b981;"></iconify-icon>
-                Empieza gratis con el plan <strong>Starter</strong>, sin tarjeta. <strong>Pro</strong> y <strong>Business</strong> con 3 días de prueba.
+                Empieza gratis con el plan <strong>Starter</strong>, sin tarjeta. <strong>Pro</strong>, <strong>Business</strong> y <strong>Enterprise</strong> con 3 días de prueba.
             </p>
             <div class="mb-5">
                 <a href="registro.php" class="btn-custom bg-accent text-white me-3">Probar gratis 3 días</a>
@@ -231,20 +231,16 @@
     <section id="precios" class="container py-5 my-5">
         <div class="text-center mb-4">
             <h2 class="fw-bold display-6 mb-3">Planes simples, sin sorpresas</h2>
-            <p class="text-secondary fs-5 mb-4">Paga solo lo que necesitas. Starter gratis, Pro y Business con 3 días de prueba.</p>
-            <div class="toggle-container mb-5" id="billingToggle">
-                <a href="#" class="active" data-period="monthly">Mensual</a>
-                <a href="#" data-period="annual">Anual <span class="pill">-20%</span> <span style="font-size:0.65rem;background:#f59e0b;color:#000;padding:1px 6px;border-radius:8px;font-weight:700;">PRONTO</span></a>
-            </div>
+            <p class="text-secondary fs-5 mb-4">Paga solo lo que necesitas. Starter gratis, Pro, Business y Enterprise con 3 días de prueba.</p>
         </div>
 
         <div class="row g-4 justify-content-center">
-            <div class="col-xl-4 col-lg-6">
+            <div class="col-xl-3 col-lg-6">
                 <div class="pricing-card h-100 d-flex flex-column">
                     <h3 class="fw-bold mb-1">Starter</h3>
                     <p class="text-secondary mb-3" style="font-size:0.9rem;">Gratis, siempre</p>
                     <div class="mb-3">
-                        <span class="display-4 fw-bold">0€</span>
+                        <span class="display-4 fw-bold monthly-price">0€</span>
                         <span class="text-secondary">/ mes</span>
                     </div>
                     <ul class="feature-list text-start mb-4 flex-grow-1">
@@ -263,17 +259,15 @@
                 </div>
             </div>
 
-            <div class="col-xl-4 col-lg-6">
+            <div class="col-xl-3 col-lg-6">
                 <div class="pricing-card premium h-100 d-flex flex-column">
                     <div class="premium-badge">Más popular</div>
                     <h3 class="fw-bold mb-1">Pro</h3>
                     <p class="text-secondary mb-3" style="font-size:0.9rem;">Personalización completa</p>
                     <div class="mb-3">
                         <span class="display-4 fw-bold monthly-price">12€</span>
-                        <span class="annual-price d-none"><span class="display-4 fw-bold">9,60€</span></span>
                         <span class="text-secondary">/ mes</span>
                     </div>
-                    <div class="annual-note d-none text-accent fw-semibold small mb-2">Facturado 115,20€/año</div>
                     <ul class="feature-list text-start mb-4 flex-grow-1">
                         <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 1 tienda</li>
                         <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 3 staff <span class="pill">+3€/mes extra c/u</span></li>
@@ -291,16 +285,14 @@
                 </div>
             </div>
 
-            <div class="col-xl-4 col-lg-6">
+            <div class="col-xl-3 col-lg-6">
                 <div class="pricing-card h-100 d-flex flex-column">
                     <h3 class="fw-bold mb-1">Business</h3>
                     <p class="text-secondary mb-3" style="font-size:0.9rem;">Multi-tienda + marca blanca</p>
                     <div class="mb-3">
                         <span class="display-4 fw-bold monthly-price">19€</span>
-                        <span class="annual-price d-none"><span class="display-4 fw-bold">15,20€</span></span>
                         <span class="text-secondary">/ mes</span>
                     </div>
-                    <div class="annual-note d-none text-accent fw-semibold small mb-2">Facturado 182,40€/año</div>
                     <ul class="feature-list text-start mb-4 flex-grow-1">
                         <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 3 tiendas <span class="pill">+15€/mes extra c/u</span></li>
                         <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> 10 staff</li>
@@ -314,10 +306,30 @@
                     <a href="registro.php?plan=business" class="btn-custom bg-light text-dark border w-100 text-center d-block">Probar 3 días gratis</a>
                 </div>
             </div>
+
+            <div class="col-xl-3 col-lg-6">
+                <div class="pricing-card h-100 d-flex flex-column">
+                    <h3 class="fw-bold mb-1">Enterprise</h3>
+                    <p class="text-secondary mb-3" style="font-size:0.9rem;">Todo ilimitado + soporte dedicado</p>
+                    <div class="mb-3">
+                        <span class="display-4 fw-bold monthly-price">39€</span>
+                        <span class="text-secondary">/ mes</span>
+                    </div>
+                    <ul class="feature-list text-start mb-4 flex-grow-1">
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Tiendas y staff ilimitados</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> API ilimitada</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> Todo lo de Business</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> <strong>Marca blanca</strong> (sin branding)</li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> <strong>Dominio personalizado</strong></li>
+                        <li><iconify-icon icon="mdi:check" class="icon" width="18"></iconify-icon> <strong>Soporte dedicado</strong></li>
+                    </ul>
+                    <a href="registro.php?plan=enterprise" class="btn-custom bg-accent text-white w-100 text-center d-block">Probar 3 días gratis</a>
+                </div>
+            </div>
         </div>
 
         <p class="text-center text-secondary mt-4" style="font-size:0.85rem;">
-            Precios sin IVA. El plan Starter es gratuito para siempre. Pro y Business incluyen 3 días de prueba sin tarjeta.
+            Precios sin IVA. El plan Starter es gratuito para siempre. Pro, Business y Enterprise incluyen 3 días de prueba sin tarjeta.
         </p>
     </section>
 
@@ -356,36 +368,6 @@
         document.getElementById('cookiesDecline').addEventListener('click', function() {
             localStorage.setItem('cookies_consent', 'declined');
             document.getElementById('cookiesBanner').style.display = 'none';
-        });
-    })();
-    </script>
-
-    <script>
-    (function() {
-        var links = document.querySelectorAll('#billingToggle a');
-        var period = 'monthly';
-
-        function actualizar(p) {
-            period = p;
-            links.forEach(function(el) {
-                el.classList.toggle('active', el.dataset.period === p);
-            });
-            document.querySelectorAll('.monthly-price').forEach(function(el) {
-                el.classList.toggle('d-none', p !== 'monthly');
-            });
-            document.querySelectorAll('.annual-price').forEach(function(el) {
-                el.classList.toggle('d-none', p !== 'annual');
-            });
-            document.querySelectorAll('.annual-note').forEach(function(el) {
-                el.classList.toggle('d-none', p !== 'annual');
-            });
-        }
-
-        links.forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                actualizar(this.dataset.period);
-            });
         });
     })();
     </script>
