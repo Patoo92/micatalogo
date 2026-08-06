@@ -267,6 +267,11 @@
                 <a href="cambiar-password.php" class="btn btn-outline-warning w-100 btn-icon" style="font-weight: 600;">
                     <iconify-icon icon="mdi:lock-reset" width="18"></iconify-icon> Cambiar Contraseña
                 </a>
+                <?php if (!isset($_SESSION['staff_id'])): ?>
+                <a href="mfa-config.php" class="btn btn-outline-success w-100 btn-icon" style="font-weight: 600;">
+                    <iconify-icon icon="mdi:shield-key" width="18"></iconify-icon> Dos pasos (MFA)
+                </a>
+                <?php endif; ?>
             </div>
         </div>
 

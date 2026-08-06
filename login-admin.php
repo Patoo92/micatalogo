@@ -12,21 +12,62 @@ $flash_message = $_SESSION['flash_message'] ?? null;
 $flash_type = $_SESSION['flash_type'] ?? null;
 unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 
+require_once __DIR__ . '/totp_helper.php';
+
+// ── Flujo 2 pasos: paso 1 = usuario+contraseña, paso 2 = código TOTP ──
+// Si se viene de un envío de código (mfa_pending), NO se puede volver a
+// cambiar el usuario en la sesión pendiente: se valida contra lo ya verificado.
+$mfa_pending = $_SESSION['mfa_pending_admin'] ?? null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verificar_csrf($_POST['_csrf'] ?? '')) {
         $error = "Solicitud inválida.";
     } elseif (!verificar_rate_limit($pdo, 'admin', 5, 15)) {
         $error = "Demasiados intentos. Espera 15 minutos.";
+    } elseif (!empty($mfa_pending)) {
+        // ── PASO 2: validar el código TOTP ──
+        $codigo = trim($_POST['codigo'] ?? '');
+        if ($codigo === '') {
+            $error = "Introduce el código de 6 dígitos.";
+        } else {
+            $stmt = $pdo->prepare("SELECT totp_secret FROM admins WHERE id = ?");
+            $stmt->execute([$mfa_pending['admin_id']]);
+            $totp_secret = $stmt->fetchColumn();
+
+            if (!empty($totp_secret) && valida_codigo_totp($totp_secret, $codigo)) {
+                unset($_SESSION['mfa_pending_admin']);
+                limpiar_intentos_login($pdo, 'admin');
+                session_regenerate_id(true);
+                $_SESSION['_logout_token'] = bin2hex(random_bytes(32));
+                $_SESSION['admin_id']      = $mfa_pending['admin_id'];
+                $_SESSION['admin_usuario'] = $mfa_pending['admin_usuario'];
+                header("Location: super-admin.php");
+                exit;
+            }
+            registrar_intento_login($pdo, 'admin');
+            $error = "Código de verificación incorrecto.";
+        }
     } else {
+        // ── PASO 1: validar usuario y contraseña ──
         $usuario  = trim($_POST['usuario']);
         $password = trim($_POST['password']);
 
         if (!empty($usuario) && !empty($password)) {
-            $stmt = $pdo->prepare("SELECT id, usuario, password FROM admins WHERE usuario = ?");
+            $stmt = $pdo->prepare("SELECT id, usuario, password, totp_secret FROM admins WHERE usuario = ?");
             $stmt->execute([$usuario]);
             $admin = $stmt->fetch();
 
             if ($admin && password_verify($password, $admin['password'])) {
+                if (!empty($admin['totp_secret'])) {
+                    // MFA habilitado: pedir el código en un segundo paso.
+                    $_SESSION['mfa_pending_admin'] = [
+                        'admin_id'      => (int)$admin['id'],
+                        'admin_usuario' => $admin['usuario'],
+                        'created_at'    => time(),
+                    ];
+                    header("Location: login-admin.php");
+                    exit;
+                }
                 limpiar_intentos_login($pdo, 'admin');
                 session_regenerate_id(true);
                 $_SESSION['_logout_token'] = bin2hex(random_bytes(32));
@@ -42,6 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Rellena todos los campos.";
         }
     }
+}
+
+// Los pendientes MFA expiran a los 5 minutos por seguridad.
+if (!empty($mfa_pending) && (time() - $mfa_pending['created_at']) > 300) {
+    unset($_SESSION['mfa_pending_admin']);
+    $mfa_pending = null;
+    $error = "El código expiró. Vuelve a introducir tus credenciales.";
 }
 ?>
 <!DOCTYPE html>
@@ -79,6 +127,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             <?php endif; ?>
 
+            <?php if (!empty($mfa_pending)): ?>
+                <div class="alert alert-info d-flex align-items-center gap-2 py-2" style="font-size: 0.875rem;">
+                    <iconify-icon icon="mdi:shield-key" width="18"></iconify-icon>
+                    Contraseña verificada. Introduce el código de tu app de autenticación.
+                </div>
+                <form method="POST" action="login-admin.php">
+                    <?php echo csrf_field(); ?>
+                    <div class="mb-3">
+                        <label class="d-flex align-items-center gap-1"><iconify-icon icon="mdi:key-variant" width="16"></iconify-icon> Código de 6 dígitos</label>
+                        <input type="text" name="codigo" class="form-control mt-1" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required autofocus>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2">
+                        <iconify-icon icon="mdi:shield-check" width="18"></iconify-icon> Verificar código
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="logout-admin.php" class="text-decoration-none small text-secondary">Cancelar</a>
+                    </div>
+                </form>
+            <?php else: ?>
             <form method="POST" action="login-admin.php">
                 <?php echo csrf_field(); ?>
                 <div class="mb-3">
@@ -103,21 +170,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="recuperar-admin.php" class="text-decoration-none small text-secondary">¿Olvidaste la contraseña?</a>
                 </div>
             </form>
+            <?php endif; ?>
         </div>
     </div>
 
     <script nonce="<?= $csp_nonce ?>">
-        document.getElementById('btnTogglePass').addEventListener('click', function() {
-            const input = document.getElementById('adminPassword');
-            const icon = document.getElementById('eyeIcon');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.setAttribute('icon', 'mdi:eye-off-outline');
-            } else {
-                input.type = 'password';
-                icon.setAttribute('icon', 'mdi:eye-outline');
-            }
-        });
+        const btnTogglePass = document.getElementById('btnTogglePass');
+        if (btnTogglePass) {
+            btnTogglePass.addEventListener('click', function() {
+                const input = document.getElementById('adminPassword');
+                const icon = document.getElementById('eyeIcon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.setAttribute('icon', 'mdi:eye-off-outline');
+                } else {
+                    input.type = 'password';
+                    icon.setAttribute('icon', 'mdi:eye-outline');
+                }
+            });
+        }
     </script>
 </body>
 </html>

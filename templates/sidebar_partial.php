@@ -55,6 +55,14 @@
                         <span class="nav-link-title">Respaldo</span>
                     </a>
                 </li>
+                <?php if (!isset($_SESSION['staff_id'])): ?>
+                <li class="nav-item">
+                    <a class="nav-link<?php echo basename($_SERVER['PHP_SELF']) === 'mfa-config.php' ? ' active' : ''; ?>" href="mfa-config.php">
+                        <span class="nav-link-icon"><iconify-icon icon="mdi:shield-key" width="18"></iconify-icon></span>
+                        <span class="nav-link-title">Dos pasos (MFA)</span>
+                    </a>
+                </li>
+                <?php endif; ?>
             </ul>
             <ul class="navbar-nav mt-auto">
                 <li class="nav-item">

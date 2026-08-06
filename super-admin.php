@@ -204,6 +204,7 @@ $total_facturas_pendientes = $pdo->query("SELECT COUNT(*) FROM facturas WHERE es
         <div class="d-flex align-items-center gap-3">
             <span class="text-secondary" style="font-size: 0.85rem;">Sesión: <strong class="text-light"><?php echo htmlspecialchars($_SESSION['admin_usuario']); ?></strong></span>
             <a href="backup.php" class="text-secondary text-decoration-none small" style="display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="mdi:database-export" width="16"></iconify-icon> Respaldo BD</a>
+            <a href="mfa-config.php" class="text-secondary text-decoration-none small" style="display:inline-flex;align-items:center;gap:4px;"><iconify-icon icon="mdi:shield-key" width="16"></iconify-icon> Dos pasos (MFA)</a>
             <a href="logout-admin.php?token=<?= $_SESSION['_logout_token'] ?? '' ?>" class="text-secondary text-decoration-none small">Cerrar sesión →</a>
         </div>
     </nav>
