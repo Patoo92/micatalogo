@@ -133,8 +133,6 @@ $prod_precio = number_format($producto['precio'], 2);
         .related-card:hover { transform: translateY(-6px); box-shadow: 0 14px 20px -4px rgba(0,0,0,0.1), 0 6px 10px -4px rgba(0,0,0,0.05) !important; }
         .related-card img { height: 180px; object-fit: cover; border-radius: 16px 16px 0 0; }
         .cart-badge { position: absolute; top: -4px; right: -6px; font-size: 0.6rem; padding: 2px 5px; border-radius: 50%; background: #ef4444; color: #fff; font-weight: 700; min-width: 18px; text-align: center; display: none; }
-        .cart-float { position: fixed; bottom: 24px; right: 24px; z-index: 999; }
-        .cart-float .btn { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; }
         .toast-container-custom { position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .toast.show { display: flex !important; }
         .offcanvas-backdrop { position: fixed; inset: 0; z-index: 1040; background: rgba(0,0,0,0.5); }
@@ -347,12 +345,6 @@ $prod_precio = number_format($producto['precio'], 2);
         </div>
     </div>
 </div>
-
-<a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $tienda['telefono_whatsapp'] ?? ''); ?>?text=<?php echo urlencode($tienda['mensaje_whatsapp'] ?? 'Hola, quiero pedir:'); ?>" target="_blank" class="text-decoration-none cart-float">
-    <button class="btn btn-success shadow-lg d-flex align-items-center justify-content-center">
-        <iconify-icon icon="mdi:whatsapp" width="24"></iconify-icon>
-    </button>
-</a>
 
 <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js" nonce="<?= $csp_nonce ?>"></script>
 <script nonce="<?= $csp_nonce ?>">

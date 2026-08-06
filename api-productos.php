@@ -26,7 +26,7 @@ $stmt->execute($params);
 $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($productos as &$p) {
-    $p['imagen'] = $p['imagen_thumb'] ?: $p['imagen_url'];
+    $p['imagen'] = imagen_url($p['imagen_thumb'] ?: $p['imagen_url']);
     $p['precio'] = (float)$p['precio'];
     $p['stock'] = (int)$p['stock'];
     unset($p['imagen_thumb'], $p['imagen_url']);

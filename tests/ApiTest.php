@@ -107,7 +107,7 @@ function _api_productos_obtener($pdo, $ids_raw, $tienda_id_param) {
     $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($productos as &$p) {
-        $p['imagen'] = $p['imagen_thumb'] ?: $p['imagen_url'];
+        $p['imagen'] = $p['imagen_thumb'] ?: $p['imagen_url'] ?: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
         $p['precio'] = (float)$p['precio'];
         $p['stock'] = (int)$p['stock'];
         unset($p['imagen_thumb'], $p['imagen_url']);

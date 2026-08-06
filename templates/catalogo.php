@@ -24,8 +24,6 @@
         .btn-icon { display: inline-flex; align-items: center; gap: 6px; }
         iconify-icon { vertical-align: -2px; display: inline-flex; }
         .cart-badge { position: absolute; top: -4px; right: -6px; font-size: 0.6rem; padding: 2px 5px; border-radius: 50%; background: #ef4444; color: #fff; font-weight: 700; min-width: 18px; text-align: center; display: none; }
-        .cart-float { position: fixed; bottom: 24px; right: 24px; z-index: 999; }
-        .cart-float .btn { width: 56px; height: 56px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; }
         .cart-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
         .cart-item:last-child { border-bottom: none; }
         .cart-item img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
@@ -95,13 +93,6 @@
         .search-wrapper .form-control:focus { background: #fff; border-color: var(--color-principal); box-shadow: 0 0 0 3px rgba(var(--color-principal), 0.1); }
         .search-wrapper .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
 
-        /* lightbox */
-        .lightbox-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; cursor: zoom-out; animation: fadeIn 0.2s ease; }
-        .lightbox-overlay.show { display: flex; }
-        .lightbox-overlay img { max-width: 90vw; max-height: 90vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: scaleIn 0.25s ease; }
-        .lightbox-overlay .lightbox-close { position: absolute; top: 16px; right: 24px; color: #fff; font-size: 2rem; cursor: pointer; background: none; border: none; opacity: 0.7; transition: opacity 0.2s; }
-        .lightbox-overlay .lightbox-close:hover { opacity: 1; }
-
         /* animaciones */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -157,11 +148,6 @@
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
         </div>
     </div>
-</div>
-
-<div class="lightbox-overlay" id="lightbox">
-    <button class="lightbox-close" id="lightboxClose">&times;</button>
-    <img id="lightboxImg" src="" alt="">
 </div>
 
 <nav class="navbar navbar-expand-lg navbar-light navbar-ecommerce sticky-top shadow-sm py-3">
@@ -233,7 +219,7 @@
                     <div class="product-card-img position-relative">
                         <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($prod['nombre']); ?>" loading="lazy">
                         <?php if (!empty($prod['etiqueta'])): ?>
-                        <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
+                        <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;color:#fff;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="card-body p-3">
@@ -305,9 +291,11 @@
                 <div class="col-6 col-md-4 product-item" data-nombre="<?php echo htmlspecialchars(strtolower($prod['nombre']), ENT_QUOTES, 'UTF-8'); ?>">
                     <div class="card h-100 product-card" style="animation-delay: <?php echo $i * 0.05; ?>s;">
                         <div class="position-relative product-card-img">
-                            <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($prod['nombre']); ?>" loading="lazy" data-img="<?php echo htmlspecialchars(imagen_url($prod['imagen_url']), ENT_QUOTES, 'UTF-8'); ?>">
+                            <a href="producto.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>&id=<?php echo $prod['id']; ?>" class="d-block">
+                                <img src="<?php echo htmlspecialchars(imagen_url($prod['imagen_thumb'] ?: $prod['imagen_url'])); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($prod['nombre']); ?>" loading="lazy">
+                            </a>
                             <?php if (!empty($prod['etiqueta'])): ?>
-                            <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
+                            <span class="position-absolute top-0 start-0 badge m-2" style="background:<?php echo $prod['etiqueta'] === 'Oferta' ? '#ef4444' : ($prod['etiqueta'] === 'Nuevo' ? '#10b981' : '#64748b'); ?>;font-size:0.75rem;color:#fff;"><?php echo htmlspecialchars($prod['etiqueta']); ?></span>
                             <?php endif; ?>
                             <div class="share-overlay">
                                 <button class="btn btn-share" data-url="producto.php?tienda=<?php echo htmlspecialchars($tienda['slug']); ?>&id=<?php echo $prod['id']; ?>" data-nombre="<?php echo htmlspecialchars($prod['nombre'], ENT_QUOTES, 'UTF-8'); ?>" title="Compartir">
@@ -653,24 +641,6 @@ if (searchInput && !window.location.search.match(/[?&]q=/)) {
         document.getElementById('searchEmpty').style.display = (term && !anyVisible) ? 'block' : 'none';
     });
 }
-
-/* --- lightbox --- */
-document.querySelectorAll('.card-img-top[data-img]').forEach(function(img) {
-    img.addEventListener('click', function() {
-        var lb = document.getElementById('lightbox');
-        document.getElementById('lightboxImg').src = this.dataset.img;
-        lb.classList.add('show');
-    });
-});
-document.getElementById('lightboxClose').addEventListener('click', function() {
-    document.getElementById('lightbox').classList.remove('show');
-});
-document.getElementById('lightbox').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('show');
-});
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('show');
-});
 
 /* --- compartir --- */
 document.querySelectorAll('.btn-share').forEach(function(btn) {
